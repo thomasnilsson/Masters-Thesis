@@ -1,0 +1,12 @@
+\section{Package Design and API}
+The software package is intended to be used by a Flutter developer and has to have an Application Programming Interface (API) that strikes the balance between being easy to use and concealing complexity from the programmer.
+
+\subsection{Pre-processing Features}
+It was chosen to give access to pre-processing features such as Stops, Moves and Places since these are very useful in on their own. Stops can be useful for compressing a dataset of raw GPS data into a much smaller and more coarse-grained dataset which captures where the user was stationary. Moves give an indication of accurate distances between stops and as such can be used to calculate distance travelled as well as velocity, while still compressing the dataset by a factor of over a thousand. Places can be used to pinpoint the main clusters the user stay at during the day. This can be very useful if combined with reverse geo-coding in which the geo-location of a place is converted to an address, which can then be further transformed into a place category such as school, work, grocery story, sports club and much more, which can give insights into what the user is actually spending their time on. The latter will not be part of this thesis though.
+
+\subsection{Features}
+The main content of the package is the Mobility features derived from the pre-processing features. 
+
+\subsection{Serialization}
+It was chosen to include a serialization API in the package since the algorithms rely on using historical data to compute the Routine Index. Otherwise the programmer would have to save this themselves, which is not very user friendly.
+

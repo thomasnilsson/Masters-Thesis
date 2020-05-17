@@ -1,0 +1,53 @@
+\input{preamble/static}
+
+%!TEX TS-program = xelatex
+%!TEX root = ../Thesis.tex
+\RequirePackage[l2tabu,orthodox]{nag} % Old habits die hard
+
+\newcommand{\papersizeswitch}[3]{\ifnum\strcmp{\papersize}{#1}=0#2\else#3\fi}
+\papersizeswitch{b5paper}{\def\classfontsize{10pt}}{\def\classfontsize{12pt}}
+
+\documentclass[\classfontsize,\papersize,twoside,showtrims,extrafontsizes]{memoir}
+
+\input{preamble/general}
+\input{preamble/fonts}
+\input{preamble/etc}
+
+\addbibresource{bibliography/Bibliography.bib}
+% SET NO INDENT
+\setlength{\parindent}{0pt}
+\begin{document}
+
+% \prefrontmatter
+% \include{prefrontmatter/titlepage}
+% \cleartoevenpage
+% \include{prefrontmatter/colophon}
+% \clearforchapter
+
+% \frontmatter
+% \include{frontmatter/Summary}
+% \include{frontmatter/Preface}
+% \include{frontmatter/Acknowledgements}
+% \clearforchapter
+% \tableofcontents
+% \clearforchapter
+% \mylistoftodos
+
+\mainmatter
+\input{chapters/01_introduction/010_chapter}
+\input{chapters/02_related_work/020-chapter}
+% \input{chapters/03_design/03_root}
+% \input{chapters/04_implementation/04-root}
+% \input{chapters/05_validation/05-root}
+% \input{chapters/06_discussion/06-root}
+% \input{chapters/07_conclusion/07-root}
+% \blinddocument
+
+\appendix
+\include{appendices/Acronyms}
+\include{appendices/depression}
+
+\backmatter
+\printbibliography
+
+\end{document}

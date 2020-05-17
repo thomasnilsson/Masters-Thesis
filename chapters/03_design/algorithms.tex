@@ -1,0 +1,38 @@
+\section{Algorithms}
+
+\subsection{Pre-processing}
+
+
+\subsection{Real-Time Routine Index}
+Inspired by the work of [Canzian et al. 2015] we computed a daily Routine Index describing how similar the mobility pattern of a given day is, compared to previous days. The Routine Index is a value between 0 and 1 and can be interpreted as a similarity measure were a low value means the day was very different from previous days while a high value means the day was highly similar to previous days.
+
+We derived a daily routine index based on the stops extracted according to the method described in the previous section. Given a history of stops, the Routine Index of a given day is computed as the mean of the distances to each day in the history. The distance between two days was computed as the mean over 24 hours where for each hour, if there was a stop in the same location during the two days, the hour was assigned a value of 0, otherwise the hour was assigned a value of 1. We included data available from the previous 28 days (4 weeks) in the history to compute the daily routine index.
+
+$$RI = \frac{\sum (A \cap B)}{\min (\sum A, \sum B)}$$
+
+The numerator $\sum (A \cap B)$ is defined as $\sum_{(i,j) , a_{ij}> 0, b_{ij} > 0} \min (a_{ij}, b_{ij})$.
+
+\subsection{Hour Matrix}
+The time distribution or Hour Matrix can be filled out either in a binary fashion where each stop is iterated and the time slots the stop covers has the entries set to 1, for the place of that stop. This also means that if a time slot contains two places, both of these entries are set to 1.
+
+A more fine-grained approach is to use fill the matrix out based on how many minutes was spent at a place, for each time slot, which can be done by using the arrival- and departure timestamp of each stop. This approach weighs the entries based on how much time was spent, rather than weighing all entries equally.
+
+\subsection{Changing Routines and Home Address}
+Most people will go on a vacation during the year, which means the place where they sleep changes during the year. Another example is if someone moves to another place, the place to sleep will in this case also change. A more general problem is that peoples' habits will inevitably change somewhat over time, which does not mean that they do not have a routine. Therefore it was chosen to base the routine index was chosen to be calculated based on the last 4 weeks of data only. 
+
+Another problem which will occur often, and therefore need to be accounted for, is when the user visits new places and the routine index has to be calculated. The solution here is to add the place to the old routine matrix and simply add a zero-column in the routine matrix to represent that place, since there has been no data for that place historically. 
+
+\subsection{Relying on Historical Data}
+In order to calculate the routine index we need to save and load the historical data somehow. Two approaches were considered.\\
+
+\textbf{\#1 Saving stops:} By saving all stops for the last 4 weeks, the places can be found by clustering the stops with DBSCAN, and a routine matrix for each day in the last 4 weeks can then be derived and averaged into a routine matrix for that period. Afterwards the routine index can be calculated as the error between today's hour matrix and the historical routine matrix. The author visited 72 stops in a week, which corresponds to around 300 stops for a 4 week period, which is a very manageable number of elements to cluster with DBSCAN.\\
+
+\textbf{\#2 Updating the historical routine matrix:} A historical routine matrix is kept saved on disk and is updated as a weighted average every time a new day's data has been collected and the hour matrix for that day has been calculated. The number of days which the routine matrix is based on will also be kept on the disk, in order to weigh the historical matrix when calculating the new average. However for this approach it becomes necessary to recalculate or at least compare today's places with the historical places every day, in order to keep track of whether the user spend time at a place which exists in the historical matrix, or if it was a completely new place. In this approach the places would need to be saved in addition to a matrix with 24 rows and columns corresponding to each place.
+
+\subsection{Incomplete Days}
+In addition, to make the routine index more meaningful in a real-time context, i.e. when requested at some point during the day, and not at 23:59, the calculation was chosen to only rely on historical data from midnight (00:00) to the current last recorded hour. This means the routine index may be high early in the day where the time distribution is likely to be very similar to the historical data, but as the day progresses, there will be more opportunities for the user to deviate from their routine. This can be useful later on if suggestions are to be given to the user; if the routine index falls below a certain threshold, a trigger can be set which will prompt the user to perform a specific action to get back on track.
+
+
+\subsection{Additional Features}
+We included some additional features described in the literature. The radius of gyration quantifies the area covered during a day and is defined as the deviation from the centroids of daily stops [Canzian et al. 2015]. When computing the radius of gyration, each distance is weighted by the time duration spent at that location. The standard deviation of displacements is computed as the standard deviation of distances between subsequent stops [Canzian et al. 2015]. The log location variance is the logarithm of the combined variance of the raw latitude and longitude values [Saeb et al. 2016]. The location entropy measures how time is distributed over different location and is computed as the entropy of time spent at different places during the day [Saeb et al. 2016].
+

@@ -1,0 +1,21 @@
+\section{Results}
+% Some theses, particularly PhDs, contain a section that summarizes the most important findings and casts these as contributions to the research field. These usually match the goals. They also include a short description as to why these findings are valuable.
+
+In this section, it will be addressed to which extent the research questions and goals were met.
+    
+\subsubsection*{Which mobility features are relevant to include in a software package?}
+The features described in \cite{Saeb2015} and \cite{extraction-of-behavioural-features} were implemented in Dart by using standard imperative language features such as loops and if-else clauses. Specifically, a set of intermediate features, namely\textit{ Stops}, \textit{Places}, and \textit{Moves}, were also implemented which aided in reducing the sheer amount of data processed by the feature-extraction algorithms. 
+
+The most important features pertaining to depression were Home Stay, Entropy/Normalized Entropy, and the Routine Index. All features except for the Routine Index can be evaluated on a daily basis without the need for historical data, and as such those features were implemented first and the Routine Index was implemented later. In addition to the features described by \cite{Saeb2015} which are evaluated daily, the features were also extended to aggregate features which are a daily feature averaged over a period of maximally 28 days, such as the average Home Stay percentage.
+
+\subsubsection*{How can these features be computed in real-time, on a smartphone device?}
+The Routine Index as well as the aggregate features, are calculated by storing the previously mentioned intermediate feature \textit{Stops} on the device. These features effectively serve as a compressed form of the raw dataset, which is saved on the device and does take up three orders of magnitude less space than the raw dataset would. This made it possible to calculate all features, even those which relied on historical data.
+
+\subsubsection*{How is a software package that includes the computation of these features be designed?}
+All the implementation details of the algorithms were hidden away from the programmer and a high abstraction level API was provided, with thorough documentation on its usage. Even the problem of saving intermediate features on the device, such that they may be used in the future, was handled with minimal need for the programmer to be involved. In the process of developing this app, the quality of the Mobility Features package was also improved both in the accuracy of the features but also in terms of the abstraction level of the API. However, a few abstraction-level decisions are still up for debate with regards to how \textit{open} the API should be, and whether or not the intermediate features should be part of it since they themselves contain sensitive information.
+
+\subsubsection*{Field Study}
+A field study with 10 participants was conducted in which a study app was developed in Flutter, in order to test the usage of the package. Due to Google restricting the Location API on Android shortly after the thesis began the app was only evaluated on iOS. In order to not spend too much time on things out of our control, the focus was put on distributing the app for iOS first and foremost. During the development of the application, the COVID-19 pandemic hit Europe, and therefore it was not possible to meet up with most of the participants physically. The demo application, therefore, had to be distributed digitally which was done via Apple's Testflight service, which ended up being a very good idea either way since it allowed for quick deployment of bug-fixes with minimal installation trouble to the users.
+
+
+

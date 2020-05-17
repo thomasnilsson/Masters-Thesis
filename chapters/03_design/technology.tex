@@ -1,0 +1,20 @@
+\section{Package Usage Considerations}
+\subsection{Flutter Plugins}
+Platforms channels, method channel and event channel\\
+Native implementation, send data to Flutter\\
+
+\subsection{Background Location Tracking}
+Android, iOS, permissions, flags\\
+For this thesis battery usage will not be considered\\
+User concerns, normally a user would not like to be tracked all the time\\
+The data stays on the phone, features are what is 'published'\\
+Notifications, app can die, user has to manually bring it to foreground every so often\\
+
+\subsection{Data Storage}
+While development of the application was still on-going the data collected on the phone had to be stored somewhere online in order to verify the output of the algorithms run in Python as well as on the phone. For this a FireBase file storage server was used which supports file uploads. A JSON file was uploaded each day, with the upload being triggered manually. 
+
+\subsection{Flutter and Cross Platform}
+Write in the Dart programming language\\
+Compile to native code\\
+Sensors and other API's not necessarily mirrored\\
+UI and most general things implemented by the Google team\\

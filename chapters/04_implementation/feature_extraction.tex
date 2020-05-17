@@ -1,0 +1,127 @@
+\begin{minted}{python}
+collect_data_continuously()
+on data_point:
+	save_to_disk(data_point)
+	if trigger:
+        points = load_todays_data_from_disk()
+		stops_hist, moves_hist = load_from_disk()
+		stops = stops_hist + find_stops(points)
+		moves = moves_hist + find_moves(stops, points)
+		features = feature_extraction(stops, places, moves)
+		# do something with the features
+		save_to_disk(stops, moves)
+\end{minted}
+
+\subsection{Feature Extraction}
+The feature extraction takes place after the data collection and pre-processing has been done, and will use the Stops, Places and Moves to derive the features described in Chapter ??. 
+
+\subsubsection{Number of Clusters}
+Defined as the number of non-negative place labels found by the Places algorithm.
+
+\begin{minted}{python}
+def num_clusters(places):
+    return len(places > 0)
+\end{minted}
+
+\subsubsection{Location Variance (LV)} 
+LV was computed as the natural logarithm of the sum of the statistical variances of the latitude and the longitude components of the location data. The dataset must contain at least 2 observations to calculate the variance, otherwise the variance of both the latitude- and the longitude will be zero, and thus $LV = log(0 + 0 + 1)  = 0$
+
+\begin{minted}{python}
+def location_variance(dataset):
+    return log(var(dataset.lat) + var(dataset.lon.var) + 1)
+\end{minted}
+
+\subsubsection{Location Entropy (LE)} 
+Here, we use the duration spent at each place, found in the duration column in the places dataframe.
+
+\begin{minted}{python}
+def entropy(places):
+    p = places.duration / sum(places.duration)
+    return -sum(p * log(p))
+\end{minted}
+
+\subsubsection{Normalized LE} 
+Here we just divide LE by the log to the number of places.
+
+\begin{minted}{python}
+def normalized_entropy(places):
+    return entropy(places) / log(places.length)
+\end{minted}
+
+\subsubsection{Time-distribution Table}
+The time distribution table tells the story of which places were visited for how long during the day and does this by dividing the day into 24 one-hour time slots represented by rows, and the columns representing the different significant places found by the pre-processing algorithms. Each entry $T[i,j]$ is the number of hours spent at timeslot $i$ at place $j$, which means that the row can maximally sum to 1.0. If the user moves between two places, the row will however not sum to 1.0 since there was time spent at none of the places.
+
+Using the stops, the time spent at each place can be calculated for each hourly timeslot during the day. Concretely, this is done by iterating through each stop and incrementing the time at entry $i,j$ using the arrival time of the stop \verb|1 - row.arrival.minute / 60| by using the \verb|arrival.hour| as the hour slot. For the last time slot the same is done, but using the departure time \verb|row.departure.minute / 60|. Every time slot in between for the the place $j$ is set to 1.0 since the user was there for the full time slot.
+
+\begin{minted}{python}
+def make_hour_matrix(stops, num_places):
+    h = np.zeros((HOURS_IN_A_DAY, num_places))
+    
+    for index, row in stops.iterrows():
+        pid = row.place
+        start_hour = row.arrival.hour
+        end_hour   = row.departure.hour
+        
+        # If user arrived and departed within the same hour
+        # Then the time stayed is the diff between departure and arrival
+        if start_hour == end_hour:
+            h[start_hour, pid] = row.departure.minute - row.arrival.minute
+        
+        else:
+            # Arrival hour
+            h[start_hour, pid] = 60 - row.arrival.minute
+
+            # In between
+            for hour in range(start_hour+1, end_hour):
+                h[hour, pid] = 60
+
+            # Departure hour
+            h[end_hour, pid] = row.departure.minute
+        
+    return h / 60 # Normalize by 60 mins
+\end{minted}
+
+\begin{figure}
+    \centering
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    \textbf{}        & \textbf{Place \#0} & \textbf{Place \#1} & \textbf{...} & \textbf{Place \#n} \\ \hline
+    \textbf{00 - 01} &                    &                    &              &                    \\ \hline
+    \textbf{01 - 02} &                    &                    &              &                    \\ \hline
+    \textbf{...}     &                    &                    &              &                    \\ \hline
+    \textbf{16 - 17} &                    &                    &              &                    \\ \hline
+    \textbf{17 - 18} &                    &                    &              &                    \\ \hline
+    \textbf{18 - 19} &                    &                    &              &                    \\ \hline
+    \textbf{...}     &                    &                    &              &                    \\ \hline
+    \textbf{23 - 00} &                    &                    &              &                    \\ \hline
+    \end{tabular}
+    \caption{Time-place distribution table.}
+    \label{fig:time-table}
+\end{figure}
+
+\subsubsection{Home Stay} 
+The percentage of time the participant has been home place, home being the most visited cluster between 12 am and 6 am which can be identified by using the mean of the the historical time distribution tables, i.e. the place which, on average, was the most visited between 00 and 06 am. Afterwards, all the stops during the day are iterated and the duration of the stops belonging to the home cluster are summed up.
+
+\subsubsection{Transition Time} 
+To calculate the transition time of the user the Moves are used, and the difference is time stamps between all the individual data points which make up each move are summed together. 
+
+\subsubsection{Total Distance} 
+Same procedure as transition time, except for using the the distances between all the individual data points rather than the duration.
+
+\subsubsection{Routine Index} 
+The Routine Index is the RMSE of today's time distribution table compared the historical table, which is the average of all historical tables. The historical tables are computed by loading all historical stops from the disk, and calculating the tables from these. The routine index is always calculated based on the current hour of the day, i.e. at 14:00 only the time-slots from 00:00 to 14:00 are compared to the historical average, between 00:00 and 14:00. 
+
+\begin{minted}{python}
+def RI(m, h, end_hour=24):
+    if m.sum() == 0:
+        # no routine index could be calculated
+        return -1.0 
+    return 1 - np.abs(m[:end_hour] - h[:end_hour]).mean()
+\end{minted}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/routine.png}
+    \caption{An hour matrix of a specific day compared to the Routine Matrix derived from several days of data.}
+    \label{fig:routine_example}
+\end{figure}
