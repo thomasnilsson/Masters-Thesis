@@ -7,7 +7,8 @@ The research goals closely match the research questions and will explain how the
 
 \subsubsection*{Goal 1: Implement the Off-line Mobility Feature Algorithms}
 The paper \cite{Saeb2015} describes a list of mobility features, some of which they prove to strongly correlate with depressive behavior. These features need to be implemented in their most simple form, i.e. off-line. This will be carried out in Python with a synthetic dataset and later in Dart (Flutter). This is done in order to demonstrate the quality of the algorithms. A pre-processing procedure described in \cite{sparse-location-2014} producing intermediate features has already been carried out by Jonas Busk prior to starting this thesis. From these intermediate features, many of the mobility features can be easily derived. 
-\subsubsection*{Goal 2: Adapt Algorithms to Work in Real-time}\\
+
+\subsubsection*{Goal 2: Adapt Algorithms to Work in Real-time}
 The features described above will be implemented such that they can be evaluated on a partial dataset, i.e. before a day is concluded. Many of the features will have minor changes applied to their calculation, however the \textit{Routine Index} feature as defined by \cite{extraction-of-behavioural-features} and \cite{Saeb2015}  (here called the\textit{ Circadian Movement}), may prove to be a challenge to implement in real-time. By its basic definition, this feature can only be evaluated on a 24-hour basis and relies on historical data, making it non-trivial to implement in a real-time fashion. 
 
 \subsubsection*{Goal 3: Implement Real-time Mobility Features in Flutter}
