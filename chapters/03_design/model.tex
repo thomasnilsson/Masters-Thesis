@@ -1,4 +1,4 @@
-\section{Pre-processing and Data Modelling}
+\section{Intermediate Features}
 Common for many of the algorithms for finding user mobility features is that they rely on some sort of clustering of data points, to reduce the initial amount of data points into clusters representing locations where the participant did not move around a lot. For spatial clustering such as 2D data points on the surface of the earth, many of the algorithms use the DBSCAN algorithm proposed in 1996  \cite{density-based-1996} which uses the density of data points to cluster them rather than a pure distance metric such as with the K-Means algorithm. \\
 
 In \cite{sparse-location-2014} a basic modelling approach for pre-processing is provided, which will be used for this thesis. The pre-processing produces intermediate features from which the final mobility features are derived. \\
@@ -9,21 +9,25 @@ As an intermediate step, stops that are close in terms of time and distance and 
 
 Moves where identified by selecting the sequences of location samples in between stops. Each move is described by departure and arrival time based on the first and last location sample in the sequence, the origin and destination place ID and the total distance between the location samples in the sequence. The moves were filtered by a minimum duration and minimum distance. We applied a minimum duration of 5 minutes and a minimum distance of 50 meters. Daily features derived from the stops, places and moves include stops count, stops total duration, places count, moves count, moves total distance and moves total duration.
 
+\subsection{Data Model}
+The system was developed using the following classes:\\
+
 \textbf{Location:} $l = (lat, lon)$ \\ 
-A location is defined by a geographical latitude and longitude. \\
+A location is defined by a geographical latitude and longitude and represents a real-life location.\\
 
-\textbf{Single Location Data Point:} $d = (l, t)$\\
-A single location data point $d$ containing a location as well as a timestamp. Some APIs may also provide the speed of the user as well as the accuracy of the data-point, but this will not be relied upon.\\
+\textbf{Single Location Data Point (SLDP):} $d = (l, t)$\\
+A \textit{single location data point} (SLDP) $d$ is a time-stamped location as well as a timestamp and represents a sampled data point. By having a time-stamp, a collection of data points may be ordered and grouped by the time of day.\\
 
-\textbf{Stop:} $s = (D, id)$\\
-A stop is a visit at a known place for an extended period of time. A stop is defined by a set of single location data points $D$ as well as a \verb|Place| identifier, which if not specified will be -1, indicating that it does not belong to a \verb|Place| and is classified as noise. From the location data, an arrival-time $t_a$ and departure-time $t_d$ can be derived, as well as the duration of time spent at the stop can be derived, i.e. the difference between departure and arrival.\\
+\textbf{Stop:} $s = (l, t_{arr}, t_{dep})$\\
+A \textit{Stop} is a visit at a known \texit{Place} (see below) for an extended period of time. A stop is defined by a location which represents the centroid of a collection of data points, from which a stop is created. In addition a stop also has an arrival- and a departure time-stamp, representing when the user arrived at the place and when the user left the place. From the arrival- and departure timestamps of the stops, the duration of a stop can be computed.\\
 
-\textbf{Place:} $p = (id, S)$\\
-Also referred to as a \textit{Place of Interest}, is a cluster of \verb|Stops| found by the DBSCAN algorithm \cite{density-based-1996}, which is also where the identifier $id$ comes from. When a place is generated, each stop $s \in S$ will be assigned the same identifier as the current place.\\
+\textbf{Place:} $p = (id, stops)$\\
+A \textit{Place} defined as a group of stops which were clustered by the DBSCAN algorithm \cite{density-based-1996}. From the cluster of stops, the centroid of the stops can be found, i.e. the center location. In addition, it can be computed how long a user has visited a given place by summing over the durations of all the stops at that place.\\
 
-\textbf{Move:} $m = (s_a, s_b, D)$\\
-A move is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through the points contained in the 'chain' of points $D$. Additional features such as the \textit{duration} of the move, the \textit{distance} between all the points (length of the point chain), and therefore also the mean transportation \textit{speed} between the two places can be derived.\\
-An extensive amount of implementation of this has been done by Jonas Busk for performing this pre-processing the raw GPS data. This implementation has been carried out in Python and processes data in the offline-fashion. A large amount of this implementation will be used and referenced since it is possible to implement this in other programming languages such as Dart, which will be the main programming language of this thesis.
+\textbf{Move:} $m = (s_a, s_b, dist)$\\
+A move is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through a series of SLDPs. Given the distance travelled from stop $s_a$ to stop $s_b$, in addition to the depatuer of $s_a$ and the arrival at $s_a$ the average speed at which the user travelled can be derived. 
+
+% An extensive amount of implementation of this has been done by Jonas Busk for performing this pre-processing the raw GPS data. This implementation has been carried out in Python and processes data in the offline-fashion. A large amount of this implementation will be used and referenced since it is possible to implement this in other programming languages such as Dart, which will be the main programming language of this thesis.
 
 \subsection{Object-oriented Modelling}
 In order to capture this data model with the above definitions in an object-oriented programming language such as Dart, a UML diagram was created along with the implementation to keep track of relationships between the classes. As a general rule of thumb, all the fields were made public including those required by the constructors, and the methods of the classes were all \textit{getters}, i.e. 
