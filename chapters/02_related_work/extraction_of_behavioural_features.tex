@@ -1,7 +1,7 @@
 \section{Extraction of Behavioral Features from Smartphone and Wearable Data}
 Published in 2019 \cite{extraction-of-behavioural-features}, this paper focuses on many channels for collecting user data, with each channel resulting in a set of features. Examples of channels are GPS data, phone usage, step count, etc. The upside of having many channels is improved accuracy since more data is available to describe the behaviour of the user, and if certain channels are inactive during certain periods of time, the other channels can cover the missing data, and thus periods of missing data will be avoided with high likelihood. 
 
-The paper uses the AWARE framework \cite{aware2015} to collect data such as  Bluetooth, Call-log, Location, Campus Map, Phone Usage, steps and sleep tracking (via FitBit).
+The paper uses the \textit{AWARE Framework }\cite{aware2015} to collect data such as  \textit{Bluetooth}, \textit{Call-log}, \textit{Location}, \textit{Campus Map}, \textit{Phone Usage}, \textit{Step Count} and \textit{Sleep State} (via FitBit).
 
 \subsection{High Level Derived Features}
 The daily behaviour of the user is predicted through four high-level features extracted from the data channels.\\
@@ -15,7 +15,7 @@ The daily behaviour of the user is predicted through four high-level features ex
 \textbf{Physical activity:} Derived from step-count during different windows of the day, i.e. when the user is walking a lot.\\
 
 \subsection{Time windows}
-The day (24 hours) is split into 4 time windows, which helps identify where the home is, since the user likely sleeps the same place most days of the week, which is likely during the \verb|Night| time window.
+The day (24 hours) is split into 4 time windows, which helps identify where the home is, since the user likely sleeps the same place most days of the week, which is likely during the \textit{night} time-window.
 
 \begin{itemize}
 \item Night (00-06)
@@ -27,9 +27,9 @@ The day (24 hours) is split into 4 time windows, which helps identify where the 
 \subsection{Location Features}
 GPS coordinates collected throughout the day have a time stamp connected to them, which makes it possible to calculate a list of interesting features within a day of the user moving around. The features are similar to those found in \cite{Saeb2015} adds two additional features, namely \textit{Radius of gyration} and \textit{Time spent at top3 clusters}.
 
-However a couple of additional contributions are found. Firstly a bout is defined as a small window of time, which can be defined based on the granularity wanted, i.e. 5 minutes. 
+However a couple of additional contributions are found. Firstly a \textit{bout} is defined as a small window of time, which can be defined based on the granularity wanted, i.e. 5 minutes. 
 
-Furthermore, a clear definition for the \verb|Home| cluster is given as being everything within 10 meters of the center of the home location center. Time spent at home is defined at time spent within 100 meters of the home centroid. The activity of studying is defined as spending 30 minutes or more in an academic building, while sedentary, which is taking fewer than 10 steps per bout.
+Furthermore, a clear definition for the \textit{home} cluster is given as being everything within 10 meters of the center of the home location center. Time spent at home is defined at time spent within 100 meters of the home centroid. The activity of studying is defined as spending 30 minutes or more in an academic building, while sedentary, which is taking fewer than 10 steps per \textit{bout}.
 
 \subsection{Bluetooth Features}
 From the Bluetooth Scan, the devices found each have a unique ID and can therefore be categorized into the following groups:
@@ -40,7 +40,7 @@ From the Bluetooth Scan, the devices found each have a unique ID and can therefo
     \item Other, other people (scanned least often)
 \end{itemize}
 
-The three categories are created through K-means clustering, by firstly creating two clusters (K=2), i.e. self and others. Secondly another model is fitted to the data with K=3 clusters, and the model which fits the data the best is chosen, i.e. through cross validation or BIC.
+The three categories are created through K-means clustering, by firstly creating two clusters ($K=2$), i.e. self and others. Secondly another model is fitted to the data with $K=3$ clusters, and the model which fits the data the best is chosen, i.e. through cross validation or BIC.
 
 
 \subsection{Phone Usage}
@@ -58,7 +58,7 @@ Phone usage is based on the screen state which at any time can be only one of th
 
 
 \subsection{Sleep Features}
-By tracking heart rate, and other signals with a FitBit watch, the FitBit API gives access to the \verb|sleep| state of the user, which at any time is one of the following: Asleep, restless, awake, unknown.
+By tracking heart rate, and other signals with a FitBit watch, the FitBit API gives access to the \textit{sleep state} of the user, which at any time is one of the following: Asleep, restless, awake, unknown.
 
 A number of samples will made during the night and thus the simplest features which can be created are the number of samples in each of the four states. 
 From this, two higher-level features are computed, which are: \\
@@ -75,9 +75,9 @@ From the step-count channel features pertaining to the fine-grained activity, wi
 
 \begin{itemize}
     \item Number of steps
-    \item Max steps in a bout
-    \item Number of active bouts
-    \item Min, Max, Avg. length of sequence active bouts in a row
+    \item Max steps in a \textit{bout}
+    \item Number of active \textit{bouts}
+    \item Min, Max, Avg. length of sequence active \textit{bouts} in a row
 \end{itemize}
     
 \subsection{Behavioural Change Tracking}

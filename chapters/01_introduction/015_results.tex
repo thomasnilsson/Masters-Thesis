@@ -11,7 +11,7 @@ The most important features pertaining to depression were \textit{Home Stay}, \t
 \subsubsection*{How can these features be computed in real-time, on a smartphone device?}
 The Routine Index as well as the aggregate features, are calculated by storing the previously mentioned intermediate feature \textit{Stops} on the device. These features effectively serve as a compressed form of the raw dataset, which is saved on the device. The compressed dataset takes up three orders of magnitude less disk space compared to the corresponding raw data, which also made it possible to calculate those features which relied on historical data.
 
-\subsubsection*{How does a the API design of such a software package look like?}
+\subsubsection*{How does the API design of such a software package look like?}
 All the implementation details of the algorithms were hidden away from the programmer and a high abstraction level API was provided, with thorough documentation on its usage. Even the problem of saving intermediate features on the device, such that they may be used in the future, was handled with minimal need for the programmer to be involved. In the process of developing this app, the quality of the \textit{Mobility Features Package}  was also improved both in the accuracy of the features but also in terms of the abstraction level of the API. However, a few abstraction-level decisions are still up for debate with regards to how \textit{open} the API should be, and whether or not the intermediate features should be part of it since they themselves contain sensitive information.
 
 \subsubsection*{Field Study}
