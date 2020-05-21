@@ -1,23 +1,27 @@
-\section{Intermediate Features}
-Common for many of the algorithms for finding user mobility features is that they rely on some sort of clustering of data points, to reduce the initial amount of data points into clusters representing locations where the participant did not move around a lot. For spatial clustering such as 2D data points on the surface of the earth, many of the algorithms use the DBSCAN algorithm proposed in 1996  \cite{density-based-1996} which uses the density of data points to cluster them rather than a pure distance metric such as with the K-Means algorithm. \\
+\section{Data Modelling}
+Coming up with a domain model is a process which can provide clarity and direction for a software system, even on a small scale such as in a library. 
 
-The modelling approach is loosely based on the \cite{sparse-location-2014} a basic modelling approach for pre-processing is provided, which will be used for this thesis. The pre-processing produces intermediate features from which the final mobility features are derived. \\
+\subsection{Intermediate Features}
+Common for many of the algorithms for finding user mobility features is that they rely on some sort of clustering of data points, to reduce the initial amount of data points into clusters representing locations where the participant did not move around a lot. For spatial clustering such as 2D data points on the surface of the earth, many of the algorithms use the DBSCAN algorithm as discussed in Chapter \ref{chapter:02-related-work}. The modelling approach is loosely based on the \cite{sparse-location-2014} a basic modelling approach for pre-processing is provided, which will be used for this thesis. The pre-processing produces \textit{intermediate features} from which the final mobility features are derived. These intermediate features are \textit{Stops}, \textit{Places} and \textit{Moves} and provide a course-grained version of the dataset which makes the final feature calculation much cheaper, computationally speaking. We define \textit{Places} as specific locations of relevance to the user, such as home or workplace. \textit{Stops} are specific visits to any of those places. Thus, a \textit{Stop} is always associated with a single place while places can be associated with one or more stops. Finally, \textit{Moves} are the sequences of location samples in between \textit{Stops}, representing moving between \textit{Places}. 
 
-In order to extract relevant mobility patterns, we define a few useful concepts that can be extracted from sequences of location samples. The methods described in this section are inspired by the techniques introduced in [Cuttone et al. 2014] and [Canzian et al. 2015]. We define places as specific locations of relevance to the user, such as home or workplace. Then stops are specific visits to any of those places. Thus, a stop is always associated with a single place while places can be associated with one or more stops. Finally, moves are the sequences of location samples in between stops, representing moving between places. Stops, places and moves are extracted from sequences of location samples by applying the following algorithm. To identify stops, location samples are traversed sequentially and grouped according to a maximum distance threshold. If a sample is too far from the current group median location, a new group is formed. Initially this strategy creates a lot of groups, which are then filtered by a minimum duration threshold leaving groups where movement stopped for at least some time. Each remaining group represents a stop, described by the median coordinates of the group of location samples and arrival and departure time based on the first and last location sample in the group. The appropriate values of maximum distance and minimum duration depends on the accuracy and sample frequency of the data. We applied a minimum distance of 50 meters and minimum duration of 20 minutes based on inspecting the distributions of distances and times between subsequent location samples in the dataset.
+\subsection{Data Model Overview}
+In order to capture the data model in an object-oriented programming language, a UML diagram was created along with the implementation to keep track of relationships between the classes. 
+% As a general rule of thumb, all the fields were made public including those required by the constructors, and the methods of the classes were all \textit{getters}, i.e. \\
 
-As an intermediate step, stops that are close in terms of time and distance and have no other stops in between are merged to reduce noise caused by outlier location samples that might break a stop into several stops. We merged stops that were maximum 5 minutes and 5 meters apart and found that this removed cases with a suspicious amount of stops per day. With the stops available, places are identified by clustering stops using the DBSCAN clustering algorithm [Ester et al. 1996] with a minimum cluster size of 1, effectively identifying stops appearing at the same location. Each place is represented by the median coordinates of the included stops along with a unique place ID. The place ID is also appended to each of the included stops associating each stop with a place. We applied a maximum distance of 50 meters between stops when computing the clusters.
-
-Moves where identified by selecting the sequences of location samples in between stops. Each move is described by departure and arrival time based on the first and last location sample in the sequence, the origin and destination place ID and the total distance between the location samples in the sequence. The moves were filtered by a minimum duration and minimum distance. We applied a minimum duration of 5 minutes and a minimum distance of 50 meters. Daily features derived from the stops, places and moves include stops count, stops total duration, places count, moves count, moves total distance and moves total duration.
-
-\subsection{Data Model}
-The system was developed using the following classes:\\
-
+\subsubsection*{Auxiliary Classes}
 \textbf{Location:} $l = (lat, lon)$ \\ 
-A location is defined by a geographical latitude and longitude and represents a real-life location.\\
+A \textit{Location} is defined by a geographical latitude and longitude and represents a real-life location.\\
 
-\textbf{Single Location Data Point (SLDP):} $d = (l, t)$\\
-A \textit{single location data point} (SLDP) $d$ is a time-stamped location as well as a timestamp and represents a sampled data point. By having a time-stamp, a collection of data points may be ordered and grouped by the time of day.\\
+\textbf{Cluster:} $c = (locations)$\\
+A \textit{Cluster} is created from a collection of locations and implements the DBSCAN algorithm \cite{density-based-1996} such that a centroid of that cluster may be extracted.
 
+\textbf{Single Location Data Point (SLDP):} $sldp = (l, t)$\\
+A \textit{Single Location Data Point} (SLDP) $sldp$ is a time-stamped location as well as a timestamp and represents a sampled data point. By having a time-stamp, a collection of data points may be ordered and grouped by the time of day. In essense, the SLDP is a Data Transfer Object (DTO) \footnote{\url{https://martinfowler.com/eaaCatalog/dataTransferObject.html}} which is used to transfer GPS data from an arbitrary Flutter plugin to the \textit{Mobility Features Package}.\\
+
+\textbf{Hour Matrix:} $hm = (matrix)$\\
+An \textit{Hour Matrix} is a matrix with 24 rows and columns equal to the number of places of some period. The \textit{Hour Matrix} class is used to calculate the \textit{Routine Index }feature, as well as to identify the \textit{Home Cluster}, which is the place most visited during 00:00 and 06:00.
+
+\subsubsection*{Intermediate Features}
 \textbf{Stop:} $s = (l, t_{arr}, t_{dep})$\\
 A \textit{Stop} is a visit at a known \texit{Place} (see below) for an extended period of time. A stop is defined by a location which represents the centroid of a collection of data points, from which a stop is created. In addition a stop also has an arrival- and a departure time-stamp, representing when the user arrived at the place and when the user left the place. From the arrival- and departure timestamps of the stops, the duration of a stop can be computed.\\
 
@@ -25,12 +29,11 @@ A \textit{Stop} is a visit at a known \texit{Place} (see below) for an extended 
 A \textit{Place} defined as a group of stops which were clustered by the DBSCAN algorithm \cite{density-based-1996}. From the cluster of stops, the centroid of the stops can be found, i.e. the center location. In addition, it can be computed how long a user has visited a given place by summing over the durations of all the stops at that place.\\
 
 \textbf{Move:} $m = (s_a, s_b, dist)$\\
-A move is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through a series of SLDPs. Given the distance travelled from stop $s_a$ to stop $s_b$, in addition to the depatuer of $s_a$ and the arrival at $s_a$ the average speed at which the user travelled can be derived. 
+A \textit{Move} is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through a series of SLDPs. Given the distance travelled from stop $s_a$ to stop $s_b$, in addition to the departure of $s_a$ and the arrival at $s_a$ the average speed at which the user travelled can be derived. 
 
-% An extensive amount of implementation of this has been done by Jonas Busk for performing this pre-processing the raw GPS data. This implementation has been carried out in Python and processes data in the offline-fashion. A large amount of this implementation will be used and referenced since it is possible to implement this in other programming languages such as Dart, which will be the main programming language of this thesis.
-
-\subsection{Object-oriented Modelling}
-In order to capture this data model with the above definitions in an object-oriented programming language such as Dart, a UML diagram was created along with the implementation to keep track of relationships between the classes. As a general rule of thumb, all the fields were made public including those required by the constructors, and the methods of the classes were all \textit{getters}, i.e. 
+\subsubsection*{Features}
+\textbf{Mobility Context (MC):} $mc = (date, stops, places, moves)$\\
+A \textit{Mobility Context} is a collection of features which are derived from a set of intermediate features, where the \textit{Stops} and \textit{Moves} are from a specific \textit{Date}. The \textit{Places} are derived from multiple dates for reasons which will be explained in the implementation details.
 
 \begin{figure}
     \centering
@@ -38,3 +41,5 @@ In order to capture this data model with the above definitions in an object-orie
     \caption{UML diagram for the classes used for pre-processing the location data. All fields shown are public and all methods represent the derived pre-processing features}
     \label{fig:my_label}
 \end{figure}
+
+
