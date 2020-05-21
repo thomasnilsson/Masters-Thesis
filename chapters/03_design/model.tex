@@ -13,13 +13,13 @@ In order to capture the data model in an object-oriented programming language, a
 A \textit{Location} is defined by a geographical latitude and longitude and represents a real-life location.\\
 
 \textbf{Cluster:} $c = (locations)$\\
-A \textit{Cluster} is created from a collection of locations and implements the DBSCAN algorithm \cite{density-based-1996} such that a centroid of that cluster may be extracted.
+A \textit{Cluster} is created from a collection of locations and implements the DBSCAN algorithm \cite{density-based-1996} such that a centroid of that cluster may be extracted.\\
 
-\textbf{Single Location Data Point (SLDP):} $sldp = (l, t)$\\
-A \textit{Single Location Data Point} (SLDP) $sldp$ is a time-stamped location as well as a timestamp and represents a sampled data point. By having a time-stamp, a collection of data points may be ordered and grouped by the time of day. In essense, the SLDP is a Data Transfer Object (DTO) \footnote{\url{https://martinfowler.com/eaaCatalog/dataTransferObject.html}} which is used to transfer GPS data from an arbitrary Flutter plugin to the \textit{Mobility Features Package}.\\
+\textbf{Single Location Point (SLP):} $slp = (l, t)$\\
+A \textit{Single Location Data Point} (SLP) is a time-stamped location as well as a timestamp and represents a sampled data point. By having a time-stamp, a collection of data points may be ordered and grouped by the time of day. In essense, the SLP is a Data Transfer Object (DTO) \footnote{\url{https://martinfowler.com/eaaCatalog/dataTransferObject.html}} which is used to transfer GPS data from an arbitrary Location plugin to the \textit{Mobility Features Package}.\\
 
-\textbf{Hour Matrix:} $hm = (matrix)$\\
-An \textit{Hour Matrix} is a matrix with 24 rows and columns equal to the number of places of some period. The \textit{Hour Matrix} class is used to calculate the \textit{Routine Index }feature, as well as to identify the \textit{Home Cluster}, which is the place most visited during 00:00 and 06:00.
+\textbf{Hour Matrix:} $hm = (stops)$\\
+An \textit{Hour Matrix} is a matrix with 24 rows and columns equal to the number of places of some period. The \textit{Hour Matrix} class is used to calculate the \textit{Routine Index} feature, as well as to identify the \textit{Home Cluster}, which is the place most visited during 00:00 and 06:00. An Hour Matrix is constructed from a list of stops which all have the same date.\\
 
 \subsubsection*{Intermediate Features}
 \textbf{Stop:} $s = (l, t_{arr}, t_{dep})$\\
@@ -29,16 +29,28 @@ A \textit{Stop} is a visit at a known \texit{Place} (see below) for an extended 
 A \textit{Place} defined as a group of stops which were clustered by the DBSCAN algorithm \cite{density-based-1996}. From the cluster of stops, the centroid of the stops can be found, i.e. the center location. In addition, it can be computed how long a user has visited a given place by summing over the durations of all the stops at that place.\\
 
 \textbf{Move:} $m = (s_a, s_b, dist)$\\
-A \textit{Move} is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through a series of SLDPs. Given the distance travelled from stop $s_a$ to stop $s_b$, in addition to the departure of $s_a$ and the arrival at $s_a$ the average speed at which the user travelled can be derived. 
+A \textit{Move} is the displacement of the user from stop $s_a$ to stop $s_b$ in which the user passes through a series of SLPs. Given the distance travelled from stop $s_a$ to stop $s_b$, in addition to the departure of $s_a$ and the arrival at $s_a$ the average speed at which the user travelled can be derived. 
 
 \subsubsection*{Features}
-\textbf{Mobility Context (MC):} $mc = (date, stops, places, moves)$\\
-A \textit{Mobility Context} is a collection of features which are derived from a set of intermediate features, where the \textit{Stops} and \textit{Moves} are from a specific \textit{Date}. The \textit{Places} are derived from multiple dates for reasons which will be explained in the implementation details.
+\textbf{Mobility Context:} $mc = (date, stops, places, moves, mobility-contexts*)$\\
+A \textit{Mobility Context} is a collection of features which are derived from a set of intermediate features, where the \textit{Stops} and \textit{Moves} are from a specific \textit{Date}. The \textit{Places} are derived from multiple dates for reasons which will be explained in the implementation details. The features derived from this class are
 
-\begin{figure}
+\begin{itemize}
+    \item Home Stay
+    \item Location Variance
+    \item Number of Places
+    \item Entropy
+    \item Normalized Entropy
+    \item Distance Travelled
+    \item Routine Index
+\end{itemize}
+
+The Routine Index is however only available if an array of other \textit{Mobility Contexts} was given as a parameter.
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{./images/Mobility-Preprocessing.pdf}
-    \caption{UML diagram for the classes used for pre-processing the location data. All fields shown are public and all methods represent the derived pre-processing features}
+    \includegraphics[width=\textwidth]{./images/uml-mobility-features.pdf}
+    \caption{UML diagram for the classes used in the \textit{Mobility Features Package}.}
     \label{fig:my_label}
 \end{figure}
 

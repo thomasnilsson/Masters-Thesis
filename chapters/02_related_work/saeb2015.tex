@@ -5,6 +5,7 @@ This paper by Saeb et al. published in 2015 \cite{Saeb2015} forms the basis for 
 The pre-processing of GPS data is split into two phases:  Firstly, each data point is labelled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous and the next data point is used. By using the this time difference as well as the distance between points the average velocity is calculated. The labelling is afterwards done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analysing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the paramter \textit{K}) is not know beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
 
 \subsection{Feature Computation}
+\label{ref:features-saeb2015}
 After the pre-processing step, the following features can be computed:\\
 
 \textbf{Number of Clusters}: This feature represents the total number of clusters found by the clustering algorithm.\\
