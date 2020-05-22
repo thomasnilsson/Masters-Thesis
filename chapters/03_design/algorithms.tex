@@ -56,7 +56,7 @@ Most people will go on a vacation during the year, which means the place where t
 Compare mondays to mondays
 
 \subsubsection*{Relying on Historical Data}
-In order to calculate the \textit{Routine Index} we need to save and load the historical data somehow. Two approaches were considered.\\
+In order to calculate the \textit{Routine Index} we need to save and load the historical data somehow. Two approaches were considered:\\
 
 \textbf{\#1 Saving Stops on device:} By saving all stops for the last 4 weeks, the \textit{Places} can be found by clustering the stops with DBSCAN, and an Hour Matrix for each day in the last 4 weeks can then be computed and the average Hour Matrix can be derived from these. Afterwards the \textit{Routine Index} can be calculated as the overlap between these two, as previously described. In the field study the author had just over 70 stops per week, which corresponds to around 300 stops for a 4 week period, which is a very manageable number of elements to cluster with DBSCAN, which would be the only bottle-neck in this approach.\\
 
