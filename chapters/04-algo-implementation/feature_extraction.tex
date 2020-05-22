@@ -125,3 +125,7 @@ def RI(m, h, end_hour=24):
     \caption{An hour matrix of a specific day compared to the Routine Matrix derived from several days of data.}
     \label{fig:routine_example}
 \end{figure}
+
+
+\section{Tuning Parameters}
+Parameter tuning was done by taking a few different examples where ground truth is  known, i.e. by having done it myself. The examples include whole days in Munich (GER), Copenhagen (DK) and Bornholm (DK) which all have vastly different environments and acitivties, with Munich having places displaced very far away and where public transporation was necessary. In Copenhagen I travelled by foot, either walking or running and on Bornholm I would travel in the city of Rønne by foot, again walking or running, or going to the other side of the island by car, and walking the dog. Since the ground truth is known for each of these examples, the parameter tuning is done by taking the parameters with the biggest impact such as stop duration and place radius, starting high and then lowering the parameter value until a reasonable result is achieved across the board.
