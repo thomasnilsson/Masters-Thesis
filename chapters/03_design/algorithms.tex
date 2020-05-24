@@ -1,32 +1,40 @@
 \section{Algorithms}
-Here, an overview of the algorithms used by the \textit{Mobility Features Package} will be provided. The overview will not discuss implementation details but will aim to get the core idea of each algorithm across, in addition to the considerations which were made in designing these algorithms. Most of the features were simple to implement with support for real-time computation and were just a matter of performing arithmetic with regards to distance and time spent and places, however the ones which need some explanation are outlined in this section. 
+Here, an overview of the algorithms used by the \textit{Mobility Features Package} will be provided. The overview will not discuss implementation details but will aim to get the core idea of each algorithm across, in addition to the considerations which were made in designing these algorithms. Most of the features were simple to implement with support for real-time computation and were just a matter of performing arithmetic with regards to distance and time spent and places, however, the ones which need some explanation are outlined in this section. 
 
 \subsection{Period}
 A period is a set of several dates is defined as $D = \{d_1, d_2, ..., d_{|D|}\}$ with $|D| \leq 28$ and the date following the period being $d_t$. This can also be translated as $D$ are the historical dates to the date $d_t$.\\
 
-\subsection{Stops}
-Finding \textit{Stops} is done by traversing every \textit{Single Location Points} in temporal order, i.e. the timestamp is used. The \textit{Stops} for a given date are found by clustering \text{Single Location Points} on that date based on time and distance. \\
+\subsection{Single Location Point}
+A \textit{Single Location Point} is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two \textit{Single Location Points} is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
 
-The Stops found for the period $D$ is defined as $S = \{s_1, s_2, ..., s_{|S|}\}$.\\
+\subsection{Stops}
+Finding \textit{Stops} is done by traversing every \textit{Single Location Points} in temporal order, i.e. the timestamp is used. The \textit{Stops} for a given date is found by clustering \text{Single Location Points} on that date based on time and distance. \\
+
+The set of Stops found for the period $D$ is defined as
+
+$$S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)$$ 
+
+The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the Stop $s_i$, respectively.
 
 \subsection{Places}
 \textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. This means all \textit{Stops} from previous dates need to be stored on the device. \\
 
-Places found for the period $D$ is a set of Places $P = {p_1, p_2, ..., p_N}$, where a Place $p$ is defined from a set of Stops $p_i = \{s_1, s_2, ..., s_{|p_i|}\}$.\\
+The set of Places found for the period $D$ is defined as 
+
+$$P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}$$
 
 \subsection{Moves}
-\textit{Moves} for a given can be calculated using the \textit{Stops}- and the \textit{Single Location Points} from that date. The \textit{Moves} are found by going through each \textit{Stop} and calculating the distance between the current \textit{Stop} and the following \textit{Stop} by going through all the \textit{Single Location Points} which were sampled in the time interval between these the \textit{Stops}. These points form the path which was taken between the two \textit{Stops} and the path is used to calculate the exact distance travelled.\\
+\textit{Moves} for a given can be calculated using the \textit{Stops}- and the \textit{Single Location Points} from that date. The \textit{Moves} are found by going through each \textit{Stop} and calculating the distance between the current \textit{Stop} and the following \textit{Stop} by going through all the \textit{Single Location Points} which were sampled in the time interval between these the \textit{Stops}. These points form the path which was taken between the two \textit{Stops} and the path is used to calculate the exact distance traveled.\\
 
-Mathematically, \textit{Moves} are defined as the set $M = \{m_1, m_2, ..., m_{|M|}\}.$\\
-
+A set of\textit{Moves} is defined as $$M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}$$ is a set of time-ordered \textit{SLPs}.\\
 
 \subsection{Hour Matrix}
 This matrix is made from all the \textit{Stops} on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the \textit{Hour Matrix}:
 
 \begin{itemize}
     \item The \textit{Hour Matrix} has exactly 24 rows, each representing 1 hour in a day.
-    \item The number of columns is represents the number of \textit{Places} for the period. 
-    \item An entry represents the portion of the given hour-slot was spent at a given \textit{Place}.
+    \item The number of columns represents the number of \textit{Places} for the period. 
+    \item An entry represents the portion of the given hour-slot that was spent at a given \textit{Place}.
     \item Each row can maximally sum to 1.
 \end{itemize}
 
@@ -37,7 +45,7 @@ Given an array of \textit{Hour Matrices} for a period with $D$ days, the \textit
 $$H^{\mu} (D) _{i,j} = \sum_{k=1}^{|D|} \frac{1}{|D|} H(d_k)_{i,j}$$
 
 \subsection{Home Stay}
-The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. Firstly a definition for Home needs to be clear; in the literature it is defined as the cluster which the user on average spends the most time at between 00:00 and 06:00 over a period of time \cite{Saeb2015, Canzian2015}. However since the \textit{Home Place} may change from day to day, it was decided to let \textit{Home} for a specific day be defined as the cluster for which the most time was spent during 00:00 and 06:00 on that day only. Formally, the \textit{Home Place} $p_h (d_t)$ for today $d_t$ is the place $p_h$ where the following holds:
+The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. Firstly a definition for Home needs to be clear; in the literature it is defined as the cluster which the user on average spends the most time at between 00:00 and 06:00 over a period of time \cite{Saeb2015, Canzian2015}. However since the \textit{Home Place,} may change from day to day, it was decided to let \textit{Home} for a specific day be defined as the cluster for which the most time was spent during 00:00 and 06:00 on that day only. Formally, the \textit{Home Place} $p_h (d_t)$ for today $d_t$ is the place $p_h$ where the following holds:
 $$h = \operatorname*{argmax}_n \sum_{m=1}^{6} \sum_{n=1}^{N} H(d_t)_{m,n}$$
 
 However in the literature \cite{Saeb2015, Canzian2015} it is not stated how this would be calculated for an incomplete day. A choice was made for this to be calculated using the sum of durations for all \textit{Stops} belonging to today's \textit{Home Cluster}, divided by the time elapsed since midnight. The duration \textit{Stop} $s$ will be denoted $\Delta T (s)$ and similar the duration spent at a place $p$ is defined as $\Delta T (p)$
@@ -46,10 +54,13 @@ $$\Delta T(p_{h} (d_t) )= \frac{\sum_i \Delta T(s_i) \;|\; s_i \in p_h (d_t)}{T_
 Where $T_{now} - T_0$ is the time elapsed since 00:00:00.
 
 \subsection{Total Distance Travelled}
-The total distance travelled for a date $d_t$ is defined as 
+First we define the distance of a Move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
+$$\delta (m_i)  = \sum_{j=1}^{|X_i|-1} \delta (x_j, x_{j+1})$$
+
+The \textit{Total Distance Travelled} for a date $d_t$ is defined as $$\delta (d_t) = \sum_{i=1}^{|M|} \delta (m_i) $$ where $M$ refers to the moves on date $d_t$.
 
 \subsection{The Routine Index}
-The features described in the literature by \cite{Saeb2015} which can be found in Section \ref{ref:features-saeb2015}. The time distribution for a day is defined by spending a duration of time at a certain space within a certain time-slot.  However the \textit{Routine Index} \cite{Saeb2015, Canzian2015} was much more demanding to implement and it will therefore be a feature which is highly discussed in this thesis. To recap, the \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. A concrete period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. However the implementation by \cite{Canzian2015} was very complex and therefore a much more simple version was chosen for the first iteration of the software package. We define the \textit{Routine Index} as a similarity measure with a value between 0 and 1, were a low value indicates little overlap and a high value indicates a high degree of overlap. By representing each day with an Hour Matrix the similarity function can be defined.
+The features described in the literature by \cite{Saeb2015} which can be found in Section \ref{ref:features-saeb2015}. The time distribution for a day is defined by spending a duration of time at a certain space within a certain time-slot.  However the \textit{Routine Index} \cite{Saeb2015, Canzian2015} was much more demanding to implement and it will, therefore, be a feature that is highly discussed in this thesis. To recap, the \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. A concrete period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. However the implementation by \cite{Canzian2015} was very complex and therefore a much more simple version was chosen for the first iteration of the software package. We define the \textit{Routine Index} as a similarity measure with a value between 0 and 1, where a low value indicates little overlap and a high value indicates a high degree of overlap. By representing each day with an Hour Matrix the similarity function can be defined.
 
 Lastly, we define a union operator $A \cap B$ for two matrices $A$ and $B$ as 
 
@@ -62,14 +73,14 @@ The numerator $\sum (H(d_t) \cap H^{\mu} (D) )$ defines the actual overlap betwe
 
 
 \subsubsection*{Real-Time Routine Index}
-If the features have to be evaluated at any point of the day, as is the case for real-time computation then the \texit{Routine Index} cannot rely on a full day of data. To make the feature represent something meaningful in real-time it would have to reflect the routine of the user up until the current time of days, i.e. if calculated at 14:00 then it should only use the first 14 rows of the matrix. This means the \textit{Routine Index} may be high early in the day since people usually sleep the same place, but are open to deviate as the day progresses. This can be useful to an application programmer in a recommender-system setting, where a trigger based on the \textit{Routine Index} could be set, such that the user could be alerted when the value falls below a certain threshold.
+If the features have to be evaluated at any point of the day, as is the case for real-time computation then the \texit{Routine Index} cannot rely on a full day of data. To make the feature represent something meaningful in real-time it would have to reflect the routine of the user up until the current time of days, i.e. if calculated at 14:00 then it should only use the first 14 rows of the matrix. This means the \textit{Routine Index} may be high early in the day since people usually sleep the same place, but are open to deviating as the day progresses. This can be useful to an application programmer in a recommender-system setting, where a trigger based on the \textit{Routine Index} could be set, such that the user could be alerted when the value falls below a certain threshold.
 
 \subsubsection*{What is a Routine?}
-Most people will go on a vacation during the year, which means the place where they sleep changes. In general, peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is not unlikely to be very different. However just because a user changes their routine over time, does not mean they don't currently possess one. Therefore it was chosen to base the \textit{Routine Index} was chosen to be calculated based on the last 4 weeks of data in order to base the routine overlap on more recent days. An issue which was not dealt with is the fact that the routine in weekdays differ a lot from the routine during the weekend. This is especially true for people who spent 8 or more hours at work during the weekdays, and spent those 8 hours somewhere else during Saturday and Sunday, since it means the \textit{Routine Index} cannot exceed $\frac{2}{3}$ due to a third of the day's total hours being spent at a different place than usual. To add to this, even weekdays may look slightly different to one another, especially for those who are parts of sports clubs which meet during certain days of the week. In future work it would be interesting to investigate whether or not comparing Mondays to Mondays and vice versa for every day in the week would yield more accurate results.
+Most people will go on vacation during the year, which means the place where they sleep changes. In general, peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is not unlikely to be very different. However just because a user changes their routine over time, does not mean they don't currently possess one. Therefore it was chosen to base the \textit{Routine Index} was chosen to be calculated based on the last 4 weeks of data in order to base the routine overlap on more recent days. An issue which was not dealt with is the fact that the routine on weekdays differs a lot from the routine during the weekend. This is especially true for people who spent 8 or more hours at work during the weekdays and spent those 8 hours somewhere else during Saturday and Sunday since it means the \textit{Routine Index} cannot exceed $\frac{2}{3}$ due to a third of the day's total hours being spent at a different place than usual. To add to this, even weekdays may look slightly different from one another, especially for those who are part of sports clubs which meet during certain days of the week. In future work it would be interesting to investigate whether or not comparing Mondays to Mondays and vice versa for every day in the week would yield more accurate results.
 
 \subsubsection*{Relying on Historical Data}
 In order to calculate the \textit{Routine Index} we need to save and load the historical data somehow. Two approaches were considered:\\
 
-The first approach involves keeping historical stops saved on disk. By doing so, the \textit{Places} can be found by clustering the stops with DBSCAN, and an \text{Hour Matrix} for each day in the last 4 weeks can then be computed and the average \text{Hour Matrix} can be derived from these. Afterwards the \textit{Routine Index} can be calculated as the overlap between these two, as previously described. In the field study the author had just over 70 stops per week, which corresponds to around 300 stops for a 4 week period, which is a very manageable number of elements to cluster with DBSCAN, which would be the only bottle-neck in this approach.\\
+The first approach involves keeping historical stops saved on disk. By doing so, the \textit{Places} can be found by clustering the stops with DBSCAN, and an \text{Hour Matrix} for each day in the last 4 weeks can then be computed and the average \text{Hour Matrix} can be derived from these. Afterward the \textit{Routine Index} can be calculated as the overlap between these two, as previously described. In the field study, the author had just over 70 stops per week, which corresponds to around 300 stops for a 4 week period, which is a very manageable number of elements to cluster with DBSCAN, which would be the only bottleneck in this approach.\\
 
-The second approach involves keeping storing the \text{Hour Matrix} for each day  on disk. However for this approach the \textit{Places} would also need to be saved such that places collected today could be compared (wrt. distance) to historical places. The reason this is necessary is to ensure that the matrix dimensions of all the matrices are the same and that these columns refer to the same \textit{Place}.  This approach has potential to be computationally cheaper but is much more complex to implement and was therefore not chosen in this iteration.
+The second approach involves keeping storing the \text{Hour Matrix} for each day on disk. However for this approach the \textit{Places} would also need to be saved such that places collected today could be compared (wrt. distance) to historical places. The reason this is necessary is to ensure that the matrix dimensions of all the matrices are the same and that these columns refer to the same \textit{Place}.  This approach has the potential to be computationally cheaper but is much more complex to implement and was therefore not chosen in this iteration.

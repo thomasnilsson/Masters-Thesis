@@ -1,5 +1,5 @@
 \section{Density-based Spatial Clustering of Applications with Noise (DBSCAN)}
-The DBSCAN algorithm is an essential algorithm for clustering GPS data points and was published by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu in 1996 \cite{density-based-1996}. The core concept of DBSCAN is to cluster location data based on a density meaure rather than a pure distance measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to round shapes which are found by using \textit{K-means} and \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.
+The DBSCAN algorithm is an essential algorithm for clustering GPS data points and was published by Martin Ester, Hans-Peter Kriegel, Jörg Sander, and Xiaowei Xu in 1996 \cite{density-based-1996}. The core concept of DBSCAN is to cluster location data based on a density measure rather than a pure distance measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to round shapes which are found by using \textit{K-means} and \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.
 
 \begin{figure}
     \centering
@@ -8,13 +8,13 @@ The DBSCAN algorithm is an essential algorithm for clustering GPS data points an
     \label{fig:dbscan_shapes}
 \end{figure}
 
-GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some area and do not cluster around a centroid.
+GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid.
 
-The DBSCAN algorithm will, given a set of geo-spatial data points and a small set of parameters, find these dense clusters as well as noisy data points, where the clusters correspond to places and the noisy data points are outliers which do not belong to a place. The output of the algorithm is a labelling of each point in the input dataset as either belonging to a cluster or being a noisy data point.
+The DBSCAN algorithm will, given a set of geospatial data points and a small set of parameters, find these dense clusters, as well as noisy data points, where the clusters correspond to places and the noisy data points, are outliers which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.
 
 \section{Mathematical Definitions}
 
-The DBSCAN paper defines a \textit{Neighbourhood} as a collection of data points within some radius, i.e. an area defined by a distance function. Within a \textit{Neighbourhood}, two types of points can reside: \textit{Core points}, that is, points which are inside in the neighbourhood, and \textit{Border points } which lie on the edge of the neighbourhood and delimit it. 
+The DBSCAN paper defines a \textit{Neighbourhood} as a collection of data points within some radius, i.e. an area defined by a distance function. Within a \textit{Neighbourhood}, two types of points can reside: \textit{Core points}, that is, points which are inside in the neighborhood, and \textit{Border points } which lie on the edge of the neighborhood and delimit it. 
 
 \subsubsection*{Definition 1: Epsilon Neighbourhood}
 An \textit{Epsilon Neighbourhood} is a \textit{Neighborhood} defined on a point $p$ which includes all the points $q$ which are inside a radius of $\epsilon$ of $p$. Formally this is defined as:\\
@@ -28,7 +28,7 @@ We Require for all points $p$ and a given cluster $C$: There must be a a point $
 \subsubsection*{Definition 2: Directly Density-Reachable}
 A point $p$ is \textit{Directly Density-Reachable} from point $q$ wrt. the parameters $\epsilon$ and $T_{min}$ if $p \in N_{\epsilon}(q)$ and $|N_{\epsilon}(q)| \geq T_{min}$ (\textit{Core Point Condition}).\\
 
-This implies a border point $p$ may be \textit{Directly Density-Reachable} from a core point $q$, but it is likely not true the other way around, since $N_{\epsilon}(p)$ is probably smaller than the minimum amount of points needed to satisfy the \textit{Core Point Condition}.
+This implies a border point $p$ may be \textit{Directly Density-Reachable} from a core point $q$, but it is likely, not true the other way around, since $N_{\epsilon}(p)$ is probably smaller than the minimum amount of points needed to satisfy the \textit{Core Point Condition}.
 
 \subsubsection*{Definition 3: Density-Reachable}
 A point $p$ is \textit{Density-Reachable} (DR) from a point $q$ if
@@ -61,7 +61,7 @@ Let $p$ be a point in $D$ for which the core point condition holds. Then, the se
 Let $C$ be a cluster wrt. to the chosen parameters and let $p$ be a core point in $C$, then it holds that $C = O$.
 
 \subsection{Choice of Parameters}
-There is no reliable way of knowing the parameters $\epsilon$ and $T_{min}$ for each cluster in advance. Instead, the parameters are determined based on the least dense cluster, and used globally for all clusters.
+There is no reliable way of knowing the parameters $\epsilon$ and $T_{min}$ for each cluster in advance. Instead, the parameters are determined based on the least dense cluster and used globally for all clusters.
 
 \section{The DBSCAN Algorithm}
 Start with a random point $p$ and get all \textit{Density-Reachable} points from $p$ wrt. the parameters.

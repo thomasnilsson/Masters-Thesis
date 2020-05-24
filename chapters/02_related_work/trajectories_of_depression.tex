@@ -1,10 +1,10 @@
 \section{Trajectories of Depression: Unobtrusive Monitoring of Depressive States by means of Smartphone Mobility Traces Analysis} 
 
 % Main idea
-In this paper by Canzian et. al from 2015 \cite{Canzian2015}, it is discussed how existing systems for diagnosing depression require the user to interact with the device. These interactions can be input such as mood-state a few times a day, which can be highly subjective and error-prone. The paper addresses this issue via objective patient data, called \textit{Mobility Features}, which was collected via unobtrusive monitoring by using smart-phone location data. There was a significant correlation between these \textit{Mobility Features} and depressive moods similar to \cite{Saeb2015}. The paper also describes concrete models to \textit{predict} changes in depressive mood by using these features. The paper uses the \textit{PHQ-8} questionnaire as reference, which is the almost the same questionnaire as the \textit{PHQ-9} (see Appendix \ref{appendix:questionnaires}), except for only including the first 8 questions. While this paper describes many of the same features as \cite{Saeb2015}, it does so in a much more detailed and mathematical way, such as with the \textit{Routine Index} feature, which correspond to the \textit{Circadian Rhythm} feature in \cite{Saeb2015}.
+In this paper by Canzian et. al from 2015 \cite{Canzian2015}, it is discussed how existing systems for diagnosing depression require the user to interact with the device. These interactions can be input such as mood-state a few times a day, which can be highly subjective and error-prone. The paper addresses this issue via objective patient data, called \textit{Mobility Features}, which was collected via unobtrusive monitoring by using smart-phone location data. There was a significant correlation between these \textit{Mobility Features} and depressive moods similar to \cite{Saeb2015}. The paper also describes concrete models to \textit{predict} changes in depressive mood by using these features. The paper uses the \textit{PHQ-8} questionnaire as a reference, which is the almost the same questionnaire as the \textit{PHQ-9} (see Appendix \ref{appendix:questionnaires}), except for only including the first 8 questions. While this paper describes many of the same features as \cite{Saeb2015}, it does so in a much more detailed and mathematical way, such as with the \textit{Routine Index} feature, which corresponds to the \textit{Circadian Rhythm} feature in \cite{Saeb2015}.
 
 \subsection{Features}
-The feature described are as follows:\\
+The feature described is as follows:\\
 
 \textbf{Place: $p = (id, t_a, t_d, c)$}\\
 A place is a cluster of geo-location points with a unique $id$ and a geographical center $c = (lat, lon)$. When the user arrives at the place it happens at $t_a$ and the user departs from the place at $t_d$. \\
@@ -22,7 +22,7 @@ The maximum distance between any two places visited in the interval $(t_1, t_2)$
 The geographical area covered in the interval $(t_1, t_2)$\\
 
 \textbf{Standard Deviation of Displacement: $\sigma_{dis}$}\\
-The standard deviation between each displacement, i.e. distances from one point to another.\\
+The standard deviation between each displacement i.e. distances from one point to another.\\
 
 \textbf{Home Cluster: $H$}\\
 The cluster most frequented cluster at 02:00, 06:00 and 20:30 on week-days.\\
@@ -40,7 +40,7 @@ The number of significant places visited in the interval $(t_1, t_2)$. The maxim
 The degree to which the place-time distribution during the interval $(t_1, t_2)$ on a given day is similar to the distribution on other days, during the interval $(t_1, t_2)$.\\
 
 \subsection{Smart Location Sampling}
-In addition to concrete definitions of features, the paper also provides an algorithm for sampling location in way which saves phone battery. GPS data collection is very expensive if done with a high frequency and by using cheaper sensors to turn it off when necessary can therefore save a lot of battery. Concretely the accelerometer is used by an activity recognition algorithm to determine the user's activity state. Concretely this is done by modelling the user as being in a movement state, of which there are 3: \textit{Static (S)}, \textit{Moving (M)} and \textit{Undecided (U)}, where location tracking only takes place in the \textit{U} or \textit{M} states. \\
+In addition to concrete definitions of features, the paper also provides an algorithm for sampling location in a way which saves phone battery. GPS data collection is very expensive if done with a high frequency and by using cheaper sensors to turn it off when necessary can, therefore, save a lot of battery. Concretely the accelerometer is used by an activity recognition algorithm to determine the user's activity state. Concretely this is done by modelling the user as being in a movement state, of which there are 3: \textit{Static (S)}, \textit{Moving (M)} and \textit{Undecided (U)}, where location tracking only takes place in the \textit{U} or \textit{M} states. \\
 
 The definitions for the states are as follows:\\
 
@@ -48,7 +48,7 @@ The definitions for the states are as follows:\\
 The user is in the same location i.e. school/work. Never sample location data while in this state since it is unnecessary.\\
 
 \textbf{Moving (M)}\\
-The user is moving from place to place and the phone should therefore keep location tracking on, while in this state.\\
+The user is moving from place to place and the phone should, therefore, keep location tracking on, while in this state.\\
 
 \textbf{Undecided (U)}\\
 It is unknown whether the user is moving or not and moving to either state \textit{S} or \textit{M} is now impending. When this state is entered, the user's location $l_1$ is sampled, and after 5 minutes the location is sampled again, providing $l_2$. Then,  The distance $d = dist(l_1, l_2)$ is calculated and from this, the algorithm will transition to either \textit{S} or \textit{M} depending on the distance between the two locations.
