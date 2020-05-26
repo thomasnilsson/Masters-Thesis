@@ -1,5 +1,88 @@
-Intermediate features are extracted from sequences of location samples by applying the following algorithm. To identify stops, location samples are traversed sequentially and grouped according to a maximum distance threshold. If a sample is too far from the current group median location, a new group is formed. Initially this strategy creates a lot of groups, which are then filtered by a minimum duration threshold leaving groups where movement stopped for at least some time. Each remaining group represents a stop, described by the median coordinates of the group of location samples and arrival and departure time based on the first and last location sample in the group. The appropriate values of maximum distance and minimum duration depends on the accuracy and sample frequency of the data. We applied a minimum distance of 50 meters and minimum duration of 20 minutes based on inspecting the distributions of distances and times between subsequent location samples in the dataset.
+\section{Intermediate Features}
+Intermediate features are extracted from sequences of location samples by computing them separately. 
+
+To identify stops, location samples are traversed sequentially and grouped according to a maximum distance threshold. If a sample is too far from the current group median location, a new group is formed. Initially this strategy creates a lot of groups, which are then filtered by a minimum duration threshold leaving groups where movement stopped for at least some time. Each remaining group represents a stop, described by the median coordinates of the group of location samples and arrival and departure time based on the first and last location sample in the group. The appropriate values of maximum distance and minimum duration depends on the accuracy and sample frequency of the data. We applied a minimum distance of 50 meters and minimum duration of 20 minutes based on inspecting the distributions of distances and times between subsequent location samples in the dataset.
 
 As an intermediate step, stops that are close in terms of time and distance and have no other stops in between are merged to reduce noise caused by outlier location samples that might break a stop into several stops. We merged stops that were maximum 5 minutes and 5 meters apart and found that this removed cases with a suspicious amount of stops per day. With the stops available, places are identified by clustering stops using the DBSCAN clustering algorithm [Ester et al. 1996] with a minimum cluster size of 1, effectively identifying stops appearing at the same location. Each place is represented by the median coordinates of the included stops along with a unique place ID. The place ID is also appended to each of the included stops associating each stop with a place. We applied a maximum distance of 50 meters between stops when computing the clusters.
 
 Moves where identified by selecting the sequences of location samples in between stops. Each move is described by departure and arrival time based on the first and last location sample in the sequence, the origin and destination place ID and the total distance between the location samples in the sequence. The moves were filtered by a minimum duration and minimum distance. We applied a minimum duration of 5 minutes and a minimum distance of 50 meters. Daily features derived from the stops, places and moves include stops count, stops total duration, places count, moves count, moves total distance and moves total duration.
+
+\section{Pre-processing}
+As previously mentioned, the goal of the pre-processing step is to reduce the raw dataset to a more condensed representation such that subsequent algorithms will have fewer data points to process, and thus run faster and consume less energy. The reason why it is possible to save compute power by doing this, is because the DBSCAN algorithm used for finding places does not take the time dimension into account. By simply running through the data points in temporal ordering, it is possible to group points into so called Stops, which represent a temporal, and small-scale distance clustering of raw points, which are then used in the DBSCAN algorithm to identify significant places. In addition, Moves are also computed between stops, such that movement-related features can be calculated, such as distance travelled. The original implementation of these pre-processing algorithms were implemented in Python by Jonas Busk, which used vectorized computations, which Dart does not support nearly to the same extent. The algorithms therefore had to be changed slightly, and were re-implemented using a functional programming approach wherever applicable. For certain computations a more traditional imperative approach, using for-loops, was utilized.
+
+\subsection{Finding Stops}
+Firstly the raw data points are clustered based on their time-ordering and distance from each other. By reducing the raw data points to more coarse grained stops, the will become easier for identifying significant places, which is can be done since the time-ordering of the data points tell us which points can belong together in a stop. This is done by iterating over the ordered data points and building a cluster from these data points, recalculating the cluster centroids with each added data point. This is repeated until the current data point is too far away from the cluster centroid and the cluster is then saved as a stop, and a new cluster is built from the current data point. This process is repeated until all data points have been considered, which means all data points will belong to exactly one stop, and that each stop contains at least one raw data point. The parameter for finding stops is the \verb|MOVE_DIST|, i.e. the radius of each stop-cluster. The lower the parameter value, the more clusters will be found. Each stop has an assigned place, however at this stage we have not yet identified the significant places and for that reasons we assign the null-place to each stop, and assign the place later.
+
+\begin{minted}{python}
+def find_stops(dataset):
+    stops = []
+    n = dataset.length
+    for i = 0 to n:
+        j = i + 1
+        cluster = dataset[i:j]
+        
+        # Expand stop-cluster
+        while dist(cluster.centroid, dataset[j]) <= MOVE_DIST and j < n:
+            j += 1
+            cluster = dataset[i:j]
+        
+        # Current data point data[j] is outside the cluster 
+        l = Location(cluster.centroid.lat, cluster.centroid.lon)
+
+        # Create unlabelled stop with place ID -1
+        s = Stop(l, cluster.arrival.min, cluster.departure.max, -1) 
+        stops.add(s)
+        
+        # Move beyond already-seen data points
+        i = j
+    return stops
+\end{minted}
+
+
+\subsubsection{Significant Places}
+For finding the significant places the stops are clustered with the DBSCAN algorithm, which will use a density-based approach to finding clusters. The parameter \verb|PLACE_DIST| is used as the max-distance between points used by DBSCAN and the Haversine distance function. The DBSCAN algorithm will assign each stop given as input with a label, which is a non-negative number for all significant places and $-1$ for all noisy stops signifying the null-place, i.e. stops not belonging to a place. After this, each stop have now been assigned a place they belong to, and this is set explicitly such that time spent at a place can be counted later.
+
+\begin{minted}{python}
+def find_places(stops):
+    places = []
+    
+    # Perform DBSCAN clustering on stops
+    labels = DBSCAN(stops, PLACE_DIST)
+    
+    # Aggregate stops on their assigned label
+    groups = stops.group_by(labels)
+    
+    for id, group in (labels, groups)
+        l = Location(group.lat.median, g.lon.median)
+        p = Place(id, l)
+        places.add(p)
+        
+        # Assign the current place id to each stop in the group
+        for s in group:
+            s.placeId = id
+    
+    return places, stops
+\end{minted}
+
+\subsubsection{Moves}
+The moves made by the user is found by iterating over each stop and assigning all the data points which were visiting between each pair of stops, i.e. $s_i$ and $s_{i + 1}$ to it, as well as the two stops. Through this, the distance of the point-chain can be calculated, as well as the duration of the transition-period.
+
+\begin{minted}{python}
+def find_moves(dataset, stops):
+    moves = []
+    
+    # Find all data points between each pair of stops
+    for i = 0 to stops.length
+        cur = stops[i]
+        next = stops[i+1]
+        points = dataset.filter(cur.departure <= d.timestamp 
+            and d.timestamp <= next.arrival)
+        m = Move(cur, next, points)
+    
+    return moves
+\end{minted}
+
+\subsection{Distance Function}
+Geodesic vs Haversine discussion here
+For all distance measures, the Haversine distance function was used due to being far easier to compute and implement and provides the same results for shorter distances, which is the case for the processing in this context. This also saves battery life. 
+
