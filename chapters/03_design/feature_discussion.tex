@@ -1,0 +1,12 @@
+\section{Feature Discussion}
+The Mobility Features which were used were a subset of the features discussed by \cite{Saeb2015,Canzian2015}. In addition a set of, what we will refer to as \textit{intermediate features} were also used which from the work of \cite{sparse-location-2014}. 
+
+\subsection{Intermediate Features}
+Common for many of the algorithms for finding user mobility features is that they rely on clustering of data points, in order to find the number of Places. However when dealing with large amounts of data points it may be necessary to reduce the initial amount of data points such that these clustering algorithms are able to run faster. This downsampling process will be carried out by clustering raw data points into what we shall refer to as \textit{Stops} indicating locations where the participant did not move around a lot. The \textit{Stop} notion is loosely based on the \cite{sparse-location-2014}. The pre-processing produces \textit{intermediate features} from which the final mobility features are derived. These intermediate features are \textit{Stops}, \textit{Places} and \textit{Moves} and provide a coarse-grained version of the dataset which makes the final feature calculation much cheaper, computationally speaking. We define \textit{Places} as specific locations of relevance to the user, such as home or workplace. \textit{Stops} are specific visits to any of those places. Thus, a \textit{Stop} is always associated with a single \textit{Place} while places can be associated with one or more \textit{Stops}. Finally, \textit{Moves} are the sequences of location samples in between \textit{Stops}, representing moving between \textit{Places}. 
+
+\subsection{Features}
+The features derived from this class are \textit{Home Stay}, \textit{Location Variance}, \textit{Number of Places, Entropy}, \textit{Normalized Entropy} , \textit{Distance Travelled} and \textit{Routine Index}.
+
+Features used
+Why tthose features
+what do they mean
