@@ -8,8 +8,77 @@ A period is a set of several dates is defined as $D = \{d_1, d_2, ..., d_{|D|}\}
 \subsection{Single Location Point (SLP)}
 A \textit{Single Location Point} (\textit{SLP}) is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two \textit{Single Location Points} is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
 
+\begin{minted}{python}
+class Location(latitude, longitude):
+    field latitude
+    field longitude
+\end{minted}
+
+\begin{minted}{python}
+class SingleLocationPoint(location, timestamp):
+    field location
+    field timestamp
+\end{minted}
+
+\begin{minted}{python}
+class Cluster(points):
+    def max_timestamp():
+        return points.timestamp.max
+        
+    def min_timestamp():
+        return points.timestamp.min
+        
+    def centroid():
+        lat = points.location.latitude.median
+        lon = points.location.longitude.median
+        return Location(lat, lon)
+\end{minted}
+
+\begin{minted}{python}
+class Stop(location, arrival, departure, place_id):
+    field location
+    field arrival
+    field departure
+    field place_id
+\end{minted}
+
+\begin{minted}{python}
+class Place(centroid, place_id):
+    field centroid
+    field place_id
+\end{minted}
+
 \subsection{Stop}
 Finding \textit{Stops} is done by traversing every \textit{Single Location Points} in temporal order, i.e. the timestamp is used. The \textit{Stops} for a given date is found by clustering \text{Single Location Points} on that date based on time and distance. \\
+
+\begin{minted}{python}
+def find_stops(D, max_dist=25):
+    stops = {} # Empty set
+    n = D.length
+    i = 0
+    while i < n:
+        j = i + 1
+        c = Cluster(D[i:j])
+        
+        # Expand cluster until the radius is exceeded
+        while dist(c.centroid, D[j]) <= max_dist && (j < n):
+            j += 1
+            c = Cluster(D[i:j])
+        
+        # We have now found the first point which 
+        # lies outside the cluster, and we create the stop.
+        arrival = c.min_timestamp()
+        departure = c.max_timestamp()
+        centroid = c.centroid()
+        place_id = null
+        s = Stop(centroid, arrival, departure, place_id) 
+        stops.append(s)
+        
+        # Move past already-seen data points
+        i = j
+    return stops
+\end{minted}
+
 
 The set of Stops found for the period $D$ is defined as
 
@@ -20,12 +89,23 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 \subsection{Place}
 \textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. This means all \textit{Stops} from previous dates need to be stored on the device. \\
 
+PSEUDO CODE\\
+
 The set of Places found for the period $D$ is defined as 
 
 $$P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}$$
 
 \subsection{Move}
 \textit{Moves} for a given can be calculated using the \textit{Stops}- and the \textit{Single Location Points} from that date. The \textit{Moves} are found by going through each \textit{Stop} and calculating the distance between the current \textit{Stop} and the following \textit{Stop} by going through all the \textit{Single Location Points} which were sampled in the time interval between these the \textit{Stops}. These points form the path which was taken between the two \textit{Stops} and the path is used to calculate the exact distance traveled.\\
+
+\begin{minted}{python}
+class Move(stop_from, stop_to, distance):
+    field stop_from
+    field stop_to
+    field distance
+\end{minted}
+
+\textsc{FIND MOVES}
 
 A set of\textit{Moves} is defined as $$M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}$$ is a set of time-ordered \textit{SLPs}.\\
 
