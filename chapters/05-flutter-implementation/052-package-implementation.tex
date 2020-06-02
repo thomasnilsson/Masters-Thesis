@@ -1,0 +1,191 @@
+\section{Implementing the Flutter Package}
+When designing a programming interface for the application programmer a balance has to be struck between what the intended behaviour is, and thus what is public to the programmer. There will be computations which are computed which, while essential, should not be public to the programmer. The reasons for this are twofold: privacy and complexity. In this case privacy could be related to intermediate features containing sensitive location information, and therefore one would likely make these intermediate features entirely private if privacy was a big concern, since we deem intermediate places more sensitive than the raw location data. For this package however, the Stops need to be saved by the application programmer, and therefore the intermediate features need to be public. 
+
+\subsection{Getters and Setters}
+In most objective oriented languages, such as Java, the safest way to use fields in classes is to make them private, and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
+
+\begin{minted}{java}
+class MobilityContext {
+
+  /// Features
+  double _routineIndex;
+  ...
+  double get routineIndex {
+    return _routineIndex;
+  }
+}
+\end{minted}
+
+This results in an easy-to-read syntax when getting the value of the field, which looks like this:
+
+\begin{minted}{dart}
+MobilityContext c = MobilityContext(...);
+print(c.routineIndex);
+\end{minted}
+
+\subsection{Lazy Evaluation}
+Getters should reflect that the value that is to be retrieved requires minimal computation, and therefore features should not be calculated in the getter methods. However to keep the nice syntax that getters provide there is a middle way, since the feature needs to be computed at some point, regardless. This middle way is lazy evaluation, which, in the context of classes is the idea of having a field be computed the first time it is retrieved only. In practice this is done by letting the field be initialized to null, and checking for null in the getter. If the value is null then the feature is calculated and the field's value is updated, and afterward the field is returned. Otherwise if the field is not null it means the field has already been computed and the field is returned.
+
+\begin{minted}{dart}
+class MobilityContext {
+    double _routineIndex;
+    ...
+    double get routineIndex {
+        if (_routineIndex == null) {
+            _routineIndex = _calculateRoutineIndex();
+        }
+        return _routineIndex;
+    }
+}
+\end{minted}
+
+This has the upsides of providing the easy-to-read syntax to the application programmer, as well as ensuring the attribute is only computed the very first time it is requested.
+
+\begin{minted}{dart}
+MobilityContext c = MobilityContext(...);
+print(c.routineIndex); // Attribute will be computed
+...
+print(c.routineIndex); // Attribute is pre-computed
+\end{minted}
+
+\subsection{Abstract Classes and Interfaces}
+Dart has no \verb|interface| keyword. Instead, all classes implicitly define an interface and an abstract class than therefore be used instead. In the domain model, abstract classes were used to define common behaviour of certain classes, in which direct inheritance does not make sense (composition vs inheritance). 
+
+\subsubsection{Geospatial Interface}
+The first abstract class is \verb|Geospatial| which forces any class implementing this interface to have a \textit{Location} attribute, i.e. the object can be mapped to a point on the surface of the Earth. Concretely, the classes which implement this interface are \textit{Location}, \textit{SingleLocationPoint} and \textit{Stop}, which enables \textit{SingleLocationPoints} and \textit{Stops} to be clustered into a \textit{Location}.
+
+The abstract class is defined as follows:
+\begin{minted}{dart}
+abstract class Geospatial {
+    Location get location;
+}
+\end{minted}
+
+A Stop implements the interface as follows:
+\begin{minted}{dart}
+class Stop implements Serializable, Geospatial { 
+    ...
+    /// Geo-location
+    Location get location => _location;
+    ...
+}
+\end{minted}
+
+Furthermore this also allows the Haversine distance to be calculated between any two classes which implement the interface:
+
+\begin{minted}{dart}
+class Distance {
+  static double fromGeospatial(Geospatial a, Geospatial b) {
+    return fromList([a.location._latitude, a.location._longitude],
+        [b.location._latitude, b.location._longitude]);
+  }
+
+  static double fromList(List<double> p1, List<double> p2) {
+    ...
+  }
+}
+\end{minted}
+
+This is used when finding \textit{Stops}, where a the distance from a center-location of a list of \textit{SingleLocationPoints} to a single \textit{SingleLocationPoint} is calculated:
+
+\begin{minted}{dart}
+List<SingleLocationPoint> subset = data.sublist(start, end);
+Location centroid = Cluster.computeCentroid(subset);
+
+/// Expand cluster until either all data points have been considered,
+/// or the current data point lies outside the radius.
+while (end < n && 
+    Distance.fromGeospatial(centroid, data[end]) <= stopRadius) 
+    { ... }
+\end{minted}
+
+\subsubsection{Serializable Interface}
+Another abstract class/interface is the \verb|Serializable| interface implemented by \textit{Location}, \textit{SingleLocationPoint}, \textit{Stop} and \textit{Move}. This interface easy serialization and de-serialization of these classes and does so by converting between JSON and Dart objects. Concretely, the \verb|Serializable| interface promises the compiler an implementation of the methods \verb|toJson()| and \verb|fromJson()|.
+
+The interface is defining as follows:
+\begin{minted}{dart}
+abstract class Serializable {
+    Map<String, dynamic> toJson();
+    Serializable.fromJson(Map<String, dynamic> json);
+}
+\end{minted}
+
+A concrete implementation is by the Stop class, which looks as follows:
+
+\begin{minted}{dart}
+class Stop implements Serializable, Geospatial { 
+    ...
+    /// Serialize to json
+    Map<String, dynamic> toJson() => {
+        "centroid": location.toJson(),
+        "place_id": placeId,
+        "arrival": arrival.millisecondsSinceEpoch,
+        "departure": departure.millisecondsSinceEpoch
+    };
+
+    /// De-serialize from json
+    factory Stop.fromJson(Map<String, dynamic> json) {
+        return Stop(
+            Location.fromJson(json['centroid']),
+            DateTime.fromMillisecondsSinceEpoch(json['arrival']),
+            DateTime.fromMillisecondsSinceEpoch(json['departure']),
+            placeId: json['place_id']);
+    }
+    ...
+}
+\end{minted}
+
+The usage of the interface is found in the Serializer class, which is utility class for serializing and de-serializing a list of objects which implement the Serializable interface.
+
+The class is defined using an element type \verb|E| which refers to either an SLP, Stop or Move which all implement the Serializable interface. The Serializer is defined as follows:
+\begin{minted}{dart}
+class Serializer<E> {
+  /// Provide a file reference in order to serialize objects.
+  File file;
+\end{minted}
+
+Serialization (saving) is done by converting each serializable element to a JSON string using the \verb|toJson| method which is promised by implementing the \textit{Serializable} class. These strings are then concatenated to one big string, delimited by a delimiter-string (the newline character) and lastly this string is appended to a file unique to the type of \verb|E|.
+
+\begin{minted}{dart}
+Future<void> save(List<Serializable> elements) async {
+    String jsonString = "";
+    for (Serializable e in elements) {
+      jsonString += json.encode(e.toJson()) + delimiter;
+    }
+    await file.writeAsString(jsonString, 
+        mode: FileMode.writeOnlyAppend);
+}
+\end{minted}
+
+The de-serialization (loading) is carried out by reading the file contents, parsing it to JSON objects, i.e. a list of \verb|Map<String, dynamic>| in the Dart language, and then parsing each of these objects to a Mobility Features object, depending on the type of \verb|E|:
+\begin{minted}{dart}
+Future<List<Serializable>> load() async {
+    Iterable<Map<String, dynamic>> maps = ... // Read file contents
+    
+    switch (E) {
+      case Move:
+    
+      /// Filter out moves which are not recent
+        return maps
+            .map((x) => Move.fromJson(x))
+            .toList();
+      case Stop:
+    
+      /// Filter out stops which are not recent
+        return maps
+            .map((x) => Stop.fromJson(x))
+            .toList();
+      default:
+    
+      /// Filter out data points not from today
+        return maps
+            .map((x) => SingleLocationPoint.fromJson(x))
+            .toList();
+    }
+}
+\end{minted}
+Ideally, the switch statement could have been replaced by the following one-liner:
+\begin{minted}{dart}
+return maps.map((x) => E.fromJson(x)) .toList();
+\end{minted}
+However, Dart does not support reflection which would allow the compiler to infer the class of \verb|E| at run-time.

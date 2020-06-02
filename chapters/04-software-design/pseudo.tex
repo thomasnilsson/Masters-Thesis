@@ -1,0 +1,133 @@
+
+\begin{minted}{python}
+class Location(latitude, longitude):
+    field latitude
+    field longitude
+\end{minted}
+
+\begin{minted}{python}
+class SingleLocationPoint(location, timestamp):
+    field location
+    field timestamp
+\end{minted}
+
+
+\begin{minted}{python}
+class Cluster(points):
+    def max_timestamp():
+        return points.timestamp.max
+        
+    def min_timestamp():
+        return points.timestamp.min
+        
+    def centroid():
+        lat = points.location.latitude.median
+        lon = points.location.longitude.median
+        return Location(lat, lon)
+\end{minted}
+
+\begin{minted}{python}
+class Stop(location, arrival, departure, place_id):
+    field location
+    field arrival
+    field departure
+    field place_id
+\end{minted}
+
+\begin{minted}{python}
+def find_stops(D, max_dist=25):
+    stops = {} # Empty set
+    n = D.length
+    i = 0
+    while i < n:
+        j = i + 1
+        c = Cluster(D[i:j])
+        
+        # Expand cluster until the radius is exceeded
+        while dist(c.centroid, D[j]) <= max_dist && (j < n):
+            j += 1
+            c = Cluster(D[i:j])
+        
+        # We have now found the first point which 
+        # lies outside the cluster, and we create the stop.
+        arrival = c.min_timestamp()
+        departure = c.max_timestamp()
+        centroid = c.centroid()
+        place_id = null
+        s = Stop(centroid, arrival, departure, place_id) 
+        stops.append(s)
+        
+        # Move past already-seen data points
+        i = j
+    return stops
+\end{minted}
+
+\begin{minted}{python}
+class Place(centroid, place_id):
+    field centroid
+    field place_id
+\end{minted}
+
+\begin{minted}{python}
+def find_places(stops):
+    places = {}
+    
+    # Perform DBSCAN clustering on stops
+    labels = DBSCAN(stops, PLACE_DIST)
+    
+    # Aggregate stops on their assigned label
+    groups = stops.group_by(labels)
+    
+    for p_id, group in (labels, groups)
+        l = Location(group.lat.median, g.lon.median)
+        p = Place(id, l)
+        places.add(p)
+        
+        # Assign the current place id to each stop in the group
+        for s in group:
+            s.place_id = p_id
+    
+    return places, stops
+\end{minted}
+\begin{minted}{python}
+class Move(stop_from, stop_to, distance):
+    field stop_from
+    field stop_to
+    field distance
+\end{minted}
+
+
+% \begin{verbatim}
+% CENTROID(cluster):
+%     lat = cluster.latitude.median
+%     lon = cluster.longitude.median
+%     return (lat, lon)
+
+% FIND_STOPS(data, max_dist):
+%     stops = {} # Empty set
+%     n = data.length
+%     i = 0
+%     WHILE i < n:
+%         j = i + 1
+%         # Create a cluster of points seen
+%         C = D[i:j]
+        
+%         # Expand cluster until the radius is exceeded
+%         WHILE DIST(CENTROID(C), data[j]) <= max_dist && (j < n):
+%             j += 1
+%             C = data[i:j]
+        
+%         # The point D[j] exceeds the max radius
+%         arrival = C[0].timestamp # First point
+%         departure = C[-1].timestamp # Last point
+%         center = CENTROID(C)
+%         # Create stop with unknown place-id
+%         s = (center, arrival, departure, NULL) 
+%         stops.append(s)
+%         $a \union b$
+%         # Move past clustered data points
+%         i = j
+%     RETURN stops
+% \end{verbatim}
+
+

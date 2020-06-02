@@ -1,2 +1,49 @@
-\section{Flutter Packages and Plugins}
-When collecting user data which reflects the daily mobility patterns of the user, it is important to note that location data should be tracked in the background. Otherwise the phone cannot be used nce the user cannot be expected to not use their phone at all during the time they are being tracked since this is virtual all the time. For this to work, certain permissions and flags must be configured correctly on the respective platforms such that the application using this package can sample location data and process it in the background. Shortly after the start of this thesis, Google limited how the Android Location API handles background updates, which meant that an Android application must be in the foreground to track location such as is the case with Google Maps navigation where it is very explicit\footnote{\url{https://developer.android.com/training/location/background}}. Due to time constraints however, a good solution to this problem was not found.
+\section{Flutter, Packages and Plugins}
+
+% \subsection{Flutter Plugins and Packages}
+% The Flutter Framework is a cross-platform development framework that was released by Google in 2018. Flutter uses the Dart programming language and makes it possible to write a codebase purely in Dart, and compiling this code to native iOS and Android code. What this means is that an application developer can create an application for both platforms with a single codebase. However whenever native-specific APIs have to be invoked such as that of the camera or various phone-sensors, a package developer has to write a library that does so, by means of a method invocation from the Dart language which triggers the corresponding API invocation ob the Android or iOS platform. This method invocation library is referred to as a \textit{plugin} within the Flutter world, in contrast to a \textit{package} which simply invokes other Dart code and as such contains no platform-specific source code. The \textit{Mobility Features Package} will be a Flutter package that contains a collection of algorithms that provides an application programmer with object-oriented abstractions that allows him/her to calculate relevant features for a mobile health application. The Location API, available on both iOS and Android, will not be invoked directly from this package since that would require it to be a plugin. This has two main upsides: From the point of the application developer, it allows him/her to use their location plugin of choice (of which there are many \footnote{\url{https://pub.dev/packages?q=location}} with specific parameters for how the location is tracked (ex frequency and distance). Secondly, from the perspective of the maintainer of this package, the package becomes much more modular and in turn easier to maintain.
+
+
+Flutter is a cross-platform app development framework developed by Google and released in 2018. It allows an application programmer to write a moible application using a single codebase written in the Dart programming language, and compile this source code to a native Android and iOS application. This has the clear advantage of reducing the amount of labour needed to produce mobile applications which most of the time need to be released on both platforms. 
+
+\subsection{Packages}
+A flutter \textit{package} is a library containing Dart code exclusively which  enable the creation of modular code that can be shared easily. A minimal package consists of a \verb|pubspec.yaml| file that declares the package name, version, author, and so on, and secondly a source code directory named \verb|lib|. It is relevant to develop a package when common functionality is to be shared among applications, and the functionality can be computed in the Dart programming language alone.
+
+\begin{figure}
+    \centering
+    \begin{minted}{yaml}
+    name: mobility_features
+    description: Real-time mobility feature calculation
+    version: 0.0.1
+    homepage: https://github.com/cph-cachet/flutter-plugins/
+    
+    environment:
+      sdk: ">=2.7.0 <3.0.0"
+    
+    dependencies:
+      flutter:
+        sdk: flutter
+      simple_cluster: ^0.2.0
+      stats: ^0.2.0+3
+      path_provider: ^1.6.7
+    
+    dev_dependencies:
+      flutter_test:
+        sdk: flutter
+    \end{minted}
+    \caption{The pubspec.yaml file for the Mobility Features Package}
+    \label{fig:my_label}
+\end{figure}
+
+\subsection{Plugins}
+Whenever a functionality is wanted which is only available through a native API, such as the camera or battery level, a \textit{plugin} is used instead. In contrast to a package, a plugin contains three codebases: Flutter (Dart), Android (Kotlin/Java), and iOS (Swift/Objective C). The Dart codebase contains an implementation which can be called from a Flutter app, and in turn calls the implementation in the Android environment and the iOS environment (whichever platform the device runs). It does so by transporting data between the platforms, which means no real computation is performed in the Dart environment; the Dart implementation simply invokes a method in the native environment, the native environment perfrosm the computation, or data collection, and then sends back an answer. For transporting data between the native environment and the Dart environment, messaging channels are used, namely \textit{MethodChannels} and \textit{EventChannels}. A \textit{MethodChannel} is used for communicating when data is to be transferred on a whenever a method is invoked. In contrast to this, the \textit{EventChannel} allows streaming data from the native environment every time an event is triggered in the native environment, such as when a sensor picks up on a new data point. A Location API plugin which streams location data continuously uses an \textit{EventChannel}.
+
+
+\subsection{Location Plugin}
+When collecting user data which reflects the daily mobility patterns of the user, it is important to note that location data should be tracked in the background. Otherwise the phone cannot be used nce the user cannot be expected to not use their phone at all during the time they are being tracked since this is virtual all the time. For this to work, certain permissions and flags must be configured correctly on the respective platforms such that the application using this package can sample location data and process it in the background. Shortly after the start of this thesis, Google limited how the Android Location API handles background updates, which meant that an Android application must be in the foreground to track location such as is the case with Google Maps navigation where it is very explicit\footnote{\url{https://developer.android.com/training/location/background}}. Due to time constraints however, a good solution to this problem was not found. A custom location plugin was built due to the existing solutions not supporting true background location tracking. The most robust plugin found was the \textit{geolocator}\footnote{\url{https://pub.dev/packages/geolocator}} plugin, however this was missing a flag in the Objective-C implementation for iOS, which allows the app to continue streaming location data while the app is minimized. The flag for background updates has to be set for an instance of a Location Manager which is the access to the Location API:
+
+\begin{minted}{c}
+    _locationManager.allowsBackgroundLocationUpdates = YES;
+\end{minted}
+
+If this flag is not set to 'YES' (i.e. True), the location stream will die shortly after the application is minimized. It is important to note that this plugin is not part of the Mobility Features Package, but is likely needed to make use of the package. A Github issue was created\footnote{\url{https://github.com/Baseflow/flutter-geolocator/issues/390}} and the features was merged to a development branch for the GeoLocator plugin.
