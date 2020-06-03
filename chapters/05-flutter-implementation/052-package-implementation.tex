@@ -116,22 +116,12 @@ A concrete implementation is by the Stop class, which looks as follows:
 class Stop implements Serializable, Geospatial { 
     ...
     /// Serialize to json
-    Map<String, dynamic> toJson() => {
-        "centroid": location.toJson(),
-        "place_id": placeId,
-        "arrival": arrival.millisecondsSinceEpoch,
-        "departure": departure.millisecondsSinceEpoch
-    };
+    Map<String, dynamic> toJson() => { ... };
 
     /// De-serialize from json
     factory Stop.fromJson(Map<String, dynamic> json) {
-        return Stop(
-            Location.fromJson(json['centroid']),
-            DateTime.fromMillisecondsSinceEpoch(json['arrival']),
-            DateTime.fromMillisecondsSinceEpoch(json['departure']),
-            placeId: json['place_id']);
+        return Stop( ... );
     }
-    ...
 }
 \end{minted}
 
