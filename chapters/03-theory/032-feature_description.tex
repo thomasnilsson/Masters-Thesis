@@ -14,8 +14,7 @@ A group of stops that were clustered by the DBSCAN algorithm \cite{density-based
 The travel between two Stops, which the user will pass though a path of GPS points. The distance of a Move can be computed as the sum of using the haversine distance of this path. Given the distance travelled as well as departure and arrival timestamp from the Stops, the average speed at which the user traveled can be derived. 
 
 \subsubsection*{Hour Matrix}
-A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The \textit{Hour Matrix} represents the time-place distribution for the user during a day.
-
+The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} and \textit{Routine Index} feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The \textit{Hour Matrix} represents the time-place distribution for the user during a day.
 \begin{figure}
     \centering
     \begin{tabular}{|l|l|l|l|l|}
@@ -57,6 +56,3 @@ The total distance travelled today (in meters), i.e. not limited to walking or r
 
 \subsubsection*{Routine Index}
 The percentage of today that overlapped with the previous, maximally, 28 days.
-
-
-

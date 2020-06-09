@@ -1,9 +1,56 @@
-\section{Main Algorithm}
-For the package to work there needs to be a main algorithm which collected data, stored data on disk and computes the features when necessary. This algorithm is not implemented by the package itself, but rather by an application that uses the package. The reason for this is that the algorithm contains many steps which can be done in many ways according to what the application programmer is already using. For example, if an application programmer uses a local SQLite database to store other data, then it is ideal to use this database for storing the location data and intermediate features as well.
+\section{API Usage}
+\subsection{Computing Intermediate Features}
+DATA PREPROC
 
-\begin{figure}
-    \centering
-    \includegraphics{images/diagrams/sequence.png}
-    \caption{Sequence diagram for the computation of the Mobility Context in a Flutter application}
-    \label{fig:sequence-diagram-mobility-context}
-\end{figure}
+\subsection{Serialization}
+A serializer can be instantiated for in a desktop environment using the \verb|File| class from the built-in package \verb|dart:io| as follows:
+\begin{minted}{dart}
+    import 'dart:io';
+    import 'package:mobility_features/mobility_features_lib.dart';
+    ...
+    Serializer<Stop> stopSerializer = Serializer(new File(FILENAME));
+\end{minted}
+
+In a mobile environment the \verb|path_provider| package is used to get the Documents directory, from which a File object is then created.
+
+\begin{minted}{dart}
+    import 'dart:io';
+    import 'package:path_provider/path_provider.dart';
+    import 'package:mobility_features/mobility_features_lib.dart';
+    ...
+    String path = (await getApplicationDocumentsDirectory()).path;
+    Serializer<Stop> stopSerializer = Serializer(new File(path));
+\end{minted}
+
+\subsection{Computing Mobility Context(s)}
+Create a single Mobility Context without prior Context:
+
+\begin{minted}{dart}
+    DateTime today = DateTime.now().midnight;
+    DataPreprocessor dp = DataPreprocessor(today);
+
+    List<SingleLocationPoint> points = await _pointSerializer.load();
+    List<Stop> stops = dp.findStops(points);
+    List<Move> moves = dp.findMoves(points, stops);
+    List<Place> places = dp.findPlaces(stops);
+    
+    MobilityContext mc = MobilityContext(today, stops, places, moves);
+\end{minted}
+
+This works for a single day of data, and does not require the user to save previous Stops and Moves. However, the Routine Index cannot be evaluated without using prior contexts. 
+
+% Using prior contexts is much more involved, and will look like the following:
+
+% \begin{minted}{dart}
+%     DateTime today = DateTime.now().midnight;
+%     DataPreprocessor dp = DataPreprocessor(today);
+%     List<Stop> stopsOld = await _stopSerializer.load();
+%     List<Move> movesOld = await _moveSerializer.load();
+    
+%     List<SingleLocationPoint> pointsToday = await _pointSerializer.load();
+%     List<Stop> stopsToday = dp.findStops(pointsToday);
+%     List<Move> movesToday = dp.findMoves(pointsToday, stopsToday);
+%     List<Place> places = dp.findPlaces(stops);
+    
+%     MobilityContext mc = MobilityContext(today, stops, places, moves);
+% \end{minted}

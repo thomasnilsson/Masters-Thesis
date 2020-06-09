@@ -1,19 +1,16 @@
 \section{Data Analysis of Study}
-As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results.
+As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants.
 
 \subsection{Calculating the Answers}
 The answers had to be converted into scalars such that they could be compared directly to the computed features. 
 
-In any case the feature calculation closest to the answer was used, prioritising a features calculated after the given answer, rather than earlier.
+In any case the feature calculation closest to the answer was used, prioritising a features calculated after the given answer, rather than earlier. For the Home Stay feature, the time at which the answer was sent is used for calculating the elapsed time. If the user is away from home at the time of answering, they will likely taken this into account. It is assumed however that most people would wait until they were at home before registering. For the \textit{Routine Index}, the answer (a number of 0 to 5) was transformed to scalar between 0 and 1, i.e. let the scale value be $s \in \{0, 1, 2, 3, 4, 5\}$, then the corresponding \textit{Routine Index} is calculated as 
 
-Homestay: Use the time of sending in the answer as the elapsed time. If the user is 'out' at the time of answering, they will likely taken this into account.
-
-Routine index: Transform scale to routine index, i.e. scale $s \in \{0, 1, 2, 3, 4, 5\}$, then the routine index is calculated as $r = \frac{s}{s_{max}}$
-
-
+\begin{equation}
+    r = \frac{s}{s_{max}}, \quad s_{max} = 5
+\end{equation}
 
 \subsection{Error Measuring}
-
 Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant which gives an indication of how much could be computed. It also became clear that some participants did not collect nearly as much data as others, and because of this their results are expected to be worse. The number of stops found are not necessarily correlated with the number of points found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer, but Stops with a longer duration being found. 
 
 \begin{figure}
