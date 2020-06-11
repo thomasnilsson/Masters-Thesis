@@ -9,8 +9,9 @@ The parameter to balance in terms of the API, is moving complexity inside the pa
  
  A bold typeface indicates the class can be instantiated by the user and is publicly available. An underlined typeface indicates the class is static and therefore cannot be instantiated but is publicly available to the programmer. A class with an italic typeface is a class which cannot be directly instantiated by the user but is available through the API. 
  
- To make things concrete, Contents of this DTO are transferred to the equivalent DTO of the \textit{Mobility Features Package}, namely \textit{SingleLocationPoint} which is workaround for allowing the programmer to use any location service API. The programmer therefore has public access to the \textit{SingleLocationPoint} class and can instantiate it.
+ To make things concrete, Contents of this DTO are transferred to the equivalent DTO of the \textit{Mobility Features Package}, namely \textit{SingleLocationPoint} which is workaround for allowing the programmer to use any location service API. The programmer therefore has public access to the \textit{SingleLocationPoint} (SLP) class and can instantiate it.
 
+The sole static class in the diagram is the ContextGenerator class which is the main interface for the application programmer. This class contains a reference to the Serializer class that allows the user to serialize SLP
 
 \begin{figure}[h]
     \centering
