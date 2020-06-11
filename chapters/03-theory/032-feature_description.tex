@@ -37,7 +37,7 @@ The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} a
 The features derived from this class are \textit{Home Stay (\%)}, \textit{Location Variance}, \textit{Number of Places}, \textit{Entropy} \textit{Normalized Entropy} , \textit{Distance Travelled} and the \textit{Routine Index (\%)}. These features are computed daily which for example means Home Stay refers to the portion of the time today which was spent at home. Below a short definition of each feature will be given since some of them differ somewhat from the descriptions given by \cite{Canzian2015,Saeb2015}. A more detailed description will be given in Section \ref{section:definitions}.
 
 \subsubsection*{Home Stay}
-The portion (percentage) of the total time elapsed since midnight which was spent at home. 
+The portion (percentage) of the total time elapsed since midnight which was spent at home. Elapsed time is calculated from the departure time of the last known stop.
 
 \subsubsection*{Location Variance}
 The statistical variance in the latitude- and longitudinal coordinates.

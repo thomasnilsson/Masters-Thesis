@@ -1,6 +1,8 @@
 \section{Application Implementation}
 This section will describe the implementation of the study application, mostly regarding how data was collected, how features were computed as well as how the data was sent to a Firebase instance. 
 
+The study app used the package while it was in a vastly different state API wise, meaning a lot more of the logic related to handling storing and loading data from disk, and calculating intermediate features prior to features were handled in the application itself.
+
 \subsection{Component Overview}
 To provide a high level overview of the different components which make up the study application a component diagram displayed in Figure \ref{fig:app-component-diagram}. The MobilityStudy component in blue is the component responsible for managing the application state but does not do much outside of this since the application state management required is minimal. Had it been a more complex application with many different screens and a state which had to be maintained across these screens (for example a shopping cart in a shopping app) then more logic would lie inside the MobilityStudy component. Instead the Main Screen is spawned from the MobilityStudy component which in turn creates an AppProcessor instance. The AppProcessor instance is responsible for a multitude of tasks, such as asking for permissions, collection location data, and computing features. Storing and loading from the disk is done through the FileManager component which includes location data, Stops, Moves, MobilityContexts and diary answers. This component is also responsible for uploading the stored data to Firebase.
 
@@ -215,7 +217,7 @@ Thirdly, today's data points are used to find the most updated set of Stops and 
     List<Place> placesAll = preprocessor.findPlaces(stopsAll);
 \end{minted}
 
-Lastly, the MobilityContex is computed from the intermediate features from the whole period
+Lastly, the MobilityContext is computed from the intermediate features from the whole period
 \begin{minted}{dart}
     /// Compute features
     MobilityContext mobilityContext = MobilityContext(today, stopsAll, placesAll, movesAll);

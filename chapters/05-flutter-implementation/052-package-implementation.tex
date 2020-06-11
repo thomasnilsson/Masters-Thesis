@@ -1,12 +1,13 @@
 \section{Implementing the Flutter Package}
-When designing a programming interface for the application programmer a balance has to be struck between what the intended behaviour is, and thus what is public to the programmer. There will be computations which are computed which, while essential, should not be public to the programmer. The reasons for this are twofold: privacy and complexity. In this case privacy could be related to intermediate features containing sensitive location information, and therefore one would likely make these intermediate features entirely private if privacy was a big concern, since we deem intermediate places more sensitive than the raw location data. For this package however, the Stops need to be saved by the application programmer, and therefore the intermediate features need to be public. 
+The main idea when implement
+
+a balance has to be struck between what the intended behaviour is, and thus what is public to the programmer. There will be computations which are computed which, while essential, should not be public to the programmer. The reasons for this are twofold: privacy and complexity. In this case privacy could be related to intermediate features containing sensitive location information, and therefore one would likely make these intermediate features entirely private if privacy was a big concern, since we deem intermediate places more sensitive than the raw location data. For this package however, the Stops need to be saved by the application programmer, and therefore the intermediate features need to be public. 
 
 \subsection{Data Preprocessing}
 Stops Moves Places
 
-
 \subsection{Mobility Context}
-\subsubsection{Field Protection}
+\subsubsection{Public and Private Facing Classes}
 In most objective oriented languages, such as Java, the safest way to use fields in classes is to make them private, and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
 
 \begin{minted}{java}
@@ -191,3 +192,6 @@ return jsonObjs.map((x) => E.fromJson(x)).toList();
 \end{minted}
 
 However, Dart does not support \textit{reflection} which is the ability for the compiler to infer the type of \verb|E| at run-time.
+
+\subsection{Calculating Routine Index}
+Using the hour matrix of other contexts
