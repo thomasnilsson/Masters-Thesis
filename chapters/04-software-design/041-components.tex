@@ -7,34 +7,18 @@ The parameter to balance in terms of the API, is moving complexity inside the pa
 \subsection{Class Access}
  Class access refers to the access that the programmer has to a given class, i.e. whether it is private or public, or whether it can be instantiated. Class acces can be applied to the different classes making up the package to ensure that the the programmer uses the package in the manner in which it was intended. If all classes were publicly available and could be instantiated, the programmer may produce errors as a result, and worst case their app will crash in production or data is lost. This can even happen in spite of proper documentation. Figure \ref{fig:component-diagram} depicts the architecture of the Mobility Features Package, the type face indicates the access: 
  
- A bold typeface indicates the class can be instantiated by the user and is publicly available. An underlined typeface indicates the class is static and therefore cannot be instantiated but is publicly available to the programmer. A class with an italic typeface is a class which cannot be directly instantiated by the user but is available through the API. 
+ A bold typeface indicates the class can be instantiated by the user and is publicly available. An underlined typeface indicates the class is static and therefore cannot be instantiated but is publicly available to the programmer. A class with an italic typeface is a class which cannot be directly instantiated by the user but is available through the API. \\
  
- To make things concrete, Contents of this DTO are transferred to the equivalent DTO of the \textit{Mobility Features Package}, namely \textit{LocationSample} which is workaround for allowing the programmer to use any location service API. The programmer therefore has public access to the \textit{LocationSample} class and can instantiate it.
+\textbf{Bold:} Contents of this DTO are transferred to the equivalent DTO of the \textit{Mobility Features Package}, namely \textit{LocationSample} which is workaround for allowing the programmer to use any location service API. The programmer therefore has public access to the \textit{LocationSample} class and can instantiate it.\\
 
-The sole static class in the diagram is the ContextGenerator class which is the main interface for the application programmer. This class contains a reference to the Serializer class that allows the user to serialize Location Samples
+\textbf{Underlined:} The sole static class in the diagram is the \textit{ContextGenerator} class which is the main interface for the application programmer. This class contains a reference to the \textit{MobilitySerializer} class that allows the user to serialize \textit{Location Samples}, which the user can use to get an instance of the \textit{MobilitySerializer}. This \textit{ContextGenerator} component is also responsible for instantiating  Mobility Context objects, which is done by loading Location Samples stored via the \textit{MobilitySerializer} (as well as Stops and Moves if applicable) in order to compute the \textit{MobilityContext}. Concretely, a \textit{ContextGenerator} generates a \textit{MobilityContext} which contains a series of features including \textit{Stops}, \textit{Places} and \textit{Moves}.\\
+
+\textbf{Italic:} Common for the \textit{MobilityContext} as well as \textit{Stops}, \textit{Places} and \textit{Moves} is that neither can directly be directly instantiated by the programmer, but they can be generated through the \textit{ContextGenerator} component. \\
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{images/diagrams/api-diagram.pdf}
-    \caption{Component diagram for the Mobility Feature Package}
+    \caption{Component diagram for the Mobility Feature Package displaying the access of each component when implemented as a class}
     \label{fig:component-diagram}
 \end{figure}
 
-
-
-
-
-
-
-
-
-
-\subsection{Main Algorithm}
-For the package to work there needs to be a main algorithm which collected data, stored data on disk and computes the features when necessary. This algorithm is not implemented by the package itself, but rather by an application that uses the package. The reason for this is that the algorithm contains many steps which can be done in many ways according to what the application programmer is already using. For example, if an application programmer uses a local SQLite database to store other data, then it is ideal to use this database for storing the location data and intermediate features as well.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.7\textwidth]{images/diagrams/sequence.png}
-    \caption{Sequence diagram for the computation of the Mobility Context in a mobile application}
-    \label{fig:sequence-diagram-mobility-context}
-\end{figure}
