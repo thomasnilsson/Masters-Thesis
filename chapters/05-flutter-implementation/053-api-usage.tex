@@ -36,7 +36,7 @@ Create a single Mobility Context without prior Context:
     DateTime today = DateTime.now().midnight;
     DataPreprocessor dp = DataPreprocessor(today);
 
-    List<SingleLocationPoint> points = await _pointSerializer.load();
+    List<LocationSample> points = await _pointSerializer.load();
     List<Stop> stops = dp.findStops(points);
     List<Move> moves = dp.findMoves(points, stops);
     List<Place> places = dp.findPlaces(stops);
@@ -54,7 +54,7 @@ This works for a single day of data, and does not require the user to save previ
 %     List<Stop> stopsOld = await _stopSerializer.load();
 %     List<Move> movesOld = await _moveSerializer.load();
     
-%     List<SingleLocationPoint> pointsToday = await _pointSerializer.load();
+%     List<LocationSample> pointsToday = await _pointSerializer.load();
 %     List<Stop> stopsToday = dp.findStops(pointsToday);
 %     List<Move> movesToday = dp.findMoves(pointsToday, stopsToday);
 %     List<Place> places = dp.findPlaces(stops);

@@ -35,7 +35,7 @@ Next, the location tracking was set up using the Geolocator plugin, in which a s
 \begin{figure}
     \centering
     \begin{minted}{dart}
-    List<SingleLocationPoint> _pointsBuffer = [];
+    List<LocationSample> _pointsBuffer = [];
     static const int BUFFER_SIZE = 100;
     ...
     
@@ -52,8 +52,8 @@ Next, the location tracking was set up using the Geolocator plugin, in which a s
     ...
     
     void _onData(Position d) async {
-        SingleLocationPoint p =
-            SingleLocationPoint(Location(d.latitude, d.longitude), d.timestamp);
+        LocationSample p =
+            LocationSample(Location(d.latitude, d.longitude), d.timestamp);
         _pointsBuffer.add(p);
     
         // Check if buffer should be saved to disk
@@ -69,20 +69,20 @@ Next, the location tracking was set up using the Geolocator plugin, in which a s
 
 
 \subsection{Storing, Loading and Uploading}
-Storing and loading SLPs, Stops and Moves work through the serialization API provided by the Mobility Features Package discussed in Chapter \ref{chapter:05}. Concretely a \verb|Serializer<E>| object is created for each type in the AppProcessor class, and are used to store and load their given type \verb|E|. Below is shown an example of this:
+Storing and loading Location Samples, Stops and Moves work through the serialization API provided by the Mobility Features Package discussed in Chapter \ref{chapter:05}. Concretely a \verb|Serializer<E>| object is created for each type in the AppProcessor class, and are used to store and load their given type \verb|E|. Below is shown an example of this:
 
 
 
 \begin{figure}
     \centering
     \begin{minted}{dart}
-    Serializer<SingleLocationPoint> _pointSerializer;
+    Serializer<LocationSample> _pointSerializer;
     
     ...
-    Future<List<SingleLocationPoint>> _loadLocalPoints() async {
+    Future<List<LocationSample>> _loadLocalPoints() async {
         DateTime today = DateTime.now().midnight;
         print('Loading local data points...');
-        List<SingleLocationPoint> points = await _pointSerializer.load();
+        List<LocationSample> points = await _pointSerializer.load();
         if (points.isEmpty) {
           return points;
         } else if (points.first.datetime.midnight.isBefore(today)) {
@@ -94,7 +94,7 @@ Storing and loading SLPs, Stops and Moves work through the serialization API pro
         return points;
     }
     \end{minted}
-    \caption{The procedure for loading the locally saved SLPs, including filtering out SLPs from previous days}
+    \caption{The procedure for loading the locally saved Location Samples, including filtering entries from previous days}
     \label{fig:points-serialization}
 \end{figure}
 
@@ -136,7 +136,7 @@ Feature calculation was done in an asynchronous manner, in which the work was of
         // Load from disk
         List<Stop> stops = await _stopSerializer.load();
         List<Move> moves = await _moveSerializer.load();
-        List<SingleLocationPoint> points = await _loadLocalPoints();
+        List<LocationSample> points = await _loadLocalPoints();
         
         // Set up background thread
         ReceivePort receivePort = ReceivePort();
@@ -147,7 +147,7 @@ Feature calculation was done in an asynchronous manner, in which the work was of
         return await _relay(sendPort, points, stops, moves);
     }
     
-    Future _relay(SendPort sp, List<SingleLocationPoint> points, 
+    Future _relay(SendPort sp, List<LocationSample> points, 
                     List<Stop> stops, List<Move> moves) {
     ReceivePort receivePort = ReceivePort();
     sp.send([points, stops, moves, receivePort.sendPort]);
@@ -159,7 +159,7 @@ Feature calculation was done in an asynchronous manner, in which the work was of
 \end{figure}
 
 
-The \verb|_asyncComputation| method is static which is due to the computation being done in a separate thread than than the main thread. If the objects contained within the AppProcessor instance (i.e. in the main thread) were to change their state while computation was ongoing in the background thread, then the resulting computation would produce an outdated, and or wrong result. To circumvent this, the method that performs the computation relies on parameters instead, i.e. the SLPs, Stops and Moves must be explicitly provided. Concretely, a copy of the objects are created when fed to the static method as parameters. These copies can then have their state modified only inside the static method and not outside which results in the computation being reliable wrt. state management. 
+The \verb|_asyncComputation| method is static which is due to the computation being done in a separate thread than than the main thread. If the objects contained within the AppProcessor instance (i.e. in the main thread) were to change their state while computation was ongoing in the background thread, then the resulting computation would produce an outdated, and or wrong result. To circumvent this, the method that performs the computation relies on parameters instead, i.e. the Location Samples, Stops and Moves must be explicitly provided. Concretely, a copy of the objects are created when fed to the static method as parameters. These copies can then have their state modified only inside the static method and not outside which results in the computation being reliable wrt. state management. 
 
 The computation will be discussed bit for bit such a to give the reader a better overview of the implementation:
 
@@ -171,7 +171,7 @@ Firstly the arguments are parsed from the sendport; the arguments come in as an 
     List args = await receivePort.first;
 
     /// Extract arguments
-    List<SingleLocationPoint> points = args[0];
+    List<LocationSample> points = args[0];
     List<Stop> stops = args[1];
     List<Move> moves = args[2];
     SendPort replyPort = args[3];

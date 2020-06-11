@@ -57,7 +57,7 @@ print(c.routineIndex); // Attribute is pre-computed
 \subsubsection{Abstract Classes and Interfaces}
 Dart has no \verb|interface| keyword. Instead, all classes implicitly define an interface and an abstract class than therefore be used instead. In the domain model, abstract classes were used to define common behaviour of certain classes, in which direct inheritance does not make sense (composition vs inheritance). 
 
-The first abstract class is \verb|Geospatial| which forces any class implementing this interface to have a \textit{Location} attribute, i.e. the object can be mapped to a point on the surface of the Earth. Concretely, the classes which implement this interface are \textit{Location}, \textit{SingleLocationPoint} and \textit{Stop}, which enables \textit{SingleLocationPoints} and \textit{Stops} to be clustered into a \textit{Location}.
+The first abstract class is \verb|Geospatial| which forces any class implementing this interface to have a \textit{Location} attribute, i.e. the object can be mapped to a point on the surface of the Earth. Concretely, the classes which implement this interface are \textit{Location}, \textit{LocationSample} and \textit{Stop}, which enables \textit{LocationSamples} and \textit{Stops} to be clustered into a \textit{Location}.
 
 The abstract class is defined as follows:
 \begin{minted}{dart}
@@ -91,10 +91,10 @@ class Distance {
 }
 \end{minted}
 
-This is used when finding \textit{Stops}, where a the distance from a center-location of a list of \textit{SingleLocationPoints} to a single \textit{SingleLocationPoint} is calculated:
+This is used when finding \textit{Stops}, where a the distance from a center-location of a list of \textit{LocationSamples} to a single \textit{LocationSample} is calculated:
 
 \begin{minted}{dart}
-List<SingleLocationPoint> subset = data.sublist(start, end);
+List<LocationSample> subset = data.sublist(start, end);
 Location centroid = Cluster.computeCentroid(subset);
 
 /// Expand cluster until either all data points have been considered,
@@ -105,7 +105,7 @@ while (end < n &&
 \end{minted}
 
 \subsubsection{Serializable Interface}
-Another abstract class/interface is the \verb|Serializable| interface implemented by \textit{Location}, \textit{SingleLocationPoint}, \textit{Stop} and \textit{Move}. This interface easy serialization and de-serialization of these classes and does so by converting between JSON and Dart objects. Concretely, the \verb|Serializable| interface promises the compiler an implementation of the methods \verb|toJson()| and \verb|fromJson()|.
+Another abstract class/interface is the \verb|Serializable| interface implemented by \textit{Location}, \textit{LocationSample}, \textit{Stop} and \textit{Move}. This interface easy serialization and de-serialization of these classes and does so by converting between JSON and Dart objects. Concretely, the \verb|Serializable| interface promises the compiler an implementation of the methods \verb|toJson()| and \verb|fromJson()|.
 
 The interface is defining as follows:
 \begin{minted}{dart}
@@ -132,7 +132,7 @@ class Stop implements Serializable, Geospatial {
 
 The usage of the interface is found in the Serializer class, which is utility class for serializing and de-serializing a list of objects which implement the Serializable interface.
 
-The class is a generic which allows the type \verb|E| to be specified later, with \verb|E| referring to either an SLP, Stop or Move which all implement the Serializable interface. The Serializer is constructed using a reference to a File object, which allows the Serializer to be unit tested (which is done in a desktop environment) as well as used in a mobile phone environment. Both of these environments have different ways of handling the file system, which means it is better to pass a file reference, rather than simply a file name, since how files are accessed depends on the file system. Concretely a Serializer object is defined as follows:
+The class is a generic which allows the type \verb|E| to be specified later, with \verb|E| referring to either an Location Sample, Stop or Move which all implement the Serializable interface. The Serializer is constructed using a reference to a File object, which allows the Serializer to be unit tested (which is done in a desktop environment) as well as used in a mobile phone environment. Both of these environments have different ways of handling the file system, which means it is better to pass a file reference, rather than simply a file name, since how files are accessed depends on the file system. Concretely a Serializer object is defined as follows:
 \begin{minted}{dart}
 class Serializer<E> {
   File file;
@@ -163,7 +163,7 @@ Future<void> save(List<Serializable> elements) async {
 }
 \end{minted}
 
-The de-serialization (loading) is carried out by reading the file contents, parsing it to JSON objects, i.e. a list of \verb|Map<String, dynamic>| in the Dart language, and then parsing each of these objects to a Mobility Features object, depending on the type of \verb|E|, i.e. if \verb|E| is a Move then the \verb|Move.fromJson| method should be used, and vice versa for Stops and SLPs. 
+The de-serialization (loading) is carried out by reading the file contents, parsing it to JSON objects, i.e. a list of \verb|Map<String, dynamic>| in the Dart language, and then parsing each of these objects to a Mobility Features object, depending on the type of \verb|E|, i.e. if \verb|E| is a Move then the \verb|Move.fromJson| method should be used, and vice versa for Stops and Location Samples. 
 
 \begin{minted}{dart}
 Future<List<Serializable>> load() async {
@@ -180,7 +180,7 @@ Future<List<Serializable>> load() async {
             .toList();
       default:
         return jsonObjs
-            .map((x) => SingleLocationPoint.fromJson(x))
+            .map((x) => LocationSample.fromJson(x))
             .toList();
     }
 }
