@@ -1,63 +1,87 @@
-\section{API Usage}
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/diagrams/api-diagram.pdf}
-    \caption{The components making up the API in which the components highlighted in bold are public facing and those in italics are private.}
-    \label{fig:api-diagram}
-\end{figure}
+\section{Using the Package}
+This section will be a mirror of the official instructions on how to use the package, as of version 1.1.5.
 
-\subsection{Computing Intermediate Features}
-DATA PREPROC
-
-\subsection{Serialization}
-A serializer can be instantiated for in a desktop environment using the \verb|File| class from the built-in package \verb|dart:io| as follows:
-\begin{minted}{dart}
-    import 'dart:io';
-    import 'package:mobility_features/mobility_features_lib.dart';
-    ...
-    Serializer<Stop> stopSerializer = Serializer(new File(FILENAME));
-\end{minted}
-
-In a mobile environment the \verb|path_provider| package is used to get the Documents directory, from which a File object is then created.
+Firstly, the programmer has to get the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project. Next once the depdency has been loaded it can be imported as such
 
 \begin{minted}{dart}
-    import 'dart:io';
-    import 'package:path_provider/path_provider.dart';
-    import 'package:mobility_features/mobility_features_lib.dart';
-    ...
-    String path = (await getApplicationDocumentsDirectory()).path;
-    Serializer<Stop> stopSerializer = Serializer(new File(path));
+import 'package:mobility_features/mobility_features.dart';
 \end{minted}
 
-\subsection{Computing Mobility Context(s)}
-Create a single Mobility Context without prior Context:
+Using the package can be broken down into 4 main steps:
+
+\subsection*{Step 1: Collect location data}
+Location data collection is, as mentioned, not part of the Mobility Features package, and the programmer will therefore have tto a location plugin such as \url{https://pub.dev/packages/geolocator}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
+Below is shown an example where incoming \verb|Position| objects are coming in from the \verb|GeoLocator| plugin and are being handled in the \verb|_onData()| call-back method.
 
 \begin{minted}{dart}
-    DateTime today = DateTime.now().midnight;
-    DataPreprocessor dp = DataPreprocessor(today);
-
-    List<LocationSample> points = await _pointSerializer.load();
-    List<Stop> stops = dp.findStops(points);
-    List<Move> moves = dp.findMoves(points, stops);
-    List<Place> places = dp.findPlaces(stops);
-    
-    MobilityContext mc = MobilityContext(today, stops, places, moves);
+_onData(Position p) async {
+    GeoPosition gp = GeoPosition(p.latitude, p.longitude);
+    LocationSample(gp, p.timestamp);
+}
 \end{minted}
 
-This works for a single day of data, and does not require the user to save previous Stops and Moves. However, the Routine Index cannot be evaluated without using prior contexts. 
+\subsubsection*{Step 2: Save location data}
+The location data must be saved on the device such that it can be used in the future. Saving the data to persistent storage prevents it from being lost should the RAM reset. Firstly, the \verb|MobilitySerializer| must be instantiated.
 
-% Using prior contexts is much more involved, and will look like the following:
+\begin{minted}{dart}
+MobilitySerializer<LocationSample> serializer =
+      await ContextGenerator.locationSampleSerializer;
+\end{minted}
 
-% \begin{minted}{dart}
-%     DateTime today = DateTime.now().midnight;
-%     DataPreprocessor dp = DataPreprocessor(today);
-%     List<Stop> stopsOld = await _stopSerializer.load();
-%     List<Move> movesOld = await _moveSerializer.load();
-    
-%     List<LocationSample> pointsToday = await _pointSerializer.load();
-%     List<Stop> stopsToday = dp.findStops(pointsToday);
-%     List<Move> movesToday = dp.findMoves(pointsToday, stopsToday);
-%     List<Place> places = dp.findPlaces(stops);
-    
-%     MobilityContext mc = MobilityContext(today, stops, places, moves);
-% \end{minted}
+
+
+Next, given that the location samples have been collected in a list `List<LocationSample> locationSamples` the data is serialized like so:
+
+```dart
+await serializer.save(locationSamples);
+```
+
+Ideally, saving the data is done with a certain interval, such as every time 100 `LocationSamples` are collected. 
+
+\subsection*{Step 3: Compute features}
+The Features can be computed using the static class `ContextGenerator` which uses the stored gps location data to compute the features.
+
+There most basic computation is done as follows:
+```dart
+MobilityContext context = await ContextGenerator.generate();
+```
+
+Note: it is not possible to instantiate a `MobilityContext` object directly. 
+It must be intantiated through the `ContextGenerator.generate()` method.
+
+\subsubsection*{Step 3.1 : Compute features with prior contexts}
+Should you wish to compute the Routine Index feature (see Theoretical Background) as well, then prior contexts are needed. 
+
+Concretely, you will have to track for at least 2 days, to compute this feature.
+
+The computation using prior contexts is done as follows
+
+```dart
+MobilityContext context = await ContextGenerator.generate(usePriorContexts: true);
+```
+
+\subsubsection*{Step 3.2: Compute features for a specific date}
+By default, the `MobilityContext` object uses the current date as reference to filter 
+and group data, however, should you wish to compute the features for 
+a specific date, then it is possible to do so using the `today` parameter.
+
+```dart
+DateTime myDate = DateTime(01, 01, 2020);
+MobilityContext context = await ContextGenerator.generate(today: myDate);
+```
+
+\subsection*{Step 4: Get features}
+All features are implemented as getters for the `MobilityContext` object.
+
+```dart
+context.places;
+context.stops;
+context.moves;
+
+context.numberOfPlaces;
+context.homeStay;
+context.entropy;
+context.normalizedEntropy;
+context.distanceTravelled;
+context.routineIndex;
+```

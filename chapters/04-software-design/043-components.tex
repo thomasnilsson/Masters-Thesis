@@ -1,7 +1,13 @@
 \section{Architectural Overview}
 The general idea of the Mobility Feature Package is to provide an API that is easy to use for the application programmer, such that the features can be computed with as few lines of code as possible. This requires closing off the API to a large degree which has the upside of leaving very little possibility of error in the hands of the programmer. However, it is indeed a balancing act, in which swaying too much to one side can have consequences. 
 
-\subsection{Delimiting the API}
+\subsection{Design Process}
+The design of the package API went through two main iterations
+A lot of logic was done outside the package
+Validation chapter, writing the app
+Latest version is discussed in this chapter
+
+\subsection{Managing Complexity}
 The parameter to balance in terms of the API, is moving complexity inside the package that would otherwise be dealt with by the programmer. As mention, location data is required to be collected to compute features which is done through a location service API. It is a possibility to move this data collection inside the package, but it has been chosen not to do so, to ensure the long term maintainability and modularity of the package. The location service depends on the platform and programming framework of choice and leaving this particular choice to the programmer therefore makes sense. To take the middle road, it was chosen to include a data storage API in the package, which allows the programmer to easily store the collected data. As such, the only steps of the process left to the application programmer is to collect location data, store it on the device (through the Mobility Features Package API) and compute features when they are needed. Getting around using a custom location plugin can be done by converting between \textit{Data Transfer Objects} (DTOs) \footnote{\url{https://martinfowler.com/eaaCatalog/dataTransferObject.html}} which in this case are simply objects holding location data, i.e. latitude, longitude and a timestamp. The DTOs considered are that of the programmers location plugin and that of the Mobility Features Package, namely \textit{LocationSample}.
 
 \subsection{Class Access}

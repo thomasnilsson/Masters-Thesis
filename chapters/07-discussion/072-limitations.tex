@@ -1,12 +1,14 @@
 \section{Limitations and Improvements}
 The package developed is in a functioning state which can produce useful features, however there are certain improvements to be made from here. Improvements have been made during the time in which the package was used for developing the app which mostly pertain the the API, and not to the implementation of the features. 
 
-Home stay calculated from last stops departure
+\subsection{Overall API Minimalism}
 The API was made drastically simpler in the time after developing the application. Very important lessons were made in developing in the application and a lot of the logic which had to be written in the application, by an application programmer was moved inside the package.
 
-Firstly, regarding the package itself, the API is still relies on the user saving the data via the serialization interface. It is not currently clear how this can be simplified for the application programmer without baking in the location collection into the package, however this may be the only option. 
+\subsection{Forcing Daily Computation}
+Force daily calculation of features, otherwise stops and moves are not saved. Strike a balance between saving too much raw data on the phone and not losing data. Concrete suggestion, save location samples, and when computing features, group data by date, and compute stops and moves for each date. When a date has been calculated, delete all raw location samples for that day.
 
-Future improvements
+\subsection{Saving Data Manually}
+Firstly, regarding the package itself, the API is still relies on the user saving the data via the serialization interface. It is not currently clear how this can be simplified for the application programmer without baking in the location collection into the package, however this may be the only option. 
 
 \subsection{Asynchronous Computation}
 Currently, the application programmer has to manually specify to use Dart Isolates in order to compute the Intermediate Features and the Mobility Context in a background thread. However once again a lot of responsibility is put on the application programmer which could instead be moved inside the package. This makes the package much easier to use, at the expense of introducing complexity, which means the library grows larger and gets harder to maintain.

@@ -1,7 +1,125 @@
 \section{Unit Testing}
-Part of the development process
-Testing for smaller things such as stop finding, move finding and serialization
-Next for mobility context testing
-Test and verify small things
-Difficult to verify a larger dataset, double precision and list comparisons are not easy to verify. The next best thing is simply to compare length of lists, or similar.
-What is ground truth
+Unit testing \footnote{\url{\url{https://martinfowler.com/bliki/UnitTest.html}}} played a large role of the development process in which the source code and the result produced were verfied. Unit tests are used to test small units of the source code such as a single function or object creation. For this project the unit tests were used as way to verify code which had been written and not the other way around, as is the case with traditional Test Driven Development \footnote{
+\url{https://martinfowler.com/bliki/TestDrivenDevelopment.html}}. Unit tests allowed simple things such as creating features from Location Samples, in which a dataset of Location Samples were provided. This dataset could either be a simple synthetic one where ground truth is easy to define, but it could also be a real one for which ground truth is somewhat subjective which was harder to verify during unit testing.  The package went through many small iterations and two major ones, in which the data flow was moved around, and it helped greatly to be able to check that the source code still worked every time changes were made.
+
+\subsection{Test: Location Sample Serialization}
+This test is the simplest unit test in the collection in which the storing- and loading functionality of the MobilitySerializer is displayed. A small, synthetic is created consisting of three Location Samples, which is first stored via the save() method and next the load() method is called. To check whether or not the store and load was successful, the lengths of the original dataset, and the loaded dataset are compared. 
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    test('Serialize and load three location samples', () async {
+      MobilitySerializer<LocationSample> serializer =
+          await ContextGenerator.locationSampleSerializer;
+
+      LocationSample x =
+          LocationSample(GeoPosition(123.456, 123.456), DateTime(2020, 01, 01));
+
+
+      List<LocationSample> dataset = [x, x, x];
+
+      await serializer.flush();
+      await serializer.save(dataset);
+      List loaded = await serializer.load();
+      expect(loaded.length, dataset.length);
+    });
+    \end{minted}
+    \caption{A unit testing demonstrating storing and loading a small, synthetic dataset}
+    \label{fig:my_label}
+\end{figure}
+
+
+\subsection{Test: Single Stop}
+This test is a step up in complexity in terms of what is tested. A dataset is constructed with a single location which the user stays at from 00:00 to 17:00. This should result in a single stop and place being found, no moves, and a home stay value of 1.0 (i.e. 100 percent). The data is first serialized and a Mobility Context is computed afterwards from which the features are extracted.
+
+\begin{minted}{dart}
+    test('Features: Single Stop', () async {
+      Duration timeTracked = Duration(hours: 17);
+
+      List<LocationSample> dataset = [
+        // home from 00 to 17
+        LocationSample(loc0, jan01),
+        LocationSample(loc0, jan01.add(timeTracked)),
+      ];
+
+      MobilitySerializer<LocationSample> serializer =
+          await ContextGenerator.locationSampleSerializer;
+
+      serializer.flush();
+      await serializer.save(dataset);
+
+      MobilityContext context = await ContextGenerator.generate(today: jan01);
+      expect(context.homeStay, 1.0);
+      expect(context.stops.length, 1);
+      expect(context.moves.length, 0);
+      expect(context.places.length, 1);
+    });
+\end{minted}
+
+\subsection{Test: Multiple Days with Routine Index}
+This test works similar to the previous one, but has the dataset spread over two different locations. The same dataset is repeated for 5 days, where the number of Stops, Moves and Places is evaluated each day, in addition to the Home Stay and Routine Index feature. Concretely, the places visited are the same each day, at the same hours of the day meaning the Routine Index is 1.0 except for the first day, since the Routine Index requires at least one historical day for comparison. The user stays at one place from 00:00 to 06:00 meaking it the home cluster, and another place from 08:00 to 09:00. This means the Home Stay should be equal to \frac{6}{9}, or 66.67 percent. 
+
+\begin{minted}{dart}
+    test('Features: Multiple days, multiple locations', () async {
+      MobilitySerializer<LocationSample> serializer =
+          await ContextGenerator.locationSampleSerializer;
+
+      /// Clean file every time test is run
+      serializer.flush();
+
+      for (int i = 0; i < 5; i++) {
+        DateTime date = jan01.add(Duration(days: i));
+
+        /// Todays data
+        List<LocationSample> locationSamples = [
+          // 5 hours spent at home
+          LocationSample(loc0, date.add(Duration(hours: 0, minutes: 0))),
+          LocationSample(loc0, date.add(Duration(hours: 6, minutes: 0))),
+
+          LocationSample(loc1, date.add(Duration(hours: 8, minutes: 0))),
+          LocationSample(loc1, date.add(Duration(hours: 9, minutes: 0))),
+        ];
+
+        await serializer.save(locationSamples);
+
+        /// Calculate and save context
+        MobilityContext context = await ContextGenerator.generate(
+            usePriorContexts: true, today: date);
+
+        double routineIndex = context.routineIndex;
+        double homeStay = context.homeStay;
+
+        expect(context.stops.length, 2);
+        expect(context.places.length, 2);
+        expect(context.moves.length, 1);
+
+        expect(homeStay, 6 / 9);
+
+        // The first day the routine index should be -1,
+        // otherwise 1 since the days are exactly the same
+        if (i == 0) {
+          expect(routineIndex, -1);
+        } else {
+          expect(routineIndex, 1);
+        }
+      }
+    });
+\end{minted}
+
+Unit testing was a very helpful tool for the project not only for validating things as they were written but also when source code was rewritten.
+
+Code coverage not an objective.
+Smaller tests:
+Serializing Location Samples, computing features for small synthetic data sets i.e. Stops, Moves and Places, home stay, routine index
+
+A test was also written simulating the collection the data contained in a pre-existing dataset from the real world. This real-world dataset was collected by the author during his stay in Munich in spring 2020. 
+Difficult to verify a larger dataset, double precision and list comparisons are not easy to verify. The next best thing is simply to compare length of lists, or similar. It was still very useful to know that the number of stops, places and moves did not change if changes to the code were made.
+
+As the package went through multiple iterations, each iteration either added or removed functionality, or changed the existing functionality slightly which meant new unit tests were often written to cover the functionality. In the end some the functionality was pruned and therefore some of the unit tests were also superfluous or had a large amount of overlap between them and were therefore also consolidated. 
+
+\subsection{Further Test Improvements}
+Firstly, a better testing method needs to be implemented in terms of comparing objects before they have been serialized to after they have been serialized. This can be done by implementing a function which breaks down each object, be it a Stop, or MobilityContext, into the most atomic values, i.e. latitude, longitude, time-stamp etc, which can be compared without a hash code.
+
+Secondly, more elaborate unit tests should be written for the clustering algorithms, since the cluster centroids can be calculated by hand, i.e. given a small, synthetic dataset, the ground truth cluster centroids can be calculated by hand and can be compared the ones found by the algorithms.
+
+Lastly, the API currently needs to give public access to all methods and classes used in the unit tests, which includes the MobilitySerializer's flush and load methods. These methods are not intended to be used by the user, since the flush method deletes all contents of the corresponding file. The load method does not pose a threat to the usability, but is unnecessary clutter, and should be used internally only. The reason for allowing these method public access is that the unit tests need to reset the contents of the file every time they are run, and verify that the original dataset is equivalent to what the serializer has stored, i.e. loading needs to be performed.

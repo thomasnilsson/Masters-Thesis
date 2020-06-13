@@ -172,9 +172,16 @@ $$H_N(P) = \frac{H(P)}{H_{max}(P)} \in [0,1]$$
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that such that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined.. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
 \subsection{The Routine Index}
-The features described in the literature by \cite{Saeb2015} which can be found in Section \ref{ref:features-saeb2015}. The time distribution for a day is defined by spending a duration of time at a certain space within a certain time-slot.  However the \textit{Routine Index} \cite{Saeb2015, Canzian2015} was much more demanding to implement and it will, therefore, be a feature that is highly discussed in this thesis. To recap, the \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. A concrete period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. However the implementation by \cite{Canzian2015} was very complex and therefore a much more simple version was chosen for the first iteration of the software package. We define the \textit{Routine Index} as a similarity measure with a value between 0 and 1, where a low value indicates little overlap and a high value indicates a high degree of overlap. By representing each day with an Hour Matrix the similarity function can be defined.
+The features described in the literature by \cite{Saeb2015} which can be found in Section \ref{ref:features-saeb2015}. The time distribution for a day is defined by spending a duration of time at a certain space within a certain time-slot.  However the \textit{Routine Index} \cite{Saeb2015, Canzian2015} was much more demanding to implement and it will, therefore, be a feature that is highly discussed in this thesis. To recap, the \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. A concrete period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. However the implementation by \cite{Canzian2015} was very complex and therefore a much more simple version was chosen for the first iteration of the software package. We define the \textit{Routine Index} as a similarity measure with a value between 0 and 1, where a low value indicates little overlap and a high value indicates a high degree of overlap. By representing each day with an Hour Matrix the similarity function can be defined. An illustration of the Hour Matrix for two different days is shown in Figure \ref{fig:routine-matrix}, from which a Routine Index can be computed.
 
-Lastly, we define a union operator $A \cap B$ defining the \textit{overlap} of two matrices $A$ and $B$ as 
+\begin{figure}
+    \centering
+    \includegraphics{images/routine.png}
+    \caption{An illustration of the Hour Matrix for the a given day and the 'average day', i.e. the Routine}
+    \label{fig:routine-matrix}
+\end{figure}
+
+For the overlap function we define a union operator $A \cap B$ defining the \textit{overlap} of two matrices $A$ and $B$ as 
 
 $$A \cap B = \sum_{i=1}^{24} \sum_{j=1}^{N} \min (A_{ij}, B_{ij}) \;|\; A_{ij} > 0, B_{ij} > 0$$
 
@@ -189,5 +196,4 @@ defines the \textit{actual overlap} as the sum of the overlapping entries betwee
 $$\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{H}^{\mu} (D) \Big)$$ 
 
 is the smallest sum of either matrix, whichever is smaller, and defines the \textit{maximum potential overlap} between the two matrices. If one matrix is very sparse then the potential overlap is very low, and vice versa. If the \textit{actual overlap} and the \textit{maximum potential overlap} are the same, it means the matrices are the same and the Routine Index will have a value of 1. 
-
 

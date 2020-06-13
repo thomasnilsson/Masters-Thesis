@@ -1,0 +1,35 @@
+\section{Requirements and Design Choices}
+The functional requirements the package should meet and how these are met will be described in this section. Functionally speaking, the package should support the computation of the features described in \ref{chapter:03} however there are several layers to achieving this, including the following:
+
+\begin{itemize}
+    \item Compute intermediate features
+    \item Save/Load Location Samples, Stops and Moves on Device
+    \item Compute Mobility Features at any time
+\end{itemize}
+
+Saving and loading of location samples was a necessity in order to not lose data.
+
+When an application tracks location data for a pro-longed period of time, i.e. a whole day, it will be sub-optimal to keep all the collected data in RAM, and thereby risking losing it if the app is killed by accident either by the OS or the user. 
+
+It was also necessary to store Stops and Moves on the device, such that which rely on historic data can be computed in the future. 
+Therefore an interface for easily saving location data points was made, which also allowed the application programmer to load these data points whenever they were required for computation. 
+
+Intermediate features were necessary such that historical data could be saved on disk without taking up too much space. In a normal day of tracking over 18000 Location Samples could be generated.
+
+Computing mobility features should be possible at any time, even if the day is incomplete. This has been taken care of by the definitions made in Chapter \ref{chapter:03} by redefining features such that they can be evaluated on incomplete days
+
+\subsection{Storing and Loading}
+In order to save the LocationSamples from today and historical Stops and Moves on the device they must be transformed from Dart objects into a data format which can store the state of the object, i.e. the information contained within it. Traditionally one would use a database implementation to do so, however for this thesis it was chosen to instead serialize objects such that they easilier could be imported in Python for data analysis.
+
+Serialization is act of transforming an object into a graph of smaller objects \footnote{\url{https://www.martinfowler.com/eaaCatalog/serializedLOB.html}}
+
+
+JavaScript Object Notation (JSON) objects, which is a very common, human-readable data format that uses key-value pairs to store data. 
+A set of serialized object in contrast to a databse is a pre-assembled set of objects, whereas databases requires joins to assemble objects, much like a box of legos vs the assembled lego figures.
+
+The database approach is more involved and was therefore not chosen given the small scope of the project and working from a philosophy of getting a prototype up and running as fast as possible.
+
+A JSON object can be stored in a database, or it can be transformed to a string in order to be stored. It was chosen to simply transform JSON objects to a string and write them to a local file, rather than storing the information in a database on the phone. 
+JSON supports a limited number of data types, such as strings, numbers, booleans, arrays, objects and null values. This means that in order to translate a Dart object to JSON, all of its fields must be serializable. An example of where this quickly becomes a problem, is with objects such as DateTime objects, since they are not supported by JSON - however a DateTime can be transformed to a number, which is milliseconds since epoch, or to an ISO standard date string. The approach is therefore to look at all the fields of the object that is to be serialized, and ensure that types of these fields all support some form of serialization. If they do not, it must be implemented.
+
+

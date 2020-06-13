@@ -1,7 +1,9 @@
-\section{Implementing the Flutter Package}
+\section{Flutter Implementation}
 The main idea when implement
 
 a balance has to be struck between what the intended behaviour is, and thus what is public to the programmer. There will be computations which are computed which, while essential, should not be public to the programmer. The reasons for this are twofold: privacy and complexity. In this case privacy could be related to intermediate features containing sensitive location information, and therefore one would likely make these intermediate features entirely private if privacy was a big concern, since we deem intermediate places more sensitive than the raw location data. For this package however, the Stops need to be saved by the application programmer, and therefore the intermediate features need to be public. 
+
+
 
 \subsection{Data Preprocessing}
 Stops Moves Places
@@ -105,6 +107,8 @@ while (end < n &&
 \end{minted}
 
 \subsubsection{Serializable Interface}
+
+
 Another abstract class/interface is the \verb|Serializable| interface implemented by \textit{Location}, \textit{LocationSample}, \textit{Stop} and \textit{Move}. This interface easy serialization and de-serialization of these classes and does so by converting between JSON and Dart objects. Concretely, the \verb|Serializable| interface promises the compiler an implementation of the methods \verb|toJson()| and \verb|fromJson()|.
 
 The interface is defining as follows:
@@ -195,3 +199,10 @@ However, Dart does not support \textit{reflection} which is the ability for the 
 
 \subsection{Calculating Routine Index}
 Using the hour matrix of other contexts
+
+\subsection{Serialization}
+Private access for the stop and move serializer such that the user is not able to accidentally save stops and moves such that the order gets messed up or duplicates arise which would require an implementation of an extensive filtering algorithm which in turn would take up compute resources every time stops and moves were loaded.
+
+For loading an object from disk into application memory again it must also support de-serialization which reads values of the JSON object's keys and stores them in a Dart object. If we continue the example of a DateTime object which was serialized by either converting it to a number or a string, de-serialization must use a parser which reads the string bit by bit or use some math for calculating what day a time delta from January 1st 1970 is. 
+Serialization and de-serialization is implemented by making an abstract class called Serializable, which has two functions: toJson and fromJson. The toJson function converts the object itself to a JSON object and the fromJson function is a so-called factory function which is in essence a constructor which creates a Dart object given a JSON object. The LocationSample, Stop and Move classes all implement the Serializable interface, which requires the classes to have a concrete implementation of these two methods, which in turn ensures the compiler that all of these classes can be serialized and de-serialized, which makes generalizing about objects belonging to either of these classes easier. Concretely, a generic class, Serializer<E>, was implemented in order to handle serialization, in which a type E is specified, which must a Serializable class. This makes it efficient in terms of lines of code to serialize a list of objects, since they are all required to implement toJson method, which produces a JSON object, and for de-serialization purposes they can all be constructed from a JSON object, given that it contains a set of correctly formatted key-value pairs.
+
