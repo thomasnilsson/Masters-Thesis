@@ -1,7 +1,7 @@
 \section{Using the Package}
 This section will be a mirror of the official instructions on how to use the package, as of version 1.1.5.
 
-Firstly, the programmer has to get the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project. Next once the depdency has been loaded it can be imported as such
+Firstly, the programmer has to get the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project. Next once the dependency has been loaded it can be imported as such
 
 \begin{minted}{dart}
 import 'package:mobility_features/mobility_features.dart';
@@ -28,60 +28,54 @@ MobilitySerializer<LocationSample> serializer =
       await ContextGenerator.locationSampleSerializer;
 \end{minted}
 
+Next, given that the programmer has a collected the samples in a list \verb|List<LocationSample> locationSamples| the samples can be serialized using the \verb|save()| method of the MobilitySerializer.
 
-
-Next, given that the location samples have been collected in a list `List<LocationSample> locationSamples` the data is serialized like so:
-
-```dart
+\begin{minted}{dart}
 await serializer.save(locationSamples);
-```
+\end{minted}
 
-Ideally, saving the data is done with a certain interval, such as every time 100 `LocationSamples` are collected. 
+Ideally, saving the data is done with a certain interval, such as every time 100 samples are collected. 
 
 \subsection*{Step 3: Compute features}
-The Features can be computed using the static class `ContextGenerator` which uses the stored gps location data to compute the features.
+The Features can be computed using the static class \verb|ContextGenerator| which uses the stored location samples, as well as  historic features to compute the features for today.
 
 There most basic computation is done as follows:
-```dart
+\begin{minted}{dart}
 MobilityContext context = await ContextGenerator.generate();
-```
+\end{minted}
 
 Note: it is not possible to instantiate a `MobilityContext` object directly. 
 It must be intantiated through the `ContextGenerator.generate()` method.
 
 \subsubsection*{Step 3.1 : Compute features with prior contexts}
-Should you wish to compute the Routine Index feature (see Theoretical Background) as well, then prior contexts are needed. 
+Should the programmer wish to compute the \textit{Routine Index} feature as well, then prior contexts are needed. Concretely, the application needs to have tracked data for at least 2 days, to compute this feature. The generation of a Mobility Context using prior contexts is done using the \verb|usePriorContexts| argument and setting it to \verb|true|.
 
-Concretely, you will have to track for at least 2 days, to compute this feature.
-
-The computation using prior contexts is done as follows
-
-```dart
+\begin{minted}{dart}
 MobilityContext context = await ContextGenerator.generate(usePriorContexts: true);
-```
+\end{minted}
 
 \subsubsection*{Step 3.2: Compute features for a specific date}
-By default, the `MobilityContext` object uses the current date as reference to filter 
-and group data, however, should you wish to compute the features for 
-a specific date, then it is possible to do so using the `today` parameter.
+By default, a \textit{MobilityContext} object uses the current date as reference to filter and group data, however, should one wish to compute the features for a specific date, then it is possible to do so using the \verb|today| argument and providing the desired date.
 
-```dart
+\begin{minted}{dart}
 DateTime myDate = DateTime(01, 01, 2020);
 MobilityContext context = await ContextGenerator.generate(today: myDate);
-```
+\end{minted}
 
 \subsection*{Step 4: Get features}
-All features are implemented as getters for the `MobilityContext` object.
+All features are implemented as \textit{getters} for the MobilityContext class and can therefore be retrieved using the dot-notation. 
 
-```dart
-context.places;
-context.stops;
-context.moves;
+\begin{minted}{dart}
+MobilityContext context = // Generate context
 
-context.numberOfPlaces;
-context.homeStay;
-context.entropy;
-context.normalizedEntropy;
-context.distanceTravelled;
-context.routineIndex;
-```
+List<Place> places = context.places;
+List<Stop> stops = context.stops;
+List<Move> moves = context.moves;
+
+int numberOfPlaces = context.numberOfPlaces;
+double homeStay = context.homeStay;
+double entropy = context.entropy;
+double normalizedEntropy = context.normalizedEntropy;
+double distanceTravelled = context.distanceTravelled;
+double routineIndex = context.routineIndex;
+\end{minted}

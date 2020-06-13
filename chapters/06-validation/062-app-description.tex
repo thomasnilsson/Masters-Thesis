@@ -35,5 +35,11 @@ The user navigates to the Diary Page by either tapping the calendar icon on the 
 \subsection{Displaying Features}
 An initial version of the application included a display of the real-time calculated features, which were re-calculated each time a button was pressed. It was decided to not display the features in the final version for the study, since they would influence the answers given by the users. For example, if the application would state that the user has visited a certain number of places today, it is highly unlikely that a participant would report something else, if they are the least in doubt themselves. This display of features may be relevant (at least for some of the more features which are more easily interpret-able such as Home Stay) for a real-world application where it makes sense to inform the user exactly what goes on behind the curtain.
 
+\begin{figure}
+    \centering
+    \includegraphics{images/app_imgs/app-features.png}
+    \caption{An early iteration of the study app in which the feature values were shown}
+    \label{fig:app-features-screen}
+\end{figure}
 \subsection{Data Storage}
 To store the data from the study online, such that it could later be extracted for data analysis, a Firebase file storage server was used for uploading files multiple times daily. Concretely, the LocationSamples, Stops and Moves were stored locally on device. Whenever a Feature calculation was triggered, the calculated MobilityContext was serialized and uploaded as a file, in addition to the data points for the day and all Stops and Moves on the phone for the period. This process was very wasteful in the sense that only 'new' data points needed to be uploaded, but instead the whole file was just overwritten. This was mainly done to ensure little data loss and avoid inconsistencies between the online file and the local file.

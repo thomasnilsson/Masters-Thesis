@@ -6,18 +6,3 @@ As mentioned, location data is defined by a latitude- and longitude coordinate w
 
 Given the radius of a sphere $r$ and two points on the sphere, $A$ and $B$, the haversine distance \cite{haversine-formula} between the two points can be directly computed as 
 $$d = 2r \cdot \arcsin \Bigg( \sqrt{\sin^2 \bigg( \frac{lat_B - lat_A}{2} \bigg) + \cos(lat_A) \cdot \cos(lat_B) \cdot \sin^2 \bigg(\frac{ lon_B - lon_A}{2} \bigg)}\Bigg)$$
-
-% $d = 2$
-
-% Let the central angle between the two points be:
-% $$\Theta = \frac{d}{r}$$
-
-% Then, let the haversine function of $\Theta$ be defined as:
-
-% $$A = (lat_A, lon_A)$$
-% $$B = (lat_B, lon_B)$$
-
-% $$hav(\Theta) = \text{hav}(lat_B - lat_A) + \cos(lat_A) \cdot \cos(lat_B) \cdot \text{hav}(lon_B - lon_A)$$
-
-% Where the haversine function for an angle $\theta$ is given as:
-% $$hav(\theta) = \frac{1 - cos(\theta)}{2}$$

@@ -1,8 +1,18 @@
 \section{Unit Testing}
-Unit testing \footnote{\url{\url{https://martinfowler.com/bliki/UnitTest.html}}} played a large role of the development process in which the source code and the result produced were verfied. Unit tests are used to test small units of the source code such as a single function or object creation. For this project the unit tests were used as way to verify code which had been written and not the other way around, as is the case with traditional Test Driven Development \footnote{
-\url{https://martinfowler.com/bliki/TestDrivenDevelopment.html}}. Unit tests allowed simple things such as creating features from Location Samples, in which a dataset of Location Samples were provided. This dataset could either be a simple synthetic one where ground truth is easy to define, but it could also be a real one for which ground truth is somewhat subjective which was harder to verify during unit testing.  The package went through many small iterations and two major ones, in which the data flow was moved around, and it helped greatly to be able to check that the source code still worked every time changes were made.
+Unit testing \footnote{\url{\url{https://martinfowler.com/bliki/UnitTest.html}}}, in which small parts of the source code are tested played a significant role in the latter part of the development process. It was prioritized to make a working demo application in order to conduct a study and while unit tests can speed up certain parts of the debugging process, it was still faster to 'hack something together'. The only testing done prior to the study was regarding serialization and making sure the feature computation producing meaningful results, i.e. they were manually verified. The traditional way of using unit testing is through Test Driven Development \footnote{
+\url{https://martinfowler.com/bliki/TestDrivenDevelopment.html}} in which the tests are written first, and the corresponding source code which should pass the test is written afterwards. The package went through many smaller iterations, in which the data flow was moved around, and unit testing made discovering bugs much easier by enabling one to constantly verify that the source code produced the desired results every time changes were made. As the package went through multiple iterations, each iteration either added or removed functionality, or changed the existing functionality slightly which meant new unit tests were often written to cover the functionality. In the end some the functionality was pruned and therefore some of the tests were also superfluous or had a large amount of overlap between them and were therefore also consolidated. 
 
-\subsection{Test: Location Sample Serialization}
+\subsection{}
+There were a few shortcoming of unit testing encountered, which largely came down to the inability to compare objects before and after serialization. This stems from objects having a hash code, i.e. a unique fingerprint which is not stored when serializing. The fingerprint is used to compare objects while in memory, and since the fingerprint is lost the problem arises. For this to be resolved, a better testing method needs to be implemented in terms of comparing objects. This can be done by implementing a function which breaks down each object, be it a Stop, or MobilityContext, into the most atomic values, i.e. latitude, longitude, time-stamp etc, which can be compared without a hash code.
+
+For testing the algorithms, small synthetic datasets were created in order to test very rudimentary cases. It was harder to construct very large synthetic datasets in order to test more realistic, noisy datasets and discover edge cases. In the future, more elaborate unit tests should be written, especially for the clustering algorithms, since the ground truth, i.e. cluster centroids and points belonging to clusters can be calculated by hand. Another possibility which was partly explored was using a real-world dataset which the author gathered tracking himself however to verify the algorithms on this dataset it would need to manually labelled which was not done. The large real-world dataset was however used to verify that the algorithms produced meaningful results, and that the computation did not throw any errors.
+
+Lastly, the current state of the API gives public access to certain methods which are not supposed to have public access. The reason for this is that they need to be part of the unit tests, concretely it is the MobilitySerializer methods \textit{flush} and \textit{save}. These methods are not intended to be used by the user, since the flush method deletes all contents of the corresponding file. The load method does not pose a threat to the usability, but is unnecessary clutter, and should only be used internally by the package. 
+
+\subsection{Example Unit Tests}
+In this subsection selected unit tests will be exemplified.
+
+\subsubsection*{Location Sample Serialization}
 This test is the simplest unit test in the collection in which the storing- and loading functionality of the MobilitySerializer is displayed. A small, synthetic is created consisting of three Location Samples, which is first stored via the save() method and next the load() method is called. To check whether or not the store and load was successful, the lengths of the original dataset, and the loaded dataset are compared. 
 
 \begin{figure}
@@ -28,8 +38,7 @@ This test is the simplest unit test in the collection in which the storing- and 
     \label{fig:my_label}
 \end{figure}
 
-
-\subsection{Test: Single Stop}
+\subsubsection*{Test: Single Stop}
 This test is a step up in complexity in terms of what is tested. A dataset is constructed with a single location which the user stays at from 00:00 to 17:00. This should result in a single stop and place being found, no moves, and a home stay value of 1.0 (i.e. 100 percent). The data is first serialized and a Mobility Context is computed afterwards from which the features are extracted.
 
 \begin{minted}{dart}
@@ -56,7 +65,7 @@ This test is a step up in complexity in terms of what is tested. A dataset is co
     });
 \end{minted}
 
-\subsection{Test: Multiple Days with Routine Index}
+\subsubsection*{Test: Multiple Days with Routine Index}
 This test works similar to the previous one, but has the dataset spread over two different locations. The same dataset is repeated for 5 days, where the number of Stops, Moves and Places is evaluated each day, in addition to the Home Stay and Routine Index feature. Concretely, the places visited are the same each day, at the same hours of the day meaning the Routine Index is 1.0 except for the first day, since the Routine Index requires at least one historical day for comparison. The user stays at one place from 00:00 to 06:00 meaking it the home cluster, and another place from 08:00 to 09:00. This means the Home Stay should be equal to \frac{6}{9}, or 66.67 percent. 
 
 \begin{minted}{dart}
@@ -106,20 +115,3 @@ This test works similar to the previous one, but has the dataset spread over two
     });
 \end{minted}
 
-Unit testing was a very helpful tool for the project not only for validating things as they were written but also when source code was rewritten.
-
-Code coverage not an objective.
-Smaller tests:
-Serializing Location Samples, computing features for small synthetic data sets i.e. Stops, Moves and Places, home stay, routine index
-
-A test was also written simulating the collection the data contained in a pre-existing dataset from the real world. This real-world dataset was collected by the author during his stay in Munich in spring 2020. 
-Difficult to verify a larger dataset, double precision and list comparisons are not easy to verify. The next best thing is simply to compare length of lists, or similar. It was still very useful to know that the number of stops, places and moves did not change if changes to the code were made.
-
-As the package went through multiple iterations, each iteration either added or removed functionality, or changed the existing functionality slightly which meant new unit tests were often written to cover the functionality. In the end some the functionality was pruned and therefore some of the unit tests were also superfluous or had a large amount of overlap between them and were therefore also consolidated. 
-
-\subsection{Further Test Improvements}
-Firstly, a better testing method needs to be implemented in terms of comparing objects before they have been serialized to after they have been serialized. This can be done by implementing a function which breaks down each object, be it a Stop, or MobilityContext, into the most atomic values, i.e. latitude, longitude, time-stamp etc, which can be compared without a hash code.
-
-Secondly, more elaborate unit tests should be written for the clustering algorithms, since the cluster centroids can be calculated by hand, i.e. given a small, synthetic dataset, the ground truth cluster centroids can be calculated by hand and can be compared the ones found by the algorithms.
-
-Lastly, the API currently needs to give public access to all methods and classes used in the unit tests, which includes the MobilitySerializer's flush and load methods. These methods are not intended to be used by the user, since the flush method deletes all contents of the corresponding file. The load method does not pose a threat to the usability, but is unnecessary clutter, and should be used internally only. The reason for allowing these method public access is that the unit tests need to reset the contents of the file every time they are run, and verify that the original dataset is equivalent to what the serializer has stored, i.e. loading needs to be performed.
