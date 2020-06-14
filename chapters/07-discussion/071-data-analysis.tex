@@ -1,24 +1,49 @@
 \section{Data Analysis of Study}
-As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants.
+As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants. Table \ref{tab:location-samples} shows the overview of the data collected for each participant, including the number of points, number of days and the storage requirements for the collected data.
+\begin{table}[]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|}
+    \hline
+    {\ul \textbf{Participant}} & {\ul \textbf{\# Days}} & {\ul \textbf{\# Total Samples}} & {\ul \textbf{Total Size (MB)}} & {\ul \textbf{\# Avg Samples / day}} & {\ul \textbf{\# Avg Size / day (MB)}} \\ \hline
+    \textbf{P1}                & 23.0                   & 181213.0                        & 17.3                           & 7878.8                              & 0.8                                   \\ \hline
+    \textbf{P2}                & 25.0                   & 142109.0                        & 13.6                           & 5684.4                              & 0.5                                   \\ \hline
+    \textbf{P3}                & 21.0                   & 101865.0                        & 9.7                            & 4850.7                              & 0.5                                   \\ \hline
+    \textbf{P4}                & 22.0                   & 98887.0                         & 9.4                            & 4494.9                              & 0.4                                   \\ \hline
+    \textbf{P5}                & 14.0                   & 209683.0                        & 20.0                           & 14977.4                             & 1.4                                   \\ \hline
+    \textbf{P6}                & 26.0                   & 101994.0                        & 9.7                            & 3922.8                              & 0.4                                   \\ \hline
+    \textbf{P7}                & 23.0                   & 1116075.0                       & 106.4                          & 48525.0                             & 4.6                                   \\ \hline
+    \textbf{P8}                & 15.0                   & 141260.0                        & 13.5                           & 9417.3                              & 0.9                                   \\ \hline
+    \textbf{P9}                & 12.0                   & 51740.0                         & 4.9                            & 4311.7                              & 0.4                                   \\ \hline
+    \textbf{R}                 & 24.0                   & 365606.0                        & 34.9                           & 15233.6                             & 1.5                                   \\ \hline
+    \end{tabular}
+    \caption{The overview of collected Location Samples for each participant in the study}
+    \label{tab:location-samples}
+\end{table}
 
-\subsection{Calculating the Answers}
-The answers had to be converted into scalars such that they could be compared directly to the computed features. 
-
-In any case the feature calculation closest to the answer was used, prioritising a features calculated after the given answer, rather than earlier. For the Home Stay feature, the time at which the answer was sent is used for calculating the elapsed time. If the user is away from home at the time of answering, they will likely taken this into account. It is assumed however that most people would wait until they were at home before registering. For the \textit{Routine Index}, the answer (a number of 0 to 5) was transformed to scalar between 0 and 1, i.e. let the scale value be $s \in \{0, 1, 2, 3, 4, 5\}$, then the corresponding \textit{Routine Index} is calculated as 
+The answers were of a different format than the computed features and therefore had to be converted into scalars such that they could be compared directly to the  features. For the Home Stay feature, the answer the users gave was the number of hours away from home, at the time of registering. It was assumed that most people be registering at home, since the diary was filled out in the evening. Therefore for calculating the Home Stay value from a given answer $a$, equation \ref{eq:home-stay-ans} was applied:
 
 \begin{equation}
+\label{eq:home-stay-ans}
+h = \frac{t - a }{t}
+\end{equation}
+
+Here, $t$ refers to the timestamp at which the diary was filled out.
+
+For the \textit{Routine Index}, the answer (a number of 0 to 5) was transformed to scalar between 0 and 1, i.e. let the scale value be $s \in \{0, 1, 2, 3, 4, 5\}$, then the corresponding \textit{Routine Index} is calculated using equation \ref{eq:routine-ans}.
+
+\begin{equation}
+\label{eq:routine-ans}
     r = \frac{s}{s_{max}}, \quad s_{max} = 5
 \end{equation}
 
-\subsection{Error Measuring}
-Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant which gives an indication of how much could be computed. It also became clear that some participants did not collect nearly as much data as others, and because of this their results are expected to be worse. The number of stops found are not necessarily correlated with the number of points found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer, but Stops with a longer duration being found. 
+Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer, but Stops with a longer duration being found. 
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/study/storage/num_points.png}
     \includegraphics[width=\textwidth]{images/study/storage/num_stops.png}
     \includegraphics[width=\textwidth]{images/study/storage/compression_N.png}
-    \caption{The number of raw GPS data-points (top) and the number of Stops (middle) collected, and the ratio between the two, for each participant}
+    \caption{The number of raw Location Samples (top) and the number of Stops (middle) collected, and the ratio between the two, for each participant}
     \label{fig:plot-num-points-stops}
 \end{figure}
 
@@ -29,9 +54,9 @@ Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how m
     \label{fig:plot-num-points-stops}
 \end{figure}
 
-With the size of a serialized \textit{LocationSample} is 100 bytes, and a \textit{Stop} being 139 bytes, it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting Location Samples into Stops. However this will inevitably vary to a potential large degree from participant to participant, due to the number of stops per  varying a lot.
+It was computed based on file size, the average size of a serialized \textit{LocationSample} is 100 bytes, and a \textit{Stop} is 139 bytes. With this information it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting Location Samples into Stops, and this is shown in Figure \ref{fig:plot-num-points-stops}. 
 
-The day-by-day results for the author are displayed in figure \ref{fig:plot-daily}.
+
 
 The number of valid days for a specific feature is a day for which the user gave answers, and the feature could be calculated. If the user for example turned off their phone during the night, the home stay feature could not be calculated, but the routine index feature and the number of places will likely still have been calculated.
 
@@ -75,25 +100,19 @@ Since the Home Stay feature is calculated by using the \textit{tracked} time at 
     \label{fig:plot-author-features}
 \end{figure}
 
-However, the author did know how the features were calculated and as such it was hard to refrain from using this information when filling out the questionnaire. Therefore it is relevant to show participant P8 who was very committed to filling out and making sure the phone was tracking. For this participant, very promising results were also produced.
+The day-by-day results for the author are displayed in figure \ref{fig:plot-daily} and from this plot the computed features have a high correspondence with the provided answers. However, the feature computation is based on the authors own definitions which means the computed features and answers of the author are also expected to be highly correlated. It is therefore relevant to show another participant, namely participant P8, who was very diligent in answering and tracking their location data. For this participant, very promising results were also produced which can be seen in Figure \ref{fig:plot-participant-features}.
 
 \begin{figure}
     \centering
     \includegraphics[0.5\textwidth]{images/study/places_ec110976-0192-436d-b451-4f5dd97e71d8.png}
     \includegraphics[0.5\textwidth]{images/study/homestay_ec110976-0192-436d-b451-4f5dd97e71d8.png}
     \includegraphics[0.5\textwidth]{images/study/routine_ec110976-0192-436d-b451-4f5dd97e71d8.png}
-    \caption{The answered and calculated data for each day for a committed participant}
+    \caption{The answered and calculated data for each day for a participant P7}
     \label{fig:plot-participant-features}
 \end{figure}
+\subsection{Measuring Errors}
 
-
-To say something about whether or not the algorithms undershoots or overshoots, the difference in sum was calculated as $ME = \frac{\sum(A) - \sum(F)}{N}$ ($N$ being the total number of days for the specific feature) meaning that if the result is positive then the answered result was on average higher and vice versa if the result is negative. The alternative is to calculate the mean error one can also calculate the mean of the difference per observation $ME = \frac{1}{N} \sum_{i=0}^{N} (a_i - f_i)$ however this the downside of cancelling out certain observations when the sign differs. 
-
-The users generally answer that they have been at more places than the algorithms calculate.
-
-Home stay generally predicts 10\% lower for half the participants, which was to be expected. Although for a couple of participants it predicts higher (i.e. negative mean error) although still within 10\% error. For participant 2 however it averages out to zero percent and for participant 1 the algorithms predict lower and has an error of 30\%.
-
-The routine index is a mixed bag, with 6 participants answering higher than the algorithm and the remaining 4 being lower. All except for participant 6 deviating with almost 40\%. An important detail here is that the routine index was answered in increments of 20\% meaning that if a larger study was conducted in which the scale was more fine-grained, i.e. from 0 to 10 instead, it is possible the answers would be a lot closer to the predictions
+To say something about whether or not the algorithms undershoots or overshoots, the difference in sum was calculated as $ME = \frac{\sum(A) - \sum(F)}{N}$ ($N$ being the total number of days for the specific feature) meaning that if the result is positive then the answered result was on average higher and vice versa if the result is negative. The alternative is to calculate the mean error one can also calculate the mean of the difference per observation $ME = \frac{1}{N} \sum_{i=0}^{N} (a_i - f_i)$ however this the downside of cancelling out certain observations when the sign differs. Figure \ref{fig:plot-mean-error} shows the mean error for each feature, for each participant. It can be observed that participants generally answer that they have been at more places than the algorithms calculate. The Home Stay feature generally lies 10\% lower for half the participants (i.e. positive mean error), which was to be expected for reasons discussed earlier. For a couple of participants it overshoots (i.e. negative mean error) although still within 10\% error. For participant 2 however it averages out to near zero percent and for participant P1 the feature undershoots dramatically with an error of 30\%. The Routine Index feature is a mixed bag, with 6 participants answering higher than the algorithm and the remaining 4 being lower. All except for participant 6 deviating with almost 40\%. An important detail here is that the Routine Index answer was given on  scale with 20 percent increments which means that the mean error is likely to lie much higher percentage-wise than the other two features.
 
 \begin{figure}
     \centering
