@@ -394,8 +394,105 @@ The Routine Index is the most difficult to compute by far. The method for comput
     \label{fig:routine-index-code}
 \end{figure}
 
+\subsection{Context Generation}
+The instantion of Mobility Contexts is done through Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. 
 
-\subsection{Using Historical Data}
+\subsubsection{Accessing the File System}
+For storing collected location data the MobilitySerializer for Location Samples can be retrieved through this class, with a getter method. 
+);
+\begin{minted}{dart}
+static Future<MobilitySerializer<LocationSample>>
+      get locationSampleSerializer async =>
+          MobilitySerializer<LocationSample>._(await _file(LOCATION_SAMPLES)
+\end{minted}
+
+Internally this class has a method for creating a file system reference, which relies on the platform the application is running on. For mobile apps, the file system must be accessed through the \verb|path_provider| package with the \verb|getApplicationDocumentsDirectory()| method. If the application is run on the desktop, such as when unit testing the file system can be accessed by specifying a file name directly. This is a textbook example of hiding complexity from the application programmer.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    static Future<File> _file(String type) async {
+      bool isMobile = Platform.isAndroid || Platform.isIOS;
+    
+      String path;
+      if (isMobile) {
+        path = (await getApplicationDocumentsDirectory()).path;
+      } else {
+        path = 'test/data';
+      }
+      return new File('$path/$type.json');
+    }
+    \end{minted}
+    \caption{Lazy evaluation of a feature}
+    \label{fig:lazy-evaluation}
+\end{figure}
+
+\subsubsection{Context Computation and Historical Data}
+Without a doubt, the most interesting part of the ContextGenerator class is the \verb|generate()| method, which is where MobilityContext are computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter, is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
+
+\begin{minted}{dart}
+static Future<MobilityContext> generate(
+      {bool usePriorContexts: false, DateTime today}) {...}
+\end{minted}
+
+First, the file system is queried by initializing the three different MobilitySerializers, i.e. one for Location Samples, another for Stops and a third one for Moves. 
+\begin{minted}{dart}
+MobilitySerializer<LocationSample> sampleSerializer =
+    await locationSampleSerializer;
+MobilitySerializer<Stop> stopSerializer =
+    MobilitySerializer<Stop>._(await _file(STOPS));
+MobilitySerializer<Move> moveSerializer =
+    MobilitySerializer<Move>._(await _file(MOVES));
+\end{minted}
+
+Next, Location Samples are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
+
+\begin{minted}{dart}
+List<LocationSample> samplesToday = await sampleSerializer.load();
+List<Stop> stopsHist = await stopSerializer.load();
+List<Move> movesHist = await moveSerializer.load();
+
+samplesToday = _filterSamples(samplesToday, today);
+stopsHist = _stopsHistoric(stopsHist, today);
+movesHist = _movesHistoric(movesHist, today);
+\end{minted}
+
+The reason for throwing away elements from today is that they need to be recomputing using all the recent Location Samples which can alter the old results. Also, in extreme cases, not recomputing Stops and Moves in this manner could lead to none being found at all throughout the day, because of how the dataset is segmented. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
+\begin{minted}{dart}
+List<Stop> stopsToday = _findStops(samplesToday, today);
+List<Move> movesToday = _findMoves(samplesToday, stopsToday);
+
+List<Stop> stopsAll = stopsHist + stopsToday;
+List<Move> movesAll = movesHist + movesToday;
+
+List<Place> placesAll = _findPlaces(stopsAll);
+\end{minted}
+
+Next, the Stops and Moves for the period are stored to disk, but before they are stored, the flush method is used for the serializers in order to delete the old content permanently.
+\begin{minted}{dart}
+stopSerializer.flush();
+moveSerializer.flush();
+stopSerializer.save(stopsAll);
+moveSerializer.save(movesAll);
+\end{minted}
+
+Lastly, if prior contexts are to be used then 
+
+\begin{minted}{dart}
+List<MobilityContext> priorContexts = [];
+
+if (usePriorContexts) {
+  Set<DateTime> dates = stopsHist.map((s) => s.arrival.midnight).toSet();
+  for (DateTime date in dates) {
+    List<Stop> stopsOnDate = _stopsForDate(stopsHist, date);
+    List<Move> movesOnDate = _movesForDate(movesHist, date);
+    MobilityContext mc =
+        MobilityContext._(stopsOnDate, placesAll, movesOnDate, date: date);
+    priorContexts.add(mc);
+  }
+}
+\end{minted}
+
 Historical  Store collected samples
 Load collected samples
 Filter collected samples
@@ -406,16 +503,7 @@ Filter stops and moves
 Recompute for today, replace with new 
 Append the filtered historical with new stops and moves
 Store by overwriting existing stops and moves
-
-\subsection{Context Generation}
 Context Generator
-Static class, does not have a state
-References the LocationSample serializer, gives access to the user
-Works as interface for computing things without being able to alter the state
-Does the computation process
-Async, since files need to be stored and loaded
-Routine Index
-
 
 
 \subsection{Improvements}
