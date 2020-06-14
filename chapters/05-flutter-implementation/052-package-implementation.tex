@@ -36,6 +36,13 @@ GeoPosition._(this._latitude, this._longitude);
 
 A private constructor allows the class to be publicly \textit{available} but not publicly \textit{instantiable}. For classes the underscore prefix is used for the class name, to make it private, similar to field, i.e. \verb|class HourMatrix| becomes \verb|class _HourMatrix|.
 
+On the note of constructors, this package makes use of factory constructors which are effectively just methods which generate an object using the normal constructor. A factory constructor may be used to construct an object from JSON data, where each relevant field is extracted from the JSON data and passed onto the real constructor. A factory constructor is defined as follows:
+\begin{minted}{dart}
+factory Stop._fromLocationSamples(...) {
+	return Stop._(...);
+}
+\end{minted}
+
 \subsection{Domain Model Implementation}
 All the components specified in the Domain Model Chapter \ref{chapter:04} were implemented with their repsective relations to each other. As specified in the component diagram \ref{fig:component-diagram} the only component with a public-facing constructor was LocationSample, and by transitivity, also GeoPosition. This is done, as mentioned, to allow the user instantiate a LocationSample with data from a given Location DTO. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
 
@@ -141,10 +148,135 @@ return jsonObjs.map((x) => E.fromJson(x)).toList();
 
 However, this relies on the language feature called reflection \footnote{\url{https://www.javaworld.com/article/2075801/reflection-vs--code-generation.html}} which allows the compiler to infer the type of \verb|E| at compile-time. However, Dart does not support \textit{reflection} which makes this impossible.
 
-\subsection{Finding Stops, Moves and Places}
-Stops, geospatial interface
-Algorithms described in Chapter \ref{chapter:03}.
-Places need to be recomputed each time the period is extended
+\subsection{Finding Intermediate Features}
+Finding the intermediate features Stops, Moves and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
+
+\subsubsection{Finding Stops}
+The Stop class has two constructors: A factory constructor which takes a set of LocationSamples from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
+
+\begin{minted}{dart}
+  factory Stop._fromLocationSamples(List<LocationSample> locationSamples,
+      {int placeId = -1}) {
+      
+    GeoPosition center = _computeCentroid(locationSamples);
+    return Stop._(center, locationSamples.first.datetime, locationSamples.last.datetime,
+        placeId: placeId);
+  }
+\end{minted}
+
+The normal constructor uses a GeoPosition, in addition to an arrival and departure time. A place ID may also be specified at construction, but often it is not yet known at construction time hence it is optional.
+
+\begin{minted}{dart}
+  Stop._(this._geoPosition, this._arrival, this._departure, {this.placeId = -1});
+\end{minted}
+
+The Stop algorithm takes a List of LocationSamples as input, and uses two while-loops, and two pointers (\textit{start} and \textit{end}) which delimit a subset of the input data we are currently considering with the outer loop. Every time the outer loop moves, the \textit{start} pointer is moved past the end pointer, in order to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer., and the process is continued. Otherwise the inner loop terminates and a Stop is created from the subset. The Stop is created without a Place ID, since Places have not yet been identified. In addition, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency and likely won't be necessary in the general case.
+
+\begin{minted}{dart}
+  int start = 0;
+  while (start < n) {
+    int end = start + 1;
+    List<LocationSample> subset = data.sublist(start, end);
+    GeoPosition centroid = _computeCentroid(subset);
+
+    while (
+        end < n && Distance.fromGeospatial(centroid, data[end]) <= stopRadius) {
+      end += 1;
+      subset = data.sublist(start, end);
+      centroid = _computeCentroid(subset);
+    }
+    Stop s = Stop._fromLocationSamples(subset);
+    stops.add(s);
+
+    start = end;
+  }
+\end{minted}
+
+The distance calculation \verb|Distance.fromGeospatial(centroid, data[end]) <= stopRadius)| is carried out using the \verb|GeoSpatial| interface previously mentioned. The distance function \verb|fromGeoSpatial| takes two objects which implement the interface and unpacks the latitude and longitude from these objects. The haversine distance can then be computed afterwards.
+
+\begin{minted}{dart}
+class Distance {
+  static double fromGeospatial(_Geospatial a, _Geospatial b) {
+    return fromList(
+        [a.geoPosition._latitude, a.geoPosition._longitude],
+        [b.geoPosition._latitude, b.geoPosition._longitude]);
+  }
+
+  static double fromList(List<double> p1, List<double> p2) {
+    /// Haversine implementation
+  }
+}
+\end{minted}
+
+\subsubsection{Finding Moves}
+The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, with argument being either a path of Locaiton Samples or a Distance, i.e. a double. The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor for create a Move. 
+\begin{minted}{dart}
+  factory Move._fromPath(Stop a, Stop b, List<LocationSample> path) {
+    double d = _computePathDistance(path);
+    return Move._(a, b, d);
+  }
+\end{minted}
+
+\begin{minted}{dart}
+  Move._(this._stopFrom, this._stopTo, this._distance);
+\end{minted}
+The normal constructor is used for de-serialization whereas the factory constructor is used to create a Move given two Stops and the path of samples between them.
+
+The algorithm for finding Moves takes a List of Location Samples and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If however the set of Stops is not empty, then two 'fake' Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop and the path between. 
+
+\begin{minted}{dart}
+  Stop first = Stop._fromLocationSamples([data.first]);
+  List<Stop> allStops = [first] + stops;
+
+  if (data.first != data.last) {
+    Stop last = Stop._fromLocationSamples([data.last]);
+    allStops.add(last);
+  }
+
+  for (int i = 0; i < allStops.length - 1; i++) {
+    Stop cur = allStops[i];
+    Stop next = allStops[i + 1];
+    List<LocationSample> samplesInBetween = data
+        .where((d) =>
+            cur.departure.leq(d.datetime) && d.datetime.leq(next.arrival))
+        .toList();
+
+    moves.add(Move._fromPath(cur, next, samplesInBetween));
+  }
+\end{minted}
+
+The mentioned 'fake' Stops is an addition to the definition in Chapter \ref{chapter:03}. They are created to avoid situations in which tracking was started while moving, in this case no Moves are created before the user is stationary for some time, and Stops are found. This situation will likely not be very common, but was found during self-study and therefore deemed worthy of covering. The extra Stops are only used for finding moves and will not be used for finding Places.
+
+\subsubsection{Finding Places}
+The Place class only has one normal constructor which takes an ID (an integer) and a List of Stops. 
+\begin{minted}{dart}
+Place._(this._id, this._stops);
+\end{minted}
+
+The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster ID, this is the place ID previously discussed. Once the labels are computed the Stops are grouped by their Place ID, and a for each group a Place object is created with the group label and the Stops contained in the group. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
+
+\begin{minted}{dart}
+  DBSCAN dbscan = DBSCAN(
+      epsilon: placeRadius, minPoints: 1, distanceMeasure: Distance.fromList);
+  List<List<double>> stopCoordinates =
+      stops.map((s) => ([s.geoPosition.latitude, s.geoPosition.longitude])).toList();
+
+  dbscan.run(stopCoordinates);
+
+  Set<int> clusterLabels = dbscan.label.where((l) => (l != -1)).toSet();
+
+  for (int label in clusterLabels) {
+    List<int> indices =
+        stops.asMap().keys.where((i) => (dbscan.label[i] == label)).toList();
+
+    List<Stop> stopsForPlace = indices.map((i) => (stops[i])).toList();
+
+    Place p = Place._(label, stopsForPlace);
+    places.add(p);
+
+    stopsForPlace.forEach((s) => s.placeId = p._id);
+  }
+\end{minted}
 
 \subsection{Using Historical Data}
 Store collected samples

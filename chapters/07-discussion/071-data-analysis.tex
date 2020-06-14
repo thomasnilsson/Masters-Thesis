@@ -2,20 +2,21 @@
 As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants. Table \ref{tab:location-samples} shows the overview of the data collected for each participant, including the number of points, number of days and the storage requirements for the collected data.
 \begin{table}[]
     \centering
-    \begin{tabular}{|l|l|l|l|l|l|}
-    \hline
-    {\ul \textbf{Participant}} & {\ul \textbf{\# Days}} & {\ul \textbf{\# Total Samples}} & {\ul \textbf{Total Size (MB)}} & {\ul \textbf{\# Avg Samples / day}} & {\ul \textbf{\# Avg Size / day (MB)}} \\ \hline
-    \textbf{P1}                & 23.0                   & 181213.0                        & 17.3                           & 7878.8                              & 0.8                                   \\ \hline
-    \textbf{P2}                & 25.0                   & 142109.0                        & 13.6                           & 5684.4                              & 0.5                                   \\ \hline
-    \textbf{P3}                & 21.0                   & 101865.0                        & 9.7                            & 4850.7                              & 0.5                                   \\ \hline
-    \textbf{P4}                & 22.0                   & 98887.0                         & 9.4                            & 4494.9                              & 0.4                                   \\ \hline
-    \textbf{P5}                & 14.0                   & 209683.0                        & 20.0                           & 14977.4                             & 1.4                                   \\ \hline
-    \textbf{P6}                & 26.0                   & 101994.0                        & 9.7                            & 3922.8                              & 0.4                                   \\ \hline
-    \textbf{P7}                & 23.0                   & 1116075.0                       & 106.4                          & 48525.0                             & 4.6                                   \\ \hline
-    \textbf{P8}                & 15.0                   & 141260.0                        & 13.5                           & 9417.3                              & 0.9                                   \\ \hline
-    \textbf{P9}                & 12.0                   & 51740.0                         & 4.9                            & 4311.7                              & 0.4                                   \\ \hline
-    \textbf{R}                 & 24.0                   & 365606.0                        & 34.9                           & 15233.6                             & 1.5                                   \\ \hline
-    \end{tabular}
+        \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+        {\ul \textbf{P}} & {\ul \textbf{Days}} & {\ul \textbf{Samples}} & {\ul \textbf{MB}} & {\ul \textbf{Samples/day}} & {\ul \textbf{MB/day}} \\ \hline
+        \textbf{P1}                & 23                   & 181                        & 17.3                           & 7878.8                              & 0.8                              \\ \hline
+        \textbf{P2}                & 25                   & 142                        & 13.6                           & 5684.4                              & 0.5                             \\ \hline
+        \textbf{P3}                & 21                   & 101                        & 9.7                            & 4850.7                              & 0.5                             \\ \hline
+        \textbf{P4}                & 22                   & 98                         & 9.4                            & 4494.9                              & 0.4                             \\ \hline
+        \textbf{P5}                & 14                   & 209                        & 20.0                           & 14977.4                             & 1.4                             \\ \hline
+        \textbf{P6}                & 26                   & 101                        & 9.7                            & 3922.8                              & 0.4                             \\ \hline
+        \textbf{P7}                & 23                   & 111                       & 106.4                          & 48525.0                             & 4.6                             \\ \hline
+        \textbf{P8}                & 15                   & 141                        & 13.5                           & 9417.3                              & 0.9                              \\ \hline
+        \textbf{P9}                & 12                   & 51                         & 4.9                            & 4311.7                              & 0.4                              \\ \hline
+        \textbf{R}                 & 24                   & 365                        & 34.9                           & 15233.6                             & 1.5                                    \\ \hline
+        \end{tabular}
+
     \caption{The overview of collected Location Samples for each participant in the study}
     \label{tab:location-samples}
 \end{table}
@@ -81,9 +82,9 @@ The Home Stay feature required the participant to track their location during th
 
 \begin{figure}
     \centering
-    \includegraphics[0.5\textwidth]{images/study/homestay_valid_days.png}
-    \includegraphics[0.5\textwidth]{images/study/numplaces_valid_days.png}
-    \includegraphics[0.5\textwidth]{images/study/routine_valid_days.png}
+    \includegraphics[width=0.5\textwidth]{images/study/homestay_valid_days.png}
+    \includegraphics[width=0.5\textwidth]{images/study/numplaces_valid_days.png}
+    \includegraphics[width=0.5\textwidth]{images/study/routine_valid_days.png}
     \caption{The days for which a given feature could be evaluated, out of the total days for which an answer was given and features were computed}
     \label{fig:plot-daily}
 \end{figure}
@@ -93,9 +94,9 @@ Since the Home Stay feature is calculated by using the \textit{tracked} time at 
 
 \begin{figure}
     \centering
-    \includegraphics[0.5\textwidth]{images/study/places_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
-    \includegraphics[0.5\textwidth]{images/study/homestay_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
-    \includegraphics[0.5\textwidth]{images/study/routine_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/places_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/homestay_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/routine_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
     \caption{The answered and calculated data for each day, for the author}
     \label{fig:plot-author-features}
 \end{figure}
@@ -104,9 +105,9 @@ The day-by-day results for the author are displayed in figure \ref{fig:plot-dail
 
 \begin{figure}
     \centering
-    \includegraphics[0.5\textwidth]{images/study/places_ec110976-0192-436d-b451-4f5dd97e71d8.png}
-    \includegraphics[0.5\textwidth]{images/study/homestay_ec110976-0192-436d-b451-4f5dd97e71d8.png}
-    \includegraphics[0.5\textwidth]{images/study/routine_ec110976-0192-436d-b451-4f5dd97e71d8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/places_ec110976-0192-436d-b451-4f5dd97e71d8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/homestay_ec110976-0192-436d-b451-4f5dd97e71d8.png}
+    \includegraphics[width=0.5\textwidth]{images/study/routine_ec110976-0192-436d-b451-4f5dd97e71d8.png}
     \caption{The answered and calculated data for each day for a participant P7}
     \label{fig:plot-participant-features}
 \end{figure}
@@ -116,9 +117,9 @@ To say something about whether or not the algorithms undershoots or overshoots, 
 
 \begin{figure}
     \centering
-    \includegraphics[0.5\textwidth]{images/study/me_places.png}
-    \includegraphics[0.5\textwidth]{images/study/me_homestay.png}
-    \includegraphics[0.5\textwidth]{images/study/me_routine.png}
+    \includegraphics[width=0.5\textwidth]{images/study/me_places.png}
+    \includegraphics[width=0.5\textwidth]{images/study/me_homestay.png}
+    \includegraphics[width=0.5\textwidth]{images/study/me_routine.png}
     \caption{The number of data points in terms of days which could be evaluated, for each participant}
     \label{fig:plot-mean-error}
 \end{figure}
