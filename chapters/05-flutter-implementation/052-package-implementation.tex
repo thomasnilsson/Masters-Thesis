@@ -4,10 +4,9 @@ The package was implemented in Flutter according to the design in Chapter \ref{c
 \subsection{Private and Public Access}
 In most objective oriented languages, such as Dart, the safest way to use fields in classes is to make them private, and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
 
-\begin{minted}{java}
+\begin{minted}{dart}
 class MobilityContext {
 
-  /// Features
   double _routineIndex;
   ...
   double get routineIndex {
@@ -278,8 +277,126 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
   }
 \end{minted}
 
+\subsection{Comuting Features}
+A Mobility Context object represents features for a given date. The class has private constructor which takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
+
+\begin{minted}{dart}
+MobilityContext._(this._stops, this._allPlaces, this._moves,
+  {this.contexts, this.date}) {
+  _timestamp = DateTime.now();
+  date = date ?? _timestamp.midnight;
+}
+\end{minted}
+
+The other optional parameters is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    class MobilityContext {
+    	// Field
+    	double _routineIndex;
+     
+     	// Getter
+        double get routineIndex {
+        	return _routineIndex;
+        }
+    }
+    \end{minted}
+    \caption{The getter method for a feature field}
+    \label{fig:feature-getter}
+\end{figure}
+
+\subsubsection{Lazy Evaluation}
+A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} \footnote{\url{https://www.martinfowler.com/eaaCatalog/lazyLoad.html}}, which is the idea of having a field be computed only the first time it is needed, and then stored from then on. In practice this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed, and can be returned immediately.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    class MobilityContext {
+        // Field
+        double _routineIndex;
+        
+        // Getter
+        double get routineIndex {
+            if (_routineIndex == null) {
+                _routineIndex = _calculateRoutineIndex();
+            }
+            return _routineIndex;
+        }
+    }
+    \end{minted}
+    \caption{Lazy evaluation of a feature}
+    \label{fig:lazy-evaluation}
+\end{figure}
+
+
+\subsubsection{Home Stay Computation}
+The derived features are computed according to their definitions in \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is not exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix, and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
+
+\begin{figure}
+    \centering
+\begin{minted}{dart}
+double _calculateHomeStay() {
+  // Latest known sample time
+  DateTime latestTime = _stops.last.departure;
+
+  // Total time elapsed from midnight until the last stop
+  int totalTime = latestTime.millisecondsSinceEpoch -
+      latestTime.midnight.millisecondsSinceEpoch;
+
+  // Find todays home id, if no home exists today return -1.0
+  _HourMatrix hm = this.hourMatrix;
+  if (hm.homePlaceId == -1) {
+    return -1.0;
+  }
+
+  int homeTime = stops
+      .where((s) => s.placeId == hm.homePlaceId)
+      .map((s) => s.duration.inMilliseconds)
+      .fold(0, (a, b) => a + b);
+
+  return homeTime.toDouble() / totalTime.toDouble();
+}
+\end{minted}
+    \caption{The method for computing the Home Stay feature}
+    \label{fig:home-stay-code}
+\end{figure}
+
+\subsubsection{Routine Index}
+The Routine Index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these the average Hour Matrix is computed. Lastly the Routine Index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    double _calculateRoutineIndex() {
+      // Require at least 2 days to compute the routine index
+      if (contexts == null) {
+        return -1.0;
+      } else if (contexts.isEmpty) {
+        return -1.0;
+      }
+    
+      /// Compute the HourMatrix for each context that is older
+      List<_HourMatrix> matrices = contexts
+          .where((c) => c.date.isBefore(this.date))
+          .map((c) => c.hourMatrix)
+          .toList();
+    
+      /// Compute the 'average day' from the matrices
+      _HourMatrix avgMatrix = _HourMatrix.average(matrices);
+    
+      /// Compute the overlap between the 'average day' and today
+      return this.hourMatrix.computeOverlap(avgMatrix);
+    }
+    \end{minted}
+    \caption{The method for computing the Routine Index feature}
+    \label{fig:routine-index-code}
+\end{figure}
+
+
 \subsection{Using Historical Data}
-Store collected samples
+Historical  Store collected samples
 Load collected samples
 Filter collected samples
 Data from day $n$ is deleted on day $n+1$ when loading
@@ -297,14 +414,9 @@ References the LocationSample serializer, gives access to the user
 Works as interface for computing things without being able to alter the state
 Does the computation process
 Async, since files need to be stored and loaded
-
-
-\subsection{Computing Features}
-Mobility context class
-Cannot be directly instantiated
-Features derived from intermediate features
-Lazy evaluation
 Routine Index
+
+
 
 \subsection{Improvements}
 Currently the implementation (not the design) requires daily computation
