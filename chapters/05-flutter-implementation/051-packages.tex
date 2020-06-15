@@ -42,24 +42,24 @@ The \textit{pubspec.yaml} contains the package specification including the packa
 \begin{figure}
     \centering
     \begin{minted}{yaml}
-    name: mobility_features
-    description: Real-time mobility feature calculation
-    version: 1.1.5
-    homepage: https://github.com/cph-cachet/flutter-plugins/
-    
-    environment:
-      sdk: ">=2.7.0 <3.0.0"
-    
-    dependencies:
-      flutter:
-        sdk: flutter
-      simple_cluster: ^0.2.0
-      stats: ^0.2.0+3
-      path_provider: ^1.6.10
-    
-    dev_dependencies:
-      flutter_test:
-        sdk: flutter
+        name: mobility_features
+        description: Real-time mobility feature calculation
+        version: 1.1.5
+        homepage: https://github.com/cph-cachet/flutter-plugins/
+        
+        environment:
+          sdk: ">=2.7.0 <3.0.0"
+        
+        dependencies:
+          flutter:
+            sdk: flutter
+          simple_cluster: ^0.2.0
+          stats: ^0.2.0+3
+          path_provider: ^1.6.10
+        
+        dev_dependencies:
+          flutter_test:
+            sdk: flutter
     \end{minted}
     \caption{The pubspec.yaml file for the Mobility Features Package}
     \label{fig:pubspec}
@@ -71,20 +71,20 @@ Lastly, the README.md file contains instructions for using the package including
 The Mobility Features Package has a library file of the same name as the package \textit{mobility\_features.dart} which is the central point of import statements for all the source code. All import statements are made within this file, and each file belonging to the library are declared using the \textit{part} keyword and. 
 
 \begin{minted}{dart}
-library mobility_features;
-
-import 'dart:math';
-...
-
-part 'mobility_functions.dart';
-...
+    library mobility_features;
+    
+    import 'dart:math';
+    ...
+    
+    part 'mobility_functions.dart';
+    ...
 \end{minted}
 
 Each file included in the library will have the equivalent \textit{part of} keyword at the top of their file, which allows the file to import all dependencies from the library, and makes the file public to other files within the library and vice versa.
 
 \begin{minted}{dart}
-part of mobility_features;
-...
+    part of mobility_features;
+    ...
 \end{minted}
 
 Classes and field which are private and still visible internally to other classes within the library. This helps making things communicate internally but have closed private access to the application programmer, for reasons discussed in Chapter \ref{chapter:04}
@@ -94,7 +94,7 @@ Distributing a Flutter package is done via the Dart Package Manager, Pub. Pub is
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.7\textwidth]{images/pub.png}
+    \includegraphics[width=\textwidth]{images/pub.png}
     \caption{The page hosting the Mobility Features Package on www.pub.dev}
     \label{fig:pub-package}
 \end{figure}
@@ -104,11 +104,11 @@ Publishing automatically generate API documentation by using comments in the cod
 \begin{figure}
     \centering
     \begin{minted}{dart}
-    /// A [LocationSample] holds a 2D [GeoPosition] spatial data point
-    /// as well as a [DateTime] value s.t. it may be temporally ordered
-    class LocationSample implements _Serializable, _Geospatial {...}
+        /// A [LocationSample] holds a 2D [GeoPosition] spatial data point
+        /// as well as a [DateTime] value s.t. it may be temporally ordered
+        class LocationSample implements _Serializable, _Geospatial {...}
     \end{minted}
-    \includegraphics[width=0.5\textwidth]{images/docs.png}
+    \includegraphics[width=\textwidth]{images/docs.png}
     \caption{The API comments for the source code of a Location Sample (top) and the auto generated documentation hosted on the Pub (bottom)}
     \label{fig:api-docs}
 \end{figure}
