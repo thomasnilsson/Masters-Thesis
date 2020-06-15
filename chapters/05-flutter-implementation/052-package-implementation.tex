@@ -38,7 +38,7 @@ A private constructor allows the class to be publicly \textit{available} but not
 On the note of constructors, this package makes use of factory constructors which are effectively just methods which generate an object using the normal constructor. A factory constructor may be used to construct an object from JSON data, where each relevant field is extracted from the JSON data and passed onto the real constructor. A factory constructor is defined as follows:
 \begin{minted}{dart}
     factory Stop._fromLocationSamples(...) {
-    	return Stop._(...);
+        return Stop._(...);
     }
 \end{minted}
 

@@ -104,12 +104,18 @@ Publishing automatically generate API documentation by using comments in the cod
 \begin{figure}
     \centering
     \begin{minted}{dart}
-        /// A [LocationSample] holds a 2D [GeoPosition] spatial data point
-        /// as well as a [DateTime] value s.t. it may be temporally ordered
-        class LocationSample implements _Serializable, _Geospatial {...}
+    /// A [LocationSample] holds a 2D [GeoPosition] spatial data point
+    /// as well as a [DateTime] value s.t. it may be temporally ordered
+    class LocationSample implements _Serializable, _Geospatial {...}
     \end{minted}
+    \caption{The API comments for the source code of the Location Sample class}
+    \label{fig:api-comments}
+\end{figure}
+
+\begin{figure}
+    \centering
     \includegraphics[width=\textwidth]{images/docs.png}
-    \caption{The API comments for the source code of a Location Sample (top) and the auto generated documentation hosted on the Pub (bottom)}
+    \caption{The auto generated documentation for the package, hosted on pub.dev, including the code snippet in Figure \ref{fig:api-comments} for the Location Sample class}
     \label{fig:api-docs}
 \end{figure}
 
