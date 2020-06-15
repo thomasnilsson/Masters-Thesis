@@ -51,7 +51,8 @@ It must be intantiated through the `ContextGenerator.generate()` method.
 Should the programmer wish to compute the \textit{Routine Index} feature as well, then prior contexts are needed. Concretely, the application needs to have tracked data for at least 2 days, to compute this feature. The generation of a Mobility Context using prior contexts is done using the \verb|usePriorContexts| argument and setting it to \verb|true|.
 
 \begin{minted}{dart}
-MobilityContext context = await ContextGenerator.generate(usePriorContexts: true);
+MobilityContext context = 
+    await ContextGenerator.generate(usePriorContexts: true);
 \end{minted}
 
 \subsubsection*{Step 3.2: Compute features for a specific date}
@@ -59,7 +60,8 @@ By default, a \textit{MobilityContext} object uses the current date as reference
 
 \begin{minted}{dart}
 DateTime myDate = DateTime(01, 01, 2020);
-MobilityContext context = await ContextGenerator.generate(today: myDate);
+MobilityContext context = 
+    await ContextGenerator.generate(today: myDate);
 \end{minted}
 
 \subsection*{Step 4: Get features}

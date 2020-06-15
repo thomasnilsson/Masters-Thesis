@@ -1,8 +1,8 @@
 \section{Application Implementation}
-This section will describe the implementation of the study application, mostly regarding how data was collected, how features were computed as well as how the data was sent to a Firebase instance. The study app used the package while it was in an earlier iteration. In this iteration almost none of the logic related to storing and loading data was part of the packagee, and as such all of this had to be written in the application instead.
+This section will describe the implementation of the study application, mostly regarding how data was collected, how features were computed as well as how the data was sent to a Firebase instance. The study app used the package while it was in an earlier iteration. In this iteration almost none of the logic related to storing and loading data was part of the package, and as such all of this had to be written in the application instead. This section will not provide a lot of source code since the implementation of the package has changed since the applicaiton was developed in regards to the API. However, the fundamental concepts of the application are still the same; collect data, compute features, collect answers and upload everything to a server.
 
-\subsection{Component Overview}
-To provide a high level overview of the different components which make up the study application a component diagram displayed in Figure \ref{fig:app-component-diagram}. The MobilityStudy component in blue is the component responsible for managing the application state but does not do much outside of this since the application state management required is minimal. Had it been a more complex application with many different screens and a state which had to be maintained across these screens (for example a shopping cart in a shopping app) then more logic would lie inside the MobilityStudy component. Instead the Main Screen is spawned from the MobilityStudy component which in turn creates an AppProcessor instance. The AppProcessor instance is responsible for a multitude of tasks, such as asking for permissions, collection location data, and computing features. Storing and loading from the disk is done through the FileManager component which includes location data, Stops, Moves, MobilityContexts and diary answers. This component is also responsible for uploading the stored data to Firebase.
+\subsection{Architecture Overview}
+To provide a high level overview of the different components which make up the study application, a component diagram displayed in Figure \ref{fig:app-component-diagram}. The MobilityStudy component in blue is the component responsible for managing the application state but does not do much outside of this since the application state management required is minimal. Had it been a more complex application with many different screens and a state which had to be maintained across these screens (for example a shopping cart in a shopping app) then more logic would lie inside the MobilityStudy component. Instead the Main Screen is spawned from the MobilityStudy component which in turn creates an AppProcessor instance. The AppProcessor instance is responsible for a multitude of tasks, such as asking for permissions, collection location data, and computing features. Storing and loading from the disk is done through the FileManager component which includes location data, Stops, Moves, MobilityContexts and diary answers. This component is also responsible for uploading the stored data to Firebase.
 
 \begin{figure}
     \centering
@@ -11,13 +11,52 @@ To provide a high level overview of the different components which make up the s
     \label{fig:app-component-diagram}
 \end{figure}
 
+\subsection{Diary Implementation}
 
-\subsection{Async Computation and Threading}
+\subsection{Firebase Storage}
 
+\subsection{Firebase Cloud Messaging}
+
+
+\subsection{Asynchronous Computation and Threading}
+One concept not discussed much so far is the need for asynchronous computation and the use of multi-threading. Flutter applications support multi-threading, which means a main thread runs the user interface, and background threads can be spawned in order to perform heavy computation which would otherwise 'clog' the main thread, which means the user will experience a frozen UI. In the study app there was no real user interface so to speak, but in a real-world application there will be a user interface which cannot be allowed to freeze due to the feature calculation. In Flutter threads are referred to as Isolates which communicate using a \textit{SendPort} and a \textit{ReceivePort}. These two objects can be used to transfer other objects between threads, such that the main thread can request a background thread to calculate the features, and the background thread will then send back a \textit{MobilityContext} object once finished. 
+
+\begin{minted}{dart}
+Future<MobilityContext> _computeFeaturesAsync() async {
+  ReceivePort receivePort = ReceivePort();
+  await Isolate.spawn(_asyncComputation, receivePort.sendPort);
+  SendPort sendPort = await receivePort.first;
+
+  MobilityContext mobilityContext = await _relay(sendPort);
+  return mobilityContext;
+}
+\end{minted}
+
+The \verb|_relay| method works as an interface between the \verb|_computeFeaturesAsync| method which runs on the UI thread and the static method \verb|_asyncComputation| which runs on the background thread and simply relays messages between the two threads.
+
+\begin{minted}{dart}
+Future _relay(SendPort sendPort) {
+  ReceivePort receivePort = ReceivePort();
+  sendPort.send([receivePort.sendPort]);
+  return receivePort.first;
+}
+\end{minted}
+
+Lastly, the \verb|_asyncComputation| method is static which is due to the computation being done in a separate thread than than the main thread. If the objects contained within the \textit{AppProcessor} instance (i.e. in the main thread) were to change their state while computation was ongoing in the background thread, then the resulting computation would produce an outdated result. The \textit{ContextGenerator} is also a static class without mutable state and can therefore be used to compute the Mobility Context without the need for mutable state anywhere in the chain, once the message reaches the background thread.
+
+\begin{minted}{dart}
+static void _asyncComputation(SendPort sendPort) async {
+  ReceivePort receivePort = ReceivePort();
+  sendPort.send(receivePort.sendPort);
+  List args = await receivePort.first;
+  SendPort replyPort = args[0];
+
+  MobilityContext context =
+      await ContextGenerator.generate(usePriorContexts: true);
+
+  replyPort.send(context);
+}
+\end{minted}
 
 \subsection{Improvements}
-A second improvement to be made is to not use lazy evaluation 
-Lazy evaluation should probably not be used, instead compute on initialization since initialization is async
-
-ContextGeneration should be done with an isolate, currently the user needs to use an isolate.
-Prevent UI thread from freezingMobilitySerializvi
+The application development process led to many of the improvements of the package API reflected in Chapter \ref{chapter:04} and \ref{chapter:05}, mostly pertaining to moving processing inside the package rather than outside, and giving the application developer more restricted access. However, a couple of issues still remain: The asynchronous computation is cumbersome to set up and takes over 30 lines of code to perform. This should ideally be moved inside the package in the next iteration. Another improvement to make is not relying on lazy evaluation, as dicussed in the Package Implemention in Chapter \ref{chapter:05}. In the current version, only the intermediate Features will be computed in the background thread, whereas all the derived features contained in the MobilityContext object returned by the async computatiton will not yet have been computed upon returning from the background thread. This is due to lazy evaluation, which ensures that the features are not unnecessarily computed in advance, and only computed once they are requested. This could potentially mean freezing the UI thread, since the features computed via lazy evaluation will be computed once the Mobility Context object is inside the main thread. The fix for this is to evaluate all features in the contructor of the Mobility Context class, which will imply longer guaranteed computation time for creating a Mobility Context object but will also guarantee that all features have been pre-computed in the background thread and will not block the UI thread.

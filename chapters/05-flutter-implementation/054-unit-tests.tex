@@ -1,5 +1,5 @@
 \section{Unit Testing}
-Unit testing \url{https://martinfowler.com/bliki/UnitTest.html}}, in which small parts of the source code are tested played a significant role in the latter part of the development process. It was prioritized to make a working demo application in order to conduct a study and while unit tests can speed up certain parts of the debugging process, it was still faster to 'hack something together'. The only testing done prior to the study was regarding serialization and making sure the feature computation producing meaningful results, i.e. they were manually verified. The traditional way of using unit testing is through Test Driven Development \footnote{
+Unit testing \footnote{\url{https://martinfowler.com/bliki/UnitTest.html}}, in which small parts of the source code are tested played a significant role in the latter part of the development process. It was prioritized to make a working demo application in order to conduct a study and while unit tests can speed up certain parts of the debugging process, it was still faster to 'hack something together'. The only testing done prior to the study was regarding serialization and making sure the feature computation producing meaningful results, i.e. they were manually verified. The traditional way of using unit testing is through Test Driven Development \footnote{
 \url{https://martinfowler.com/bliki/TestDrivenDevelopment.html}} in which the tests are written first, and the corresponding source code which should pass the test is written afterwards. The package went through many smaller iterations, in which the data flow was moved around, and unit testing made discovering bugs much easier by enabling one to constantly verify that the source code produced the desired results every time changes were made. As the package went through multiple iterations, each iteration either added or removed functionality, or changed the existing functionality slightly which meant new unit tests were often written to cover the functionality. In the end some the functionality was pruned and therefore some of the tests were also superfluous or had a large amount of overlap between them and were therefore also consolidated. 
 
 \subsection{}
@@ -41,7 +41,9 @@ This test is the simplest unit test in the collection in which the storing- and 
 \subsubsection*{Test: Single Stop}
 This test is a step up in complexity in terms of what is tested. A dataset is constructed with a single location which the user stays at from 00:00 to 17:00. This should result in a single stop and place being found, no moves, and a home stay value of 1.0 (i.e. 100 percent). The data is first serialized and a Mobility Context is computed afterwards from which the features are extracted.
 
-\begin{minted}{dart}
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
     test('Features: Single Stop', () async {
       Duration timeTracked = Duration(hours: 17);
 
@@ -57,18 +59,25 @@ This test is a step up in complexity in terms of what is tested. A dataset is co
       serializer.flush();
       await serializer.save(dataset);
 
-      MobilityContext context = await ContextGenerator.generate(today: jan01);
+      MobilityContext context = 
+        await ContextGenerator.generate(today: jan01);
       expect(context.homeStay, 1.0);
       expect(context.stops.length, 1);
       expect(context.moves.length, 0);
       expect(context.places.length, 1);
     });
-\end{minted}
+    \end{minted}
+    \caption{Unit test for a single Stop}
+    \label{fig:test-single-stop}
+\end{figure}
 
 \subsubsection*{Test: Multiple Days with Routine Index}
-This test works similar to the previous one, but has the dataset spread over two different locations. The same dataset is repeated for 5 days, where the number of Stops, Moves and Places is evaluated each day, in addition to the Home Stay and Routine Index feature. Concretely, the places visited are the same each day, at the same hours of the day meaning the Routine Index is 1.0 except for the first day, since the Routine Index requires at least one historical day for comparison. The user stays at one place from 00:00 to 06:00 meaking it the home cluster, and another place from 08:00 to 09:00. This means the Home Stay should be equal to \frac{6}{9}, or 66.67 percent. 
+This test works similar to the previous one, but has the dataset spread over two different locations. The same dataset is repeated for 5 days, where the number of Stops, Moves and Places is evaluated each day, in addition to the Home Stay and Routine Index feature. Concretely, the places visited are the same each day, at the same hours of the day meaning the Routine Index is 1.0 except for the first day, since the Routine Index requires at least one historical day for comparison. The user stays at one place from 00:00 to 06:00 meaking it the home cluster, and another place from 08:00 to 09:00. This means the Home Stay should be equal to $\frac{6}{9}$, or 66.67 percent. 
 
-\begin{minted}{dart}
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
     test('Features: Multiple days, multiple locations', () async {
       MobilitySerializer<LocationSample> serializer =
           await ContextGenerator.locationSampleSerializer;
@@ -113,5 +122,7 @@ This test works similar to the previous one, but has the dataset spread over two
         }
       }
     });
-\end{minted}
-
+    \end{minted}
+    \caption{Unit test for a single Stop}
+    \label{fig:test-single-stop}
+\end{figure}
