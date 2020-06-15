@@ -183,7 +183,10 @@ The features described in the literature by \cite{Saeb2015} which can be found i
 
 For the overlap function we define a union operator $A \cap B$ defining the \textit{overlap} of two matrices $A$ and $B$ as 
 
-$$A \cap B = \sum_{i=1}^{24} \sum_{j=1}^{N} \min (A_{ij}, B_{ij}) \;|\; A_{ij} > 0, B_{ij} > 0$$
+\begin{equation}
+\label{eq:overlap-function}
+    A \cap B = \sum_{i=1}^{24} \sum_{j=1}^{N} \min (A_{ij}, B_{ij}) \;|\; A_{ij} \geq 0, B_{ij} \geq 0
+\end{equation}
 
 The \textit{Routine Index} for today $d_t$ given the historical dates $D$, is defined as: 
 

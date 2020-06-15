@@ -330,22 +330,98 @@ A \textit{getter} method for a given feature should reflect that the feature tha
     \label{fig:lazy-evaluation}
 \end{figure}
 
+\subsubsection{Hour Matrix Computation}
+The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor which takes a List of Stops and the number of places visited. From this, the matrix is created and filled out. Each Stop can be converted into an array of doubles which tells which place and how much was visited.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    factory _HourMatrix.fromStops(List<Stop> stops, int numPlaces) {
+      List<List<double>> matrix = new List.generate(
+          HOURS_IN_A_DAY, (_) => new List<double>.filled(numPlaces, 0.0));
+    
+      for (int j = 0; j < numPlaces; j++) {
+        List<Stop> stopsAtPlace = stops.where((s) => (s.placeId) == j).toList();
+    
+        for (Stop s in stopsAtPlace) {
+          for (int i = 0; i < HOURS_IN_A_DAY; i++) {
+            matrix[i][j] += s.hourSlots[i];
+          }
+        }
+      }
+      return _HourMatrix(matrix);
+    }
+    \end{minted}
+    \caption{Construction of the Hour Matrix}
+    \label{fig:hour-matrix-construction}
+\end{figure}
+
+Next, the \verb|average()| factory constructor is discussed. This is a method for creating the Hour Matrix of average day, given a list of other Hour Matrices. The method is quite simple, since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    factory _HourMatrix.average(List<_HourMatrix> matrices) {
+      int nDays = matrices.length;
+      int nPlaces = matrices.first.matrix.first.length;
+      List<List<double>> avg = zeroMatrix(HOURS_IN_A_DAY, nPlaces);
+    
+      for (_HourMatrix m in matrices) {
+        for (int i = 0; i < HOURS_IN_A_DAY; i++) {
+          for (int j = 0; j < nPlaces; j++) {
+            avg[i][j] += m.matrix[i][j] / nDays;
+          }
+        }
+      }
+      return _HourMatrix(avg);
+    }
+    \end{minted}
+    \caption{Construction of the Hour Matrix}
+    \label{fig:hour-matrix-average}
+\end{figure}
+
+Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \ref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. 
+
+The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severily limited. If either of the sums are zero then -1 is returned, due to either matrix beign empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position the overlap for two sclars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \ref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    double computeOverlap(_HourMatrix other) {
+      assert(other.matrix.length == HOURS_IN_A_DAY &&
+          other.matrix.first.length == _matrix.first.length);
+    
+      double maxOverlap = min(this.sum, other.sum);
+      if (maxOverlap == 0.0) return -1.0;
+    
+      double overlap = 0.0;
+      for (int i = 0; i < HOURS_IN_A_DAY; i++) {
+        for (int j = 0; j < _numberOfPlaces; j++) {
+          if (this.matrix[i][j] > 0.0 && other.matrix[i][j] > 0.0) {
+            overlap += min(this.matrix[i][j], other.matrix[i][j]);
+          }
+        }
+      }
+      return overlap / maxOverlap;
+    }
+    \end{minted}
+    \caption{Construction of the Hour Matrix}
+    \label{fig:hour-matrix-overlap}
+\end{figure}
+
 
 \subsubsection{Home Stay Computation}
-The derived features are computed according to their definitions in \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is not exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix, and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
+The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is not exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix, and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
 
 \begin{figure}
     \centering
 \begin{minted}{dart}
 double _calculateHomeStay() {
-  // Latest known sample time
   DateTime latestTime = _stops.last.departure;
 
-  // Total time elapsed from midnight until the last stop
   int totalTime = latestTime.millisecondsSinceEpoch -
       latestTime.midnight.millisecondsSinceEpoch;
 
-  // Find todays home id, if no home exists today return -1.0
   _HourMatrix hm = this.hourMatrix;
   if (hm.homePlaceId == -1) {
     return -1.0;
@@ -370,23 +446,19 @@ The Routine Index is the most difficult to compute by far. The method for comput
     \centering
     \begin{minted}{dart}
     double _calculateRoutineIndex() {
-      // Require at least 2 days to compute the routine index
       if (contexts == null) {
         return -1.0;
       } else if (contexts.isEmpty) {
         return -1.0;
       }
     
-      /// Compute the HourMatrix for each context that is older
       List<_HourMatrix> matrices = contexts
           .where((c) => c.date.isBefore(this.date))
           .map((c) => c.hourMatrix)
           .toList();
     
-      /// Compute the 'average day' from the matrices
       _HourMatrix avgMatrix = _HourMatrix.average(matrices);
     
-      /// Compute the overlap between the 'average day' and today
       return this.hourMatrix.computeOverlap(avgMatrix);
     }
     \end{minted}
