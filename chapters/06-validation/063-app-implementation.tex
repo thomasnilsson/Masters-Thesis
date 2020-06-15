@@ -10,3 +10,14 @@ To provide a high level overview of the different components which make up the s
     \caption{Component diagram for the study application displaying the different building blocks and the interactions between them}
     \label{fig:app-component-diagram}
 \end{figure}
+
+
+\subsection{Async Computation and Threading}
+
+
+\subsection{Improvements}
+A second improvement to be made is to not use lazy evaluation 
+Lazy evaluation should probably not be used, instead compute on initialization since initialization is async
+
+ContextGeneration should be done with an isolate, currently the user needs to use an isolate.
+Prevent UI thread from freezingMobilitySerializvi

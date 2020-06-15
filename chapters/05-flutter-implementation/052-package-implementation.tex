@@ -476,7 +476,7 @@ stopSerializer.save(stopsAll);
 moveSerializer.save(movesAll);
 \end{minted}
 
-Lastly, if prior contexts are to be used then 
+Lastly, if prior contexts are to be used then the historical dates are extracted from the historical stops, and for each date the Stops and Moves are extracted and used to construct a Mobility Context, with each context being added to a List of prior contexts.
 
 \begin{minted}{dart}
 List<MobilityContext> priorContexts = [];
@@ -493,26 +493,13 @@ if (usePriorContexts) {
 }
 \end{minted}
 
-Historical  Store collected samples
-Load collected samples
-Filter collected samples
-Data from day $n$ is deleted on day $n+1$ when loading
+The method returns a MobilityContext object using the Stops and Moves of today and the Places for the period. In addition the date of today is also chosen to be overriden and the computed contexts are also provided. If no contexts were computed, then \verb|priorContexts| will be an empty List.
 
-Load historical stops and moves
-Filter stops and moves
-Recompute for today, replace with new 
-Append the filtered historical with new stops and moves
-Store by overwriting existing stops and moves
-Context Generator
-
+\begin{minted}{dart}
+return MobilityContext._(stopsToday, placesAll, movesToday,
+        contexts: priorContexts, date: today);
+\end{minted}
 
 \subsection{Improvements}
-Currently the implementation (not the design) requires daily computation
-If features are not computed on a given day, then all the data collected on that day will be lost next time features are computed due to being filtered out. Currently the user can avoid this by either computing features every day without fault or specifying the date on which the features are yet to be computed.
-The fix is to mark data and not throw it out before stops and moves have been evaluated for those samples
-When data is loaded, group by date, and compute stops and moves per date. Only then should the samples be thrown out.
-
-Lazy evaluation should probably not be used, instead compute on initialization since initialization is async
-
-ContextGeneration should be done with an isolate, currently the user needs to use an isolate.
-Prevent UI thread from freezingMobilitySerializvi
+While the current implementation lives up to all the functional requirements, there is still room for improvement. Currently the implementation throws away Location Samples from previous days when computing the MobilityContext for today. This approach assumes that any data left from a previous date has been transformed into Stops and Moves, and therefore no longer is needed. However does not consider the case where a large part of the stored Location Samples have not been used, due to no computation having taken place. In some cases whole days of Location Samples may end up being thrown away without Stops and Moves being computed from this data. The current way to avoid this is to compute features every day, making sure at least one computation takes place late in the evening such that minimal data is lost. Another way around it currently is to override the date, if is known that computation did not take place for a given date. This 'latest date of computation' can be kept track of by the programmer, but goes back to the problem of managing complexity. Ideally this is done by the package itself, and can be solved the following way:
+When Location Samples are loaded, group them by date, and compute Stops and Moves for each of these dates. Save the Stops and Moves, and then throw away the samples from these previous dates. out.
