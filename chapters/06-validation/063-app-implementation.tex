@@ -11,6 +11,16 @@ To provide a high level overview of the different components which make up the s
     \label{fig:app-component-diagram}
 \end{figure}
 
+\subsection{Data Collection}
+For collecting Location Samples, a custom version of the \textit{Geolocator}\footnote{\url{https://pub.dev/packages/geolocator}} plugin was developed for the purpose of this package to achieve reliable background location streaming. The current implementation of \textit{Geolocator} was missing a flag in the \textit{Objective-C} implementation for iOS, which allows the app to continue streaming location data while the app is minimized. The flag for background updates has to be set for an instance of a Location Manager which is the access to the Location API:
+
+\begin{minted}{dart}
+    _locationManager.allowsBackgroundLocationUpdates = YES;
+\end{minted}
+
+If this flag is not set to 'YES' (i.e. True), the location stream will die shortly after the application is minimized. It is important to note that this plugin is not part of the Mobility Features Package, but is likely needed to make use of the package. A Github issue was created\footnote{\url{https://github.com/Baseflow/flutter-geolocator/issues/390}} and the features was merged to a development branch for the GeoLocator plugin. The feature is however not public as of yet, and the custom plugin was therefore necessary to use when developing the application. 
+
+
 \subsection{Diary Implementation}
 
 \subsection{Firebase Storage}

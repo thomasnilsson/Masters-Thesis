@@ -55,19 +55,13 @@ Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how m
     \label{fig:plot-num-points-stops}
 \end{figure}
 
-It was computed based on file size, the average size of a serialized \textit{LocationSample} is 100 bytes, and a \textit{Stop} is 139 bytes. With this information it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting Location Samples into Stops, and this is shown in Figure \ref{fig:plot-num-points-stops}. 
-
-
-
-The number of valid days for a specific feature is a day for which the user gave answers, and the feature could be calculated. If the user for example turned off their phone during the night, the home stay feature could not be calculated, but the routine index feature and the number of places will likely still have been calculated.
-
+It was computed based on file size, the average size of a serialized \textit{LocationSample} is 100 bytes, and a \textit{Stop} is 139 bytes. With this information it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting Location Samples into Stops, and this is shown in Figure \ref{fig:plot-num-points-stops}. The number of valid days for a specific feature is a day for which the user gave answers, and the feature could be calculated. If the user for example turned off their phone during the night, the home stay feature could not be calculated, but the routine index feature and the number of places will likely still have been calculated.
 
 \subsection{Subjectivity of Answers and Ground Truth}
 A thing to keep in mind is that the participants' answers are not ground truth, and there are multiple reasons why a participants answer may be inaccurate. Firstly, people's subjective recollection is not necessarily as accurate as they think it might me. Secondly, it was not communicated explicitly to the participants what exactly counts as a place, and how their 'routine' is calculated - this means that participants may have filled out the questionnaire differently, given the same ground truth data - for example whether or not being in the garden counts as being home. Secondly, some users misunderstood the routine scale and users whose data looked strange were contacted afterwards to enquire about whether they had misunderstood the question and if so the answers were corrected as much as could be done. Lastly, the hour away from home and routine index answers were very course grained, and therefore the participants were probably rarely able to give exact answers, according to the their own recollection. 
 
 \subsection{Missing Data and Correcting Data}
 Some users missed several days of filling out the diary which meant the computed features for that day could not be compared to a subjective measurement. Figure \ref{fig:plot-days-answered} shows the number of total days where a participant participated in the study where data was collected vs the days on which they provided an answer. For data analysis it was only possible to calculate the error between computed features and the answers given if the participant actually gave an answer. This mean that for some participants, a lot of data was unfortunately not usable for the data analysis. As an example, it was considered whether or not to entirely get rid of P9 since he or she has very little data both terms of total days collected and even fewer in terms of days with answers. 
-
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/study/storage/answers_days_plot.png}

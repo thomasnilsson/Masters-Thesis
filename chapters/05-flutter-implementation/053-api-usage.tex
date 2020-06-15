@@ -1,13 +1,32 @@
 \section{Using the Package}
 This section will be a mirror of the official instructions on how to use the package, as of version 1.1.5.
 
-Firstly, the programmer has to get the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project. Next once the dependency has been loaded it can be imported as such
+Firstly, the programmer has to get the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project. Next once the dependency has been loaded it can be imported as follows:
 
 \begin{minted}{dart}
 import 'package:mobility_features/mobility_features.dart';
 \end{minted}
 
-Using the package can be broken down into 4 main steps:
+Computing features can essentially be done in just 3 lines of code, excluding collecting Location Samples:
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    /// Get serializer
+    MobilitySerializer<LocationSample> serializer =
+          await ContextGenerator.locationSampleSerializer;
+    
+    /// Save Location Samples      
+    await serializer.save(locationSamples);
+    
+    /// Compute Features
+    MobilityContext context = await ContextGenerator.generate();
+    \end{minted}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+The exact method for arriving at this stage is outlined in the following 4 steps.
 
 \subsection*{Step 1: Collect location data}
 Location data collection is, as mentioned, not part of the Mobility Features package, and the programmer will therefore have tto a location plugin such as \url{https://pub.dev/packages/geolocator}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
