@@ -29,7 +29,7 @@ Computing features can essentially be done in just 3 lines of code, excluding co
 The exact method for arriving at this stage is outlined in the following 4 steps.
 
 \subsection*{Step 1: Collect location data}
-Location data collection is, as mentioned, not part of the Mobility Features package, and the programmer will therefore have tto a location plugin such as \url{https://pub.dev/packages/geolocator}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
+Location data collection is, as mentioned, not part of the Mobility Features package, and the programmer will, therefore, have to a location plugin such as \url{https://pub.dev/packages/geolocator}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
 Below is shown an example where incoming \verb|Position| objects are coming in from the \verb|GeoLocator| plugin and are being handled in the \verb|_onData()| call-back method.
 
 \begin{minted}{dart}
@@ -56,7 +56,7 @@ await serializer.save(locationSamples);
 Ideally, saving the data is done with a certain interval, such as every time 100 samples are collected. 
 
 \subsection*{Step 3: Compute features}
-The Features can be computed using the static class \verb|ContextGenerator| which uses the stored location samples, as well as  historic features to compute the features for today.
+The Features can be computed using the static class \verb|ContextGenerator| which uses the stored location samples, as well as historic features to compute the features for today.
 
 There most basic computation is done as follows:
 \begin{minted}{dart}
@@ -64,9 +64,9 @@ MobilityContext context = await ContextGenerator.generate();
 \end{minted}
 
 Note: it is not possible to instantiate a `MobilityContext` object directly. 
-It must be intantiated through the `ContextGenerator.generate()` method.
+It must be instantiated through the `ContextGenerator.generate()` method.
 
-\subsubsection*{Step 3.1 : Compute features with prior contexts}
+\subsubsection*{Step 3.1: Compute features with prior contexts}
 Should the programmer wish to compute the \textit{Routine Index} feature as well, then prior contexts are needed. Concretely, the application needs to have tracked data for at least 2 days, to compute this feature. The generation of a Mobility Context using prior contexts is done using the \verb|usePriorContexts| argument and setting it to \verb|true|.
 
 \begin{minted}{dart}
@@ -75,7 +75,7 @@ MobilityContext context =
 \end{minted}
 
 \subsubsection*{Step 3.2: Compute features for a specific date}
-By default, a \textit{MobilityContext} object uses the current date as reference to filter and group data, however, should one wish to compute the features for a specific date, then it is possible to do so using the \verb|today| argument and providing the desired date.
+By default, a \textit{MobilityContext} object uses the current date as a reference to filter and group data, however, should one wish to compute the features for a specific date, then it is possible to do so using the \verb|today| argument and providing the desired date.
 
 \begin{minted}{dart}
 DateTime myDate = DateTime(01, 01, 2020);
@@ -84,7 +84,7 @@ MobilityContext context =
 \end{minted}
 
 \subsection*{Step 4: Get features}
-All features are implemented as \textit{getters} for the MobilityContext class and can therefore be retrieved using the dot-notation. 
+All features are implemented as \textit{getters} for the MobilityContext class and can, therefore, be retrieved using the dot-notation. 
 
 \begin{minted}{dart}
 MobilityContext context = // Generate context

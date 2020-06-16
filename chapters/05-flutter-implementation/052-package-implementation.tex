@@ -2,7 +2,7 @@
 The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the overall data model was outlined. This section will go through selected examples of source code as well as the general principles applied, to achieve the specified design, when implementing in Flutter and Dart.
 
 \subsection{Private and Public Access}
-In most objective oriented languages, such as Dart, the safest way to use fields in classes is to make them private, and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
+In most objective oriented languages, such as Dart, the safest way to use fields in classes is to make them private and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
 
 \begin{minted}{dart}
     class MobilityContext {
@@ -33,9 +33,9 @@ With the private equivalent being:
     GeoPosition._(this._latitude, this._longitude);
 \end{minted}
 
-A private constructor allows the class to be publicly \textit{available} but not publicly \textit{instantiable}. For classes the underscore prefix is used for the class name, to make it private, similar to field, i.e. \verb|class HourMatrix| becomes \verb|class _HourMatrix|.
+A private constructor allows the class to be publicly \textit{available} but not publicly \textit{instantiable}. For classes the underscore prefix is used for the class name, to make it private, similar to a field, i.e. \verb|class HourMatrix| becomes \verb|class _HourMatrix|.
 
-On the note of constructors, this package makes use of factory constructors which are effectively just methods which generate an object using the normal constructor. A factory constructor may be used to construct an object from JSON data, where each relevant field is extracted from the JSON data and passed onto the real constructor. A factory constructor is defined as follows:
+On the note of constructors, this package makes use of factory constructors which are effectively just methods that generate an object using the normal constructor. A factory constructor may be used to construct an object from JSON data, where each relevant field is extracted from the JSON data and passed onto the real constructor. A factory constructor is defined as follows:
 \begin{minted}{dart}
     factory Stop._fromLocationSamples(...) {
         return Stop._(...);
@@ -43,7 +43,7 @@ On the note of constructors, this package makes use of factory constructors whic
 \end{minted}
 
 \subsection{Domain Model Implementation}
-All the components specified in the Domain Model Chapter \ref{chapter:04} were implemented with their repsective relations to each other. As specified in the component diagram \ref{fig:component-diagram} the only component with a public-facing constructor was LocationSample, and by transitivity, also GeoPosition. This is done, as mentioned, to allow the user instantiate a LocationSample with data from a given Location DTO. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
+All the components specified in the Domain Model Chapter \ref{chapter:04} were implemented with their respective relations to each other. As specified in the component diagram \ref{fig:component-diagram} the only component with a public-facing constructor was LocationSample, and by transitivity, also GeoPosition. This is done, as mentioned, to allow the user instantiate a LocationSample with data from a given Location DTO. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
 
 \begin{minted}{dart}
     abstract class _Geospatial {
@@ -51,7 +51,7 @@ All the components specified in the Domain Model Chapter \ref{chapter:04} were i
     }
 \end{minted}
 
-This interface allows other classes to promise the Dart compiler that it has a GeoPosition field which allows it to be compared to other classes which implement the same interface. In Dart interfaces and abstract classes are one and the same thing, and the \textit{abstract class} keyword is used for implementing them. The GeoPosition class even implements this interface since a GeoPosition object itself has a GeoPosition. This may seem superfluous, but will come in handy when finding Stops.
+This interface allows other classes to promise the Dart compiler that it has a GeoPosition field which allows it to be compared to other classes that implement the same interface. In Dart interfaces and abstract classes are the same thing, and the \textit{abstract class} keyword is used for implementing them. The GeoPosition class even implements this interface since a GeoPosition object itself has a GeoPosition. This may seem superfluous but will come in handy when finding Stops.
 
 \begin{minted}{dart}
     class GeoPosition implements _Serializable, _Geospatial {
@@ -67,7 +67,7 @@ This interface allows other classes to promise the Dart compiler that it has a G
 \end{minted}
 
 \subsection{Storing and Loading Data}
-The storing and loading of data, which includes Location Samples, Stops and Moves happen through the MobilitySerializer class. This class allows classes which implement the Serializable interface to be serialized and de-serialized. Just like the GeoSpatial interface, the Serializable interface is also implemented as a private abstract class only used internally in the package library. The interface contains a method for serializing a class to JSON, named \verb|toJson()| which takes no parameters and produces a HashMap of Strings to the dynamic, the dynamic type meaning any type. This is the Dart equivalent of a JSON object. Another method the interface forces other classes to implement is the deserialization method \verb|fromJson(json)| which takes a JSON object as parameter and creates a runtime object of the given type, from the JSON object. The implemention of this method is left to the individual classes implementing the interface which is done by extracting data from the JSON object.
+The storing and loading of data, which includes Location Samples, Stops, and Moves happen through the MobilitySerializer class. This class allows classes that implement the Serializable interface to be serialized and de-serialized. Just like the GeoSpatial interface, the Serializable interface is also implemented as a private abstract class only used internally in the package library. The interface contains a method for serializing a class to JSON, named \verb|toJson()| which takes no parameters and produces a HashMap of Strings to the dynamic, the dynamic type meaning any type. This is the Dart equivalent of a JSON object. Another method the interface forces other classes to implement is the deserialization method \verb|fromJson(json)| which takes a JSON object as a parameter and creates a runtime object of the given type, from the JSON object. The implementation of this method is left to the individual classes implementing the interface which is done by extracting data from the JSON object.
 
 \begin{minted}{dart}
     abstract class _Serializable {
@@ -77,7 +77,7 @@ The storing and loading of data, which includes Location Samples, Stops and Move
     }
 \end{minted}
 
-The MobilitySerializer class is a generic which allows the type \verb|E| to be specified later, with \verb|E| referring to either an Location Sample, Stop or Move which all implement the Serializable interface. The MobilitySerializer is constructed using a reference to a File object. The File object is used for storing the data of the given type i.e. Location Samples are stored one file, Stops in another and Moves in a third.
+The MobilitySerializer class is a generic which allows the type \verb|E| to be specified later, with \verb|E| referring to either a Location Sample, Stop or Move which all implement the Serializable interface. The MobilitySerializer is constructed using a reference to a File object. The File object is used for storing the data of the given type i.e. Location Samples are stored one file, Stops in another, and Moves in a third.
 
 \begin{minted}{dart}
     class MobilitySerializer<E> {
@@ -116,7 +116,7 @@ For storing data the \verb|save| method is used which takes in a list of objects
     }
 \end{minted}
 
-Loading works in the reverse order, where the contents of the specified file is loaded into a string, the string is then split into elements using the delimiter token and each of these elements is turn de-serialized using the \verb|fromJson| method.  For deciding which type to de-serialize the elements into, a switch statement is used that checks the type of \verb|E| which is specified when the MobilitySerializer object is instantiated.
+Loading works in the reverse order, where the contents of the specified file are loaded into a string, the string is then split into elements using the delimiter token and each of these elements is de-serialized using the \verb|fromJson| method.  For deciding which type to de-serialize the elements into, a switch statement is used that checks the type of \verb|E| which is specified when the MobilitySerializer object is instantiated.
 
 \begin{minted}{dart}
     Future<List<_Serializable>> load() async {
@@ -153,7 +153,7 @@ Ideally, the switch statement could have been replaced by the following one-line
 However, this relies on the language feature called reflection \footnote{\url{https://www.javaworld.com/article/2075801/reflection-vs--code-generation.html}} which allows the compiler to infer the type of \verb|E| at compile-time. However, Dart does not support \textit{reflection} which makes this impossible.
 
 \subsection{Finding Intermediate Features}
-Finding the intermediate features Stops, Moves and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
+Finding the intermediate features Stops, Moves, and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
 
 \subsubsection{Finding Stops}
 The Stop class has two constructors: A factory constructor which takes a set of LocationSamples from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
@@ -175,7 +175,7 @@ The normal constructor uses a GeoPosition, in addition to an arrival and departu
         this._departure, {this.placeId = -1});
 \end{minted}
 
-The Stop algorithm takes a List of LocationSamples as input, and uses two while-loops, and two pointers (\textit{start} and \textit{end}) which delimit a subset of the input data we are currently considering with the outer loop. Every time the outer loop moves, the \textit{start} pointer is moved past the end pointer, in order to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer., and the process is continued. Otherwise the inner loop terminates and a Stop is created from the subset. The Stop is created without a Place ID, since Places have not yet been identified. In addition, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency and likely won't be necessary in the general case.
+The Stop algorithm takes a List of LocationSamples as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) which delimit a subset of the input data we are currently considering with the outer loop. Every time the outer loop moves, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer., and the process is continued. Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a Place ID since Places have not yet been identified. Also, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency and likely won't be necessary in the general case.
 
 \begin{minted}{dart}
     int start = 0;
@@ -197,7 +197,7 @@ The Stop algorithm takes a List of LocationSamples as input, and uses two while-
     }
 \end{minted}
 
-The distance calculation \verb|Distance.fromGeospatial(centroid, data[end]) <= stopRadius)| is carried out using the \verb|GeoSpatial| interface previously mentioned. The distance function \verb|fromGeoSpatial| takes two objects which implement the interface and unpacks the latitude and longitude from these objects. The haversine distance can then be computed afterwards.
+The distance calculation \verb|Distance.fromGeospatial(centroid, data[end]) <= stopRadius)| is carried out using the \verb|GeoSpatial| interface previously mentioned. The distance function \verb|fromGeoSpatial| takes two objects which implement the interface and unpacks the latitude and longitude from these objects. The haversine distance can then be computed afterward.
 
 \begin{minted}{dart}
     class Distance {
@@ -214,7 +214,7 @@ The distance calculation \verb|Distance.fromGeospatial(centroid, data[end]) <= s
 \end{minted}
 
 \subsubsection{Finding Moves}
-The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, with argument being either a path of Locaiton Samples or a Distance, i.e. a double. The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor for create a Move. 
+The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, with argument being either a path of Location Samples or a Distance, i.e. a double. The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor to create a Move. 
 \begin{minted}{dart}
     factory Move._fromPath(Stop a, Stop b, List<LocationSample> path) {
       double d = _computePathDistance(path);
@@ -227,7 +227,7 @@ The Move class has two constructors which are both private. Common for both cons
 \end{minted}
 The normal constructor is used for de-serialization whereas the factory constructor is used to create a Move given two Stops and the path of samples between them.
 
-The algorithm for finding Moves takes a List of Location Samples and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If however the set of Stops is not empty, then two 'fake' Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop and the path between. 
+The algorithm for finding Moves takes a List of Location Samples and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If however, the set of Stops is not empty, then two 'fake' Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop, and the path between. 
 
 \begin{minted}{dart}
   Stop first = Stop._fromLocationSamples([data.first]);
@@ -250,7 +250,7 @@ The algorithm for finding Moves takes a List of Location Samples and the Stops f
   }
 \end{minted}
 
-The mentioned 'fake' Stops is an addition to the definition in Chapter \ref{chapter:03}. They are created to avoid situations in which tracking was started while moving, in this case no Moves are created before the user is stationary for some time, and Stops are found. This situation will likely not be very common, but was found during self-study and therefore deemed worthy of covering. The extra Stops are only used for finding moves and will not be used for finding Places.
+The mentioned 'fake' Stops is an addition to the definition in Chapter \ref{chapter:03}. They are created to avoid situations in which tracking was started while moving, in this case, no Moves are created before the user is stationary for some time, and Stops are found. This situation will likely not be very common, but was found during self-study and therefore deemed worthy of covering. The extra Stops are only used for finding moves and will not be used for finding Places.
 
 \subsubsection{Finding Places}
 The Place class only has one normal constructor which takes an ID (an integer) and a List of Stops. 
@@ -258,7 +258,7 @@ The Place class only has one normal constructor which takes an ID (an integer) a
 Place._(this._id, this._stops);
 \end{minted}
 
-The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster ID, this is the place ID previously discussed. Once the labels are computed the Stops are grouped by their Place ID, and a for each group a Place object is created with the group label and the Stops contained in the group. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
+The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster-ID, this is the place ID previously discussed. Once the labels are computed the Stops are grouped by their Place ID, and for each group, a Place object is created with the group label and the Stops contained in the group. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
 
 \begin{minted}{dart}
   DBSCAN dbscan = DBSCAN(
@@ -284,7 +284,7 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
 \end{minted}
 
 \subsection{Comuting Features}
-A Mobility Context object represents features for a given date. The class has private constructor which takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
+A Mobility Context object represents features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
 
 \begin{minted}{dart}
 MobilityContext._(this._stops, this._allPlaces, this._moves,
@@ -294,18 +294,18 @@ MobilityContext._(this._stops, this._allPlaces, this._moves,
 }
 \end{minted}
 
-The other optional parameters is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
+The other optional parameter is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
 
 \begin{figure}
     \centering
     \begin{minted}{dart}
     class MobilityContext {
-    	// Field
-    	double _routineIndex;
+        // Field
+        double _routineIndex;
      
-     	// Getter
+         // Getter
         double get routineIndex {
-        	return _routineIndex;
+            return _routineIndex;
         }
     }
     \end{minted}
@@ -314,7 +314,7 @@ The other optional parameters is a List of Mobility Contexts is used for computi
 \end{figure}
 
 \subsubsection{Lazy Evaluation}
-A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], which applied to this example is the idea of postponing computation of a given field until the first time it is needed. After being computed, the field is stored and can be retrieved henceforth without any computational cost. In practice this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed, and can be returned immediately.
+A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However, there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], which applied to this example is the idea of postponing computation of a given field until the first time it is needed. After being computed, the field is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
 
 \begin{figure}
     \centering
@@ -337,7 +337,7 @@ A \textit{getter} method for a given feature should reflect that the feature tha
 \end{figure}
 
 \subsubsection{Hour Matrix Computation}
-The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor which takes a List of Stops and the number of places visited. From this, the matrix is created and filled out. Each Stop can be converted into an array of doubles which tells which place and how much was visited.
+The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. From this, the matrix is created and filled out. Each Stop can be converted into an array of doubles that tells which place and how much was visited.
 
 \begin{figure}
     \centering
@@ -362,7 +362,7 @@ The Hour Matrix is an auxiliary feature used for internal computation and is the
     \label{fig:hour-matrix-construction}
 \end{figure}
 
-Next, the \verb|average()| factory constructor is discussed. This is a method for creating the Hour Matrix of average day, given a list of other Hour Matrices. The method is quite simple, since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.
+Next, the \verb|average()| factory constructor is discussed. This is a method for creating the Hour Matrix of the average day, given a list of other Hour Matrices. The method is quite simple since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.
 
 \begin{figure}
     \centering
@@ -388,7 +388,7 @@ Next, the \verb|average()| factory constructor is discussed. This is a method fo
 
 Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \ref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. 
 
-The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severily limited. If either of the sums are zero then -1 is returned, due to either matrix beign empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position the overlap for two sclars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \ref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
+The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severely limited. If either of the sums is zero then -1 is returned, due to either matrix being empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position, the overlap for two scalars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \ref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
 
 \begin{figure}
     \centering
@@ -417,7 +417,7 @@ The maximum possible overlap is computed as the minimum of the two matrix sums, 
 
 
 \subsubsection{Home Stay Computation}
-The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is not exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix, and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
+The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is no exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
 
 \begin{figure}
     \centering
@@ -446,7 +446,7 @@ double _calculateHomeStay() {
 \end{figure}
 
 \subsubsection{Routine Index}
-The Routine Index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these the average Hour Matrix is computed. Lastly the Routine Index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
+The Routine Index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the average Hour Matrix is computed. Lastly, the Routine Index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
 
 \begin{figure}
     \centering
@@ -473,7 +473,7 @@ The Routine Index is the most difficult to compute by far. The method for comput
 \end{figure}
 
 \subsection{Context Generation}
-The instantion of Mobility Contexts is done through Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. 
+The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. 
 
 \subsubsection{Accessing the File System}
 For storing collected location data the MobilitySerializer for Location Samples can be retrieved through this class, with a getter method. 
@@ -506,7 +506,7 @@ Internally this class has a method for creating a file system reference, which r
 \end{figure}
 
 \subsubsection{Context Computation and Historical Data}
-Without a doubt, the most interesting part of the ContextGenerator class is the \verb|generate()| method, which is where MobilityContext are computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter, is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
+Without a doubt, the most interesting part of the ContextGenerator class is the \verb|generate()| method, which is where MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
 
 \begin{minted}{dart}
 static Future<MobilityContext> generate(
@@ -535,7 +535,7 @@ stopsHist = _stopsHistoric(stopsHist, today);
 movesHist = _movesHistoric(movesHist, today);
 \end{minted}
 
-The reason for throwing away elements from today is that they need to be recomputing using all the recent Location Samples which can alter the old results. Also, in extreme cases, not recomputing Stops and Moves in this manner could lead to none being found at all throughout the day, because of how the dataset is segmented. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
+The reason for throwing away elements from today is that they need to be recomputing using all the recent Location Samples which can alter the old results. Also, in extreme cases, not recomputing Stops and Moves in this manner could lead to none being found throughout the day, because of how the dataset is segmented. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
 \begin{minted}{dart}
 List<Stop> stopsToday = _findStops(samplesToday, today);
 List<Move> movesToday = _findMoves(samplesToday, stopsToday);
@@ -554,7 +554,7 @@ stopSerializer.save(stopsAll);
 moveSerializer.save(movesAll);
 \end{minted}
 
-Lastly, if prior contexts are to be used then the historical dates are extracted from the historical stops, and for each date the Stops and Moves are extracted and used to construct a Mobility Context, with each context being added to a List of prior contexts.
+Lastly, if prior contexts are to be used then the historical dates are extracted from the historical stops, and for each date, the Stops and Moves are extracted and used to construct a Mobility Context, with each context being added to a List of prior contexts.
 
 \begin{minted}{dart}
 List<MobilityContext> priorContexts = [];
@@ -571,7 +571,7 @@ if (usePriorContexts) {
 }
 \end{minted}
 
-The method returns a MobilityContext object using the Stops and Moves of today and the Places for the period. In addition the date of today is also chosen to be overriden and the computed contexts are also provided. If no contexts were computed, then \verb|priorContexts| will be an empty List.
+The method returns a MobilityContext object using the Stops and Moves of today and the Places for the period. Also, the date of today is chosen to be overridden and the computed contexts are also provided. If no contexts were computed, then \verb|priorContexts| will be an empty List.
 
 \begin{minted}{dart}
 return MobilityContext._(stopsToday, placesAll, movesToday,

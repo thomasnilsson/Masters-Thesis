@@ -1,5 +1,5 @@
 \section{Domain Model}
-The domain model provides clarity and direction for a software system, even on a small scale such as in a library. In this section the design choices of the data model will be discussed.
+The domain model provides clarity and direction for a software system, even on a small scale such as in a library. In this section, the design choices of the data model will be discussed.
 
 \subsection{Data Model Overview}
 In order to capture the data model in an object-oriented programming language, a UML diagram was maintained as the implementation went along in order to keep track of relationships between the classes. 
@@ -14,7 +14,7 @@ A \textit{Single Location Data Point} is a time-stamped \textit{Location}. By ha
 An \textit{Hour Matrix} is a matrix with 24 rows and columns equal to the number of places of some period. The \textit{Hour Matrix} class is used to calculate the \textit{Routine Index} feature, as well as to identify the \textit{Home Cluster}, which is the place most visited during 00:00 and 06:00. An Hour Matrix is constructed from a list of \textit{Stops} which all have the same date.
 
 \subsubsection*{Stop}
-A \textit{Stop} is constructed from a centroid of a data point cluster (i.e. a Location) in addition to an arrival- and a departure timestamp, and a place ID indicating which place it belongs to.
+A \textit{Stop} is constructed from a centroid of a data point cluster (i.e. a Location) in addition to arrival- and a departure timestamp, and a place ID indicating which place it belongs to.
 
 \subsubsection*{Place}
 A \textit{Place} is constructed from a place ID, as well as a collection of \textit{Stops} belonging to that \textit{Place}. 
@@ -29,7 +29,7 @@ A \textit{Mobility Context} is a collection of features which are derived from a
 This interface will impose a getter-method for the GeoPosition of the class which implements it. This allows the Haversine distance to be calculated between objects of different types.
 
 \subsubsection*{Serializable (Interface)}
-This interface will impose a serialization and de-serialization method for converting between a language object and a JSON object. The interface will allow the MobilitySerializer component as previosly discussed to more easily implement serialization in a generic manner which is disucssed in Chapter \ref{chapter:05}.
+This interface will impose a serialization and de-serialization method for converting between a language object and a JSON object. The interface will allow the MobilitySerializer component as previously discussed to more easily implement serialization in a generic manner which is discussed in Chapter \ref{chapter:05}.
 
 \subsection{UML Diagram and Discussion}
 
