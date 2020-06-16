@@ -1,14 +1,5 @@
 \section{Field Study}
-A small-scale study was conducted which ran for 3 weeks and included 10 participants (including the author). In the study the participants used the application discussed in Chapter \ref{chapter:05-api-implementation} that collected their location data and computed mobility features daily. This section will discussed the overall method with which the study was conducted.
-
-% Self-study was conducted first and foremost to evaluate parameters for stops and places
-% I have a new phone, app isnt killed there
-% Larger study was conducted to validate the package on a broader scale, in contrast to unit testing
-% Is it feasible? Is it even possible to track location so frequently, will it die on its own?
-% Do they algorithms produce meaningful results
-% Tracked for 3 weeks
-% Compare answers to computed results
-% Try to match time wise as close as possible
+A small-scale study was conducted which ran for 3 weeks and included 10 participants (including the author). In the study the participants used the application discussed in Chapter \ref{chapter:05} that collected their location data and computed mobility features daily. This section will discussed the overall method with which the study was conducted.
 
 \subsection{Self-study}
 Before the main study was conducted a self-study was conducted in three different cities, in order to select appropriate parameters for the algorithms. This parameter tweaking happened while the author was in Munich where he sat in a large university building and visited different offices. In Figure \ref{fig:tum-map} the Places and the Stops at the university are displayed and as can be seen which are very close. Had the radius parameter for finding places been higher then some the places would have been merged into a single place. Here, the parameter was set to 25 meters, and in the final study it was chosen to set it to 50 meters.
