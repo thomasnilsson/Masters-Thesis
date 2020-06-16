@@ -2186,53 +2186,99 @@
     <bcf:citekey order="2">learning_significant_locations</bcf:citekey>
     <bcf:citekey order="3">sparse-location-2014</bcf:citekey>
     <bcf:citekey order="4">Saeb2015</bcf:citekey>
-    <bcf:citekey order="4">Canzian2015</bcf:citekey>
-    <bcf:citekey order="5">Saeb2015</bcf:citekey>
-    <bcf:citekey order="6">mubs-rohani</bcf:citekey>
-    <bcf:citekey order="6">moribus</bcf:citekey>
-    <bcf:citekey order="7">Saeb2015</bcf:citekey>
-    <bcf:citekey order="8">sparse-location-2014</bcf:citekey>
-    <bcf:citekey order="9">extraction-of-behavioural-features</bcf:citekey>
-    <bcf:citekey order="10">Saeb2015</bcf:citekey>
+    <bcf:citekey order="5">Canzian2015</bcf:citekey>
+    <bcf:citekey order="6">Saeb2015</bcf:citekey>
+    <bcf:citekey order="7">mubs-rohani</bcf:citekey>
+    <bcf:citekey order="7">moribus</bcf:citekey>
+    <bcf:citekey order="8">Saeb2015</bcf:citekey>
+    <bcf:citekey order="9">sparse-location-2014</bcf:citekey>
+    <bcf:citekey order="10">extraction-of-behavioural-features</bcf:citekey>
     <bcf:citekey order="11">Saeb2015</bcf:citekey>
-    <bcf:citekey order="12">extraction-of-behavioural-features</bcf:citekey>
-    <bcf:citekey order="13">Saeb2015</bcf:citekey>
-    <bcf:citekey order="14">digital_phenotyping</bcf:citekey>
-    <bcf:citekey order="15">digital_phenotyping</bcf:citekey>
+    <bcf:citekey order="12">digital_phenotyping</bcf:citekey>
+    <bcf:citekey order="13">digital_phenotyping</bcf:citekey>
+    <bcf:citekey order="14">learning_significant_locations</bcf:citekey>
+    <bcf:citekey order="15">learning_significant_locations</bcf:citekey>
     <bcf:citekey order="16">learning_significant_locations</bcf:citekey>
-    <bcf:citekey order="17">learning_significant_locations</bcf:citekey>
-    <bcf:citekey order="18">learning_significant_locations</bcf:citekey>
+    <bcf:citekey order="17">density-based-1996</bcf:citekey>
+    <bcf:citekey order="18">density-based-1996</bcf:citekey>
     <bcf:citekey order="19">density-based-1996</bcf:citekey>
-    <bcf:citekey order="20">density-based-1996</bcf:citekey>
-    <bcf:citekey order="21">density-based-1996</bcf:citekey>
-    <bcf:citekey order="22">Saeb2015</bcf:citekey>
-    <bcf:citekey order="23">extraction-of-behavioural-features</bcf:citekey>
-    <bcf:citekey order="24">aware2015</bcf:citekey>
+    <bcf:citekey order="20">Saeb2015</bcf:citekey>
+    <bcf:citekey order="21">extraction-of-behavioural-features</bcf:citekey>
+    <bcf:citekey order="22">aware2015</bcf:citekey>
+    <bcf:citekey order="23">Saeb2015</bcf:citekey>
+    <bcf:citekey order="24">Canzian2015</bcf:citekey>
     <bcf:citekey order="25">Saeb2015</bcf:citekey>
-    <bcf:citekey order="26">Canzian2015</bcf:citekey>
+    <bcf:citekey order="26">Saeb2015</bcf:citekey>
     <bcf:citekey order="27">Saeb2015</bcf:citekey>
-    <bcf:citekey order="28">Saeb2015</bcf:citekey>
-    <bcf:citekey order="29">Saeb2015</bcf:citekey>
-    <bcf:citekey order="30">aware2015</bcf:citekey>
-    <bcf:citekey order="31">moribus</bcf:citekey>
-    <bcf:citekey order="32">mubs-rohani</bcf:citekey>
-    <bcf:citekey order="33">gps-navstar</bcf:citekey>
-    <bcf:citekey order="34">learning_significant_locations</bcf:citekey>
-    <bcf:citekey order="35">haversine-formula</bcf:citekey>
-    <bcf:citekey order="36">Saeb2015</bcf:citekey>
-    <bcf:citekey order="36">Canzian2015</bcf:citekey>
-    <bcf:citekey order="37">sparse-location-2014</bcf:citekey>
-    <bcf:citekey order="38">sparse-location-2014</bcf:citekey>
-    <bcf:citekey order="39">density-based-1996</bcf:citekey>
-    <bcf:citekey order="40">Canzian2015</bcf:citekey>
+    <bcf:citekey order="28">aware2015</bcf:citekey>
+    <bcf:citekey order="29">moribus</bcf:citekey>
+    <bcf:citekey order="30">mubs-rohani</bcf:citekey>
+    <bcf:citekey order="31">gps-navstar</bcf:citekey>
+    <bcf:citekey order="32">learning_significant_locations</bcf:citekey>
+    <bcf:citekey order="33">haversine-formula</bcf:citekey>
+    <bcf:citekey order="34">Saeb2015</bcf:citekey>
+    <bcf:citekey order="34">Canzian2015</bcf:citekey>
+    <bcf:citekey order="35">sparse-location-2014</bcf:citekey>
+    <bcf:citekey order="36">sparse-location-2014</bcf:citekey>
+    <bcf:citekey order="37">density-based-1996</bcf:citekey>
+    <bcf:citekey order="38">Canzian2015</bcf:citekey>
+    <bcf:citekey order="38">Saeb2015</bcf:citekey>
+    <bcf:citekey order="39">Saeb2015</bcf:citekey>
+    <bcf:citekey order="39">Canzian2015</bcf:citekey>
     <bcf:citekey order="40">Saeb2015</bcf:citekey>
+    <bcf:citekey order="40">Canzian2015</bcf:citekey>
     <bcf:citekey order="41">Saeb2015</bcf:citekey>
-    <bcf:citekey order="41">Canzian2015</bcf:citekey>
-    <bcf:citekey order="42">Saeb2015</bcf:citekey>
-    <bcf:citekey order="42">Canzian2015</bcf:citekey>
+    <bcf:citekey order="42">information-theory</bcf:citekey>
     <bcf:citekey order="43">Saeb2015</bcf:citekey>
-    <bcf:citekey order="44">information-theory</bcf:citekey>
-    <bcf:citekey order="45">Saeb2015</bcf:citekey>
-    <bcf:citekey order="46">Saeb2015</bcf:citekey>
-    <bcf:citekey order="46">Canzian2015</bcf:citekey>
-    <bcf:citekey order="47">Canzian2015</bcf:citekey>
+    <bcf:citekey order="44">Saeb2015</bcf:citekey>
+    <bcf:citekey order="44">Canzian2015</bcf:citekey>
+    <bcf:citekey order="45">Canzian2015</bcf:citekey>
+    <bcf:citekey order="46">mubs-rohani</bcf:citekey>
+    <bcf:citekey order="47">density-based-1996</bcf:citekey>
+    <bcf:citekey order="48">mubs-rohani</bcf:citekey>
+    <bcf:citekey order="49">Saeb2015</bcf:citekey>
+    <bcf:citekey order="50">extraction-of-behavioural-features</bcf:citekey>
+  </bcf:section>
+  <!-- SORTING TEMPLATES -->
+  <bcf:sortingtemplate name="anyt">
+    <bcf:sort order="1">
+      <bcf:sortitem order="1">presort</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="2">
+      <bcf:sortitem order="1">labelalpha</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="3" final="1">
+      <bcf:sortitem order="1">sortkey</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="4">
+      <bcf:sortitem order="1">sortname</bcf:sortitem>
+      <bcf:sortitem order="2">author</bcf:sortitem>
+      <bcf:sortitem order="3">editor</bcf:sortitem>
+      <bcf:sortitem order="4">translator</bcf:sortitem>
+      <bcf:sortitem order="5">sorttitle</bcf:sortitem>
+      <bcf:sortitem order="6">title</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="5">
+      <bcf:sortitem order="1">sortyear</bcf:sortitem>
+      <bcf:sortitem order="2">year</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="6">
+      <bcf:sortitem order="1">sorttitle</bcf:sortitem>
+      <bcf:sortitem order="2">title</bcf:sortitem>
+    </bcf:sort>
+    <bcf:sort order="7">
+      <bcf:sortitem order="1">volume</bcf:sortitem>
+      <bcf:sortitem literal="1" order="2">0</bcf:sortitem>
+    </bcf:sort>
+  </bcf:sortingtemplate>
+  <!-- DATALISTS -->
+  <bcf:datalist section="0"
+                name="anyt/global//global/global"
+                type="entry"
+                sortingtemplatename="anyt"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global">
+  </bcf:datalist>
+</bcf:controlfile>

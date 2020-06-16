@@ -1,5 +1,11 @@
-    dependencies:
-      geolocator:
-        path: ../geolocator_custom/
-      mobility_features:
-        path: ../mobility_features/
+static void _asyncComputation(SendPort sendPort) async {
+  ReceivePort receivePort = ReceivePort();
+  sendPort.send(receivePort.sendPort);
+  List args = await receivePort.first;
+  SendPort replyPort = args[0];
+
+  MobilityContext context =
+      await ContextGenerator.generate(usePriorContexts: true);
+
+  replyPort.send(context);
+}

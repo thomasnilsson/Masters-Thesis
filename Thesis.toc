@@ -1,0 +1,299 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\selectlanguage *{english}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Summary}{i}{chapter*.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Preface}{iii}{chapter*.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Acknowledgements}{v}{chapter*.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Contents}{vii}{section*.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.1}Context and Motivation}{1}{section.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.2}Background}{2}{section.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.3}Research Question}{3}{section.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.4}Goals and Methods}{4}{section.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {1.5}Thesis Overview}{5}{section.1.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {2}Related Work}{9}{chapter.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Digital phenotyping: a global tool for psychiatry}{9}{section.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.1}Phenotyping and Psychiatry}{9}{subsection.2.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.1.2}The Ethical Dimension}{10}{subsection.2.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}Learning Significant Locations and Predicting User Movement With GPS}{10}{section.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.1}Data Collection}{10}{subsection.2.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.2}Finding Locations}{10}{subsection.2.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.3}Finding Sub-locations}{11}{subsection.2.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.4}Prediction}{11}{subsection.2.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}Density-based Spatial Clustering of Applications with Noise (DBSCAN)}{11}{section.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.4}Mathematical Definitions}{12}{section.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.4.1}Choice of Parameters}{14}{subsection.2.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.5}The DBSCAN Algorithm}{14}{section.2.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.6}The Relationship between Clinical, Momentary, and Sensor-based Assessment of Depression}{15}{section.2.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.6.1}Pre-processing of GPS Data}{15}{subsection.2.6.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.6.2}Feature Computation}{15}{subsection.2.6.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.6.3}Correlations with PHQ-9}{17}{subsection.2.6.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.6.4}Findings}{17}{subsection.2.6.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.7}Extraction of Behavioral Features from Smartphone and Wearable Data}{18}{section.2.7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.1} High-Level Derived Features}{18}{subsection.2.7.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.2}Time windows}{18}{subsection.2.7.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.3}Location Features}{19}{subsection.2.7.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.4}Bluetooth Features}{19}{subsection.2.7.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.5}Phone Usage}{19}{subsection.2.7.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.6}Sleep Features}{20}{subsection.2.7.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.7}Steps Features}{20}{subsection.2.7.7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.7.8}Behavioural Change Tracking}{20}{subsection.2.7.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.8}Inferring Human Mobility from Sparse Low Accuracy Mobile Sensing Data}{21}{section.2.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.8.1}Data Collection and Features}{21}{subsection.2.8.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.9}Trajectories of Depression: Unobtrusive Monitoring of Depressive States by means of Smartphone Mobility Traces Analysis}{21}{section.2.9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.9.1}Features}{22}{subsection.2.9.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.9.2}Smart Location Sampling}{23}{subsection.2.9.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.10}AWARE: Mobile Context Instrumentation Framework}{24}{section.2.10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.11}Rohani: The MORIBUS \& MUBS Systems}{24}{section.2.11}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.11.1}The MORIBUS System}{25}{subsection.2.11.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.11.2}MUBS}{25}{subsection.2.11.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.11.3}Improving the Systems}{25}{subsection.2.11.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.12}The CAMS Framework}{25}{section.2.12}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.12.1}The Goal of CAMS}{26}{subsection.2.12.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.12.2}The CAMS Domain Model}{26}{subsection.2.12.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {3}Theory}{29}{chapter.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Location Data}{29}{section.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.1.1}Measuring Distance}{29}{subsection.3.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}Feature Descriptions}{30}{section.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.1}Intermediate Features}{30}{subsection.3.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.2.2}Feature Descriptions}{31}{subsection.3.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}Feature Discussion}{32}{section.3.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.1}Defining Stops and Places}{32}{subsection.3.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.2}Calculating Home Stay}{33}{subsection.3.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.3}Defining the Routine Index}{33}{subsection.3.3.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.4}Relying on Historical Data}{34}{subsection.3.3.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.4}Feature Definitions}{34}{section.3.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.1}Period}{34}{subsection.3.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.2}Location Sample}{35}{subsection.3.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.3}Stop}{35}{subsection.3.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.4}Place}{35}{subsection.3.4.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.5}Move}{36}{subsection.3.4.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.6}Hour Matrix}{36}{subsection.3.4.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.7}Home Stay}{38}{subsection.3.4.7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.8}Total Distance Travelled}{38}{subsection.3.4.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.9}Number of Places}{39}{subsection.3.4.9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.10}Location Variance}{39}{subsection.3.4.10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.11}Entropy and Normalized Entropy}{39}{subsection.3.4.11}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.4.12}The Routine Index}{40}{subsection.3.4.12}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {4}Software Design}{43}{chapter.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Requirements and Design Choices}{43}{section.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.1}Storing and Loading}{44}{subsection.4.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.2}Data Format}{44}{subsection.4.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.1.3}Computing Features}{44}{subsection.4.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}Domain Model}{46}{section.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2.1}Data Model Overview}{46}{subsection.4.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.2.2}UML Diagram and Discussion}{47}{subsection.4.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}Design Overview and Choices}{47}{section.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.1}Design Process}{48}{subsection.4.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.2}Managing Complexity}{48}{subsection.4.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.3.3}Component Overview}{49}{subsection.4.3.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {5}Flutter Implementation}{53}{chapter.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.1}Flutter, Packages and Plugins}{53}{section.5.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1.1}Why Flutter?}{53}{subsection.5.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1.2}Packages and Plugins}{53}{subsection.5.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1.3}Package Structure}{54}{subsection.5.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1.4}Dart Libraries}{55}{subsection.5.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.1.5}Package Publishing}{56}{subsection.5.1.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.2}Package Implementation}{56}{section.5.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.1}Private and Public Access}{56}{subsection.5.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.2}Domain Model Implementation}{57}{subsection.5.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.3}Storing and Loading Data}{58}{subsection.5.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.4}Finding Intermediate Features}{59}{subsection.5.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.4.1}Finding Stops}{59}{subsubsection.5.2.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.4.2}Finding Moves}{60}{subsubsection.5.2.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.4.3}Finding Places}{61}{subsubsection.5.2.4.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.5}Comuting Features}{61}{subsection.5.2.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.5.1}Lazy Evaluation}{61}{subsubsection.5.2.5.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.5.2}Hour Matrix Computation}{62}{subsubsection.5.2.5.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.5.3}Home Stay Computation}{62}{subsubsection.5.2.5.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.5.4}Routine Index}{63}{subsubsection.5.2.5.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.2.6}Context Generation}{63}{subsection.5.2.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.6.1}Accessing the File System}{63}{subsubsection.5.2.6.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{\numberline {5.2.6.2}Context Computation and Historical Data}{64}{subsubsection.5.2.6.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.3}Using the Package}{65}{section.5.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.4}Unit Testing}{66}{section.5.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.4.1}}{67}{subsection.5.4.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {5.4.2}Example Unit Tests}{67}{subsection.5.4.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {6}Validation}{69}{chapter.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {6.1}Field Study}{69}{section.6.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.1.1}Self-study}{69}{subsection.6.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.1.2}Main Study}{69}{subsection.6.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.1.3}Evaluating Features}{70}{subsection.6.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.1.4}The Impact of COVID-19}{71}{subsection.6.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {6.2}Study Application}{71}{section.6.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.2.1}Installing the Application}{72}{subsection.6.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.2.2}App Screens}{72}{subsection.6.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.2.3}Displaying Features}{73}{subsection.6.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.2.4}Data Storage}{74}{subsection.6.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {6.3}Application Implementation}{74}{section.6.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3.1}Architecture Overview}{75}{subsection.6.3.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3.2}Custom Location Plugin}{75}{subsection.6.3.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3.3}Collecting Location Samples}{76}{subsection.6.3.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3.4}Firebase Services}{77}{subsection.6.3.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {6.3.5}Computing Features and Async Calls }{77}{subsection.6.3.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {7}Discussion}{79}{chapter.7}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {7.1}Data Analysis of Study}{79}{section.7.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.1.1}Subjectivity of Answers and Ground Truth}{80}{subsection.7.1.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.1.2}Missing Data and Correcting Data}{80}{subsection.7.1.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.1.3}Feature Evaluation}{83}{subsection.7.1.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.1.4}Measuring Errors}{83}{subsection.7.1.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {7.2}Improvements and Future Work}{84}{section.7.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.2.1}Feature Accuracy}{84}{subsection.7.2.1}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.2.2}Forced Daily Computation}{88}{subsection.7.2.2}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.2.3}Asynchronous Computation}{88}{subsection.7.2.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.2.4}Example Application}{89}{subsection.7.2.4}%
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {7.2.5}CAMS Integration and Maintenance}{89}{subsection.7.2.5}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {7.3}User Prompting in Real-Time}{89}{section.7.3}%
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{91}{chapter.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {appendix}{\chapternumberline {A}Nomenclature}{93}{appendix.A}%
+\defcounter {refsection}{0}\relax 
+\contentsline {appendix}{\chapternumberline {B}Installation Manual}{95}{appendix.B}%
+\defcounter {refsection}{0}\relax 
+\contentsline {appendix}{\chapternumberline {C}Questionnaires}{99}{appendix.C}%
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {C.1}PHQ-9 (Patient Health Questionnaire)}{99}{section.C.1}%
