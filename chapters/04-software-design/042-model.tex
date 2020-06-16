@@ -8,7 +8,7 @@ In order to capture the data model in an object-oriented programming language, a
 A \textit{GeoPosition} is defined by a geographical \textit{latitude} and \textit{longitude} and represents a 2D position on the Earth's surface.
 
 \subsubsection*{Location Sample}
-A \textit{Single Location Data Point} is a time-stamped \textit{Location}. By having a time-stamp, a collection of Location Samples may be ordered and grouped by the time of day. In essence, the class is a Data Transfer Object (DTO) \footnote{\url{https://martinfowler.com/eaaCatalog/dataTransferObject.html}} which is used to transfer GPS data from an arbitrary Location plugin to the \textit{Mobility Features Package}.
+A \textit{Single Location Data Point} is a time-stamped \textit{Location}. By having a time-stamp, a collection of Location Samples may be ordered and grouped by the time of day. In essence, the class is a Data Transfer Object (DTO) as defined by Fowler \cite{fowler-PEEA} [p. 401] which is used to transfer GPS data from an arbitrary Location plugin to the \textit{Mobility Features Package}.
 
 \subsubsection*{Hour Matrix}
 An \textit{Hour Matrix} is a matrix with 24 rows and columns equal to the number of places of some period. The \textit{Hour Matrix} class is used to calculate the \textit{Routine Index} feature, as well as to identify the \textit{Home Cluster}, which is the place most visited during 00:00 and 06:00. An Hour Matrix is constructed from a list of \textit{Stops} which all have the same date.
