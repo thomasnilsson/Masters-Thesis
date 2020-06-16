@@ -258,7 +258,7 @@ The Place class only has one normal constructor which takes an ID (an integer) a
 Place._(this._id, this._stops);
 \end{minted}
 
-The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster ID, this is the place ID previously discussed. Once the labels are computed the Stops are grouped by their Place ID, and a for each group a Place object is created with the group label and the Stops contained in the group. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
+The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster ID, this is the place ID previously discussed. Once the labels are computed the Stops are grouped by their Place ID, and a for each group a Place object is created with the group label and the Stops contained in the group. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
 
 \begin{minted}{dart}
   DBSCAN dbscan = DBSCAN(

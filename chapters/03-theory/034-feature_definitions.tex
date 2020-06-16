@@ -123,10 +123,10 @@ hour(T_{arr}) - T_{arr}       & \text{if $i < k = j$}
 \]
 
 \subsection{Home Stay}
-The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. Firstly a definition for Home needs to be clear; in the literature it is defined as the cluster which the user on average spends the most time at between 00:00 and 06:00 over a period of time \cite{Saeb2015, Canzian2015}. However since the \textit{Home Place,} may change from day to day, it was decided to let \textit{Home} for a specific day be defined as the cluster for which the most time was spent during 00:00 and 06:00 on that day only. Formally, the \textit{Home Place} $p_h (d_t)$ for today $d_t$ is the place $p_h$ where the following holds:
+The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. Firstly a definition for Home needs to be clear; in the literature it is defined as the cluster which the user on average spends the most time at between 00:00 and 06:00 over a period of time. However since the \textit{Home Place,} may change from day to day, it was decided to let \textit{Home} for a specific day be defined as the cluster for which the most time was spent during 00:00 and 06:00 on that day only. Formally, the \textit{Home Place} $p_h (d_t)$ for today $d_t$ is the place $p_h$ where the following holds:
 $$h = \operatorname*{argmax}_n \sum_{m=1}^{6} \sum_{n=1}^{N}  \mathsf{H}(d_t)_{m,n}$$
 
-However in the literature \cite{Saeb2015, Canzian2015} it is not stated how this would be calculated for an incomplete day. A choice was made for this to be calculated using the sum of durations for all \textit{Stops} belonging to today's \textit{Home Cluster}, divided by the time elapsed since midnight. The duration \textit{Stop} $s$ will be denoted $\Delta T (s)$ and similar the duration spent at a place $p$ is defined as $\Delta T (p)$
+However in the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} it is not stated how this would be calculated for an incomplete day. A choice was made for this to be calculated using the summed duration for each \textit{Stop} belonging to today's \textit{Home Cluster}, divided by the time elapsed since midnight. The duration \textit{Stop} $s$ will be denoted $\Delta T (s)$ and similar the duration spent at a place $p$ is defined as $\Delta T (p)$
 
 $$\Delta T(p_{h} (d_t) )= \frac{\sum_i \Delta_T (s_i) \;|\; s_i \in p_h (d_t)}{T_{now} - T_{0}}$$
 Where $T_{now} - T_0$ is the time elapsed since 00:00:00.
@@ -143,14 +143,14 @@ By using the DBSCAN algorithm to cluster a set of Stops, each Stop is given a cl
 $$N = |K|$$
 
 \subsection{Location Variance}
-Defined by \cite{Saeb2015}, the Location Variance is defined as the natural logarithm to the variance of the latitude and longitude coordinates summed together: 
+Defined by Saeb et al. \cite{Saeb2015}, the Location Variance is defined as the natural logarithm to the variance of the latitude and longitude coordinates summed together: 
 
 $$\sigma^2 = \log (\sigma_{lat}^2 + \sigma_{lon}^2)$$
 
 The logarithm is applied in order to compensate for the skewness in the location distribution of location variances across users.
 
 \subsection{Entropy and Normalized Entropy}
-Within the field of Information Theory, entropy is described in \cite{information-theory} as a quantity associated with a random variable, and can be interpreted as the average level of \textit{information} contained within the outcomes of that variable. 
+Within the field of Information Theory, entropy is described in MacKay \cite{information-theory} as a quantity associated with a random variable, and can be interpreted as the average level of \textit{information} contained within the outcomes of that variable. 
 
 The Entropy $H(X)$ of the set of outcomes $X = \{x_1, x_2, ..., x_n\}$ is defined as
 $$E(X) = -\sum_{i=1}^{n} p(x) \log p(x)$$. 
@@ -172,7 +172,7 @@ $$H_N(P) = \frac{H(P)}{H_{max}(P)} \in [0,1]$$
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that such that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined.. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
 \subsection{The Routine Index}
-The features described in the literature by \cite{Saeb2015} which can be found in Section \ref{ref:features-saeb2015}. The time distribution for a day is defined by spending a duration of time at a certain space within a certain time-slot.  However the \textit{Routine Index} \cite{Saeb2015, Canzian2015} was much more demanding to implement and it will, therefore, be a feature that is highly discussed in this thesis. To recap, the \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. A concrete period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. However the implementation by \cite{Canzian2015} was very complex and therefore a much more simple version was chosen for the first iteration of the software package. We define the \textit{Routine Index} as a similarity measure with a value between 0 and 1, where a low value indicates little overlap and a high value indicates a high degree of overlap. By representing each day with an Hour Matrix the similarity function can be defined. An illustration of the Hour Matrix for two different days is shown in Figure \ref{fig:routine-matrix}, from which a Routine Index can be computed.
+The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at the different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} was highly complicated to compute, and therefore a more straightforward definition of the Routine Index was chosen for the sake of simplicity. This definition is novel to the best of our knowledge and defined the Routine Index as a similarity measure between two matrices. This measure has a value between 0 and 1, a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. By representing days using Hour Matrices the similarity function can be defined from today and the 'average' Hour Matrix for the last 28 days. An illustration of the Hour Matrix for two different days is shown in Figure \ref{fig:routine-matrix}, from which a Routine Index can be computed.
 
 \begin{figure}
     \centering
