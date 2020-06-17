@@ -386,9 +386,9 @@ Next, the \verb|average()| factory constructor is discussed. This is a method fo
     \label{fig:hour-matrix-average}
 \end{figure}
 
-Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \ref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. 
+Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \eqref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. 
 
-The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severely limited. If either of the sums is zero then -1 is returned, due to either matrix being empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position, the overlap for two scalars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \ref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
+The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severely limited. If either of the sums is zero then -1 is returned, due to either matrix being empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position, the overlap for two scalars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \eqref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
 
 \begin{figure}
     \centering

@@ -19,7 +19,10 @@ The DBSCAN paper defines a \textit{Neighbourhood} as a collection of data points
 \subsubsection*{Definition 1: Epsilon Neighbourhood}
 An \textit{Epsilon Neighbourhood} is a \textit{Neighborhood} defined on a point $p$ which includes all the points $q$ which are inside a radius of $\epsilon$ of $p$. Formally this is defined as:\\
 
-$$N_{\epsilon} (p) = q \in D \quad|\quad dist(p,q) \leq \epsilon$$
+\begin{equation}
+\label{eq:epsilon-nbh}
+    N_{\epsilon} (p) = q \in D \quad|\quad dist(p,q) \leq \epsilon
+\end{equation}
 
 \textit{Note: The $N_{\epsilon}$ of a border point contains much fewer points than that of a core point. }\\
 

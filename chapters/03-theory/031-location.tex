@@ -5,4 +5,8 @@ The Navbar Global Positioning System (GPS) is a space-based radio-navigation sys
 As mentioned, location data is defined by a latitude- and longitude coordinate which map to a point on the globe, however since the earth is a sphere and not a plane, a standard Euclidean distance metric cannot be used to calculate the distance between two points on the surface of the Earth. A few methods of calculating the distance between GPS coordinates exist, one of the fastest to compute being the Haversine formula \cite{haversine-formula} which calculates the great-circle distance between the two points on a sphere. The Earth is however not exactly spherical, and therefore the Haversine distance is just an approximation that works well when the distance has to be calculated many times, such as when calculating the distance of a path consisting of many points close to each other.
 
 Given the radius of a sphere $r$ and two points on the sphere, $A$ and $B$, the \textit{haversine distance} between the two points can be directly computed as 
-$$d = 2r \cdot \arcsin \Bigg( \sqrt{\sin^2 \bigg( \frac{lat_B - lat_A}{2} \bigg) + \cos(lat_A) \cdot \cos(lat_B) \cdot \sin^2 \bigg(\frac{ lon_B - lon_A}{2} \bigg)}\Bigg)$$
+\begin{equation}
+\label{eq:haversine}
+d = 2r \cdot \arcsin \Bigg( \sqrt{\sin^2 \bigg( \frac{lat_B - lat_A}{2} \bigg) + \cos(lat_A) \cdot \cos(lat_B) \cdot \sin^2 \bigg(\frac{ lon_B - lon_A}{2} \bigg)}\Bigg)
+\end{equation}
+

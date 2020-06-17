@@ -2,7 +2,7 @@
 This paper by Saeb et al. published in 2015 \cite{Saeb2015} forms the basis for the context generation of this thesis, with regards how one may derive mobility features from GPS data with the features \textit{Location Entropy} and \textit{Circadian Movement} being new contributions at the time at which the paper was written. In addition, this paper also shows how certain features, in particular, correlate strongly with a \textit{PHQ-9} questionnaire score, which is relevant in a mental health context. Since the \textit{PHQ-9} questionnaire requires manual input from the user, and the user may forget to fill out the questionnaire, the strong correlation is great news. This could imply that it is possible to automate the patient data gathering process by simply tracking the location of the patient with a high frequency, and thus get around the issue of manually gathering biweekly subjective questionnaire data. The \textit{PHQ-9} questionnaire (see Appendix \ref{appendix:questionnaires}).
 
 \subsection{Pre-processing of GPS Data}
-The pre-processing of GPS data is split into two phases:  Firstly, each data point is labeled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous, and the next data point is used. By using this time difference as well as the distance between points the average velocity is calculated. The labeling is afterward done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analyzing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
+The pre-processing of GPS data is split into two phases: Initially each data point is labeled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous, and the next data point is used. By using this time difference as well as the distance between points the average velocity is calculated. After this, labeling is done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analyzing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
 
 \subsection{Feature Computation}
 \label{ref:features-saeb2015}
@@ -11,26 +11,37 @@ After the pre-processing step, the following features can be computed:\\
 \textbf{Number of Clusters}: This feature represents the total number of clusters found by the clustering algorithm.\\
 \textit{'Cluster' and 'Place' may be used interchangeably when describing features. A cluster is simply the mathematical term for a collection of data points which corresponds to a place with some GPS coordinates in the real world.}\\
 
-$$N = K$$\\
+\begin{equation}
+\label{eq:saeb-num-places}
+N = K
+\end{equation}
 
 \textbf{Location Variance (LV)}: This feature measures the variability of a participant’s location data from stationary states. LV was computed as the natural logarithm of the sum of the statistical variances of the latitude and the longitude components of the location data.\\
 
-$$LV = \log (\sigma^2_{lat} + \sigma^2_{lon} + 1) $$\\
+\begin{equation}
+\label{eq:saeb-loc-var}
+LV = \log (\sigma^2_{lat} + \sigma^2_{lon} + 1) 
+\end{equation}
 
 \textbf{Location Entropy (LE)}: A measure of points of interest. High
 entropy indicates that the participant spent time more uniformly across different location
 clusters, while lower entropy indicates the participant spent most of the time at some
-specific clusters.\\
-Calculated as 
+specific clusters. The entropy is calculated as 
 
 \begin{equation}
+\label{eq:saeb-num-places}
 H = - \sum_{i=1}^N p_i \cdot \log p_i
 \end{equation}
 
 where each $i$ represents a location cluster, $N$ denotes the total number of location clusters, and $p_i$ is the percentage of time the participant spent at the location cluster $i$. \\
 
 \textbf{Normalized LE}: Normalized entropy is calculated by dividing the cluster entropy by its maximum value, which is the logarithm of the total number of clusters. 
-$$H_N = \frac{H}{\log N}$$
+
+\begin{equation}
+\label{eq:saeb-num-places}
+H_N = \frac{H}{\log N}
+\end{equation}
+
 Normalized entropy is invariant to the number of clusters and thus solely depends on their visiting distribution. The value of normalized entropy ranges from 0 to 1, where 0 indicates the participant has spent their time at only one location, and 1 indicates that the participant has spent an equal amount of time to visit each location cluster.\\
 
 \textbf{Home Stay}: The percentage of time the participant has been at the cluster that represents home. We define the home cluster as the cluster, which is mostly visited during the period between 12 am and 6 am.\\
