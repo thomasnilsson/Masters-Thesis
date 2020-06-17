@@ -1,26 +1,17 @@
 \section{Thesis Overview}
-% The chapter often ends with an overview of the remainder of the thesis. This is usually done by summarizing each chapter as a brief paragraph. Good chapter descriptions will relate the contributions of that chapter to the particular goals of your \section{Thesis Overview}
-% The chapter often ends with an overview of the remainder of the thesis. This is usually done by summarizing each chapter as a brief paragraph. Good chapter descriptions will relate the contributions of that chapter to the particular goals of your thesis.
-This section will provide an overview of the thesis in the form of a short summary of each remaining chapter.
 
-\subsection*{Related Work}
-In this chapter, the most relevant research with regards to ubiquitous computing and generating mobility features will be laid out. This includes relevant contributions within the broader context of mobile sensor context generation, algorithms for pre-processing spatial data, clustering GPS data, how features can be generated from geospatial clusters, and lastly what the features can be used for.
+The process of developing the Mobility Features Package is documented in the following chapters for which a brief overview is given below.\\
 
-\subsection*{Algorithm Design}
-Here, it will be discussed which requirements the final product should fulfill. This includes the mathematical definitions and the data model for the \textit{Mobility Features}. This includes the algorithms for computing these, and how some of these algorithms have been adapted such that they work on an incomplete, real-time generated dataset.
+\textbf{Chapter 2: Related Work} will outline a set of relevant contributions related to behaviour and mental state tracking through mobile sensing. \\
 
-\subsection*{Algorithm Implementation}
-Here, it will be discussed how the algorithms were concretely implemented both in Flutter such that they fulfill the functional requirements outlined in the \textit{Algorithm Design} chapter.
+\textbf{Chapter 3: Theoretical Background} will describe all the theory behind computing the features. This includes definitions and discussion of all the features, as well as the algorithms that can extract mobility patterns from this data. The section is very mathematical as well as philosophical and lays the ground work for the later implementation.\\
 
-\subsection*{Application Programming Interface}
-Here, it will discus how the implemented algorithms were wrapped up into a software package with a public-facing API. This includes public and private data, API considerations and documentation. Furthermore an integration to CAMS will also be discussed.
+\textbf{Chapter 4: Software Design} will discuss the design choices and principles used to model a software system capable of computing the mobility features. Design pertains to both how the internal system of the package works as well as the public facing API which is the interface the application programmer talks to when using the package.\\
 
-\subsection*{Validation}
-Validation of the package will be discussed both from a quantitative- as well as a qualitative perspective. The quantitative validation will verify that the algorithms produce meaningful and correct results, which will be validated by means of unit testing as well as data analysis in which subjective data reported by participants will be compared to the features computed by the algorithms. The qualitative part will be much more focused on how the software package was designed, i.e. the ease of use for the application developer as well as design of the API. Concretely this can be evaluated in terms of the number of lines an application developer needs to write in order to use the package.
+\textbf{Chapter 5: Flutter Implementation} will describe how the domain model and the feature algorithms were implemented in the Dart language. How a user may use the final version of the package is also described.
 
-\subsection*{Results and Discussion}
-Here the results will be discussed as well as how one may go about developing the software package further, including changing the existing algorithms and which design- and implementation choices could have been made differently. This includes how the API is designed with regards to trade-offs between varying the abstraction-level, complexity and openness of the API.
+\textbf{Chapter 6: Validation} will outline the field study that was conducted in which 10 participants. The participants were tracked with a mobile application that used the Mobility Features Package to compute daily features based on their location data. Implementation of the mobile application is also discussed in this chapter.
 
-\subsection*{Conclusion}
-The most important findings and things that could be worked on in the future will be described in this chapter.
+\textbf{Chapter 7: Discussion} will include a data analysis of the study conducted in which the computed features are compared with the subjective answers given by participants. Additionally, further work is discussed which includes improvements to the package, the algorithms and concrete applications for the Mobility Features Package in the near future.\\
 
+\textbf{Chapter 8: Conclusion} will report the major findings of the thesis and answer the research questions in detail.\\
