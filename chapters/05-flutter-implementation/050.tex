@@ -1,6 +1,24 @@
 \chapter{Flutter Implementation}
 \label{chapter:05}
-This chapter will describe the implementation in of Flutter-specific terms which for the most part will be found in other programming languages. This includes how packages are built, how one goes about using packages, how testing is done and how packages are be published and how versioning works.
+The final product allows the programmer to compute mobility features with the following 3 lines of code displayed in Figure \ref{fig:code-example-intro}. This chapter will describe how the package design described in Chapter \ref{chapter:04} was implemented in Flutter such that this succinct code interface was achieved.
+
+\begin{figure}[h]
+    \centering
+    \begin{minted}{dart}
+    /// Collect data with a location plugin
+    List<LocationSample> locationSamples = ///
+
+    /// Store data via the package
+    await ContextGenerator.saveSamples(locationSamples);
+    
+    /// Compute Features via the package
+    MobilityContext context = await ContextGenerator.generate();
+    \end{minted}
+    \caption{All the three lines of code necessary for the application developer to write}
+    \label{fig:code-example-intro}
+\end{figure}
+
+
 
 \input{chapters/05-flutter-implementation/051-packages}
 \input{chapters/05-flutter-implementation/052-package-implementation}

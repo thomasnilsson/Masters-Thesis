@@ -1,46 +1,5 @@
 \section{Package Implementation}
-The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the overall data model was outlined. This section will go through selected examples of source code as well as the general principles applied, to achieve the specified design, when implementing in Flutter and Dart.
-
-\subsection{Private and Public Access}
-In most objective oriented languages, such as Dart, the safest way to use fields in classes is to make them private and to implement a parameter-less 'getter' method for retrieving the value, and a 'setter' method which takes in the new value as its parameter. In the Dart programming language, a field is declared private by having the underscore prefix, i.e. \verb|routineIndex| becomes \verb|_routineIndex|, and the corresponding getter method is declared with \verb|get| and is simply called the \verb|routineIndex|:
-
-\begin{minted}{dart}
-    class MobilityContext {
-    
-      double _routineIndex;
-      ...
-      double get routineIndex {
-        return _routineIndex;
-      }
-    }
-\end{minted}
-
-This results in an easy-to-read syntax when getting the value of the field, which looks like this:
-
-\begin{minted}{dart}
-    MobilityContext c = MobilityContext(...);
-    print(c.routineIndex);
-\end{minted}
-
-The same concept can be applied to a constructor as well as the whole class. A public constructor is declared as:
-\begin{minted}{dart}
-    GeoPosition(this._latitude, this._longitude);
-\end{minted}
-
-With the private equivalent being:
-
-\begin{minted}{dart}
-    GeoPosition._(this._latitude, this._longitude);
-\end{minted}
-
-A private constructor allows the class to be publicly \textit{available} but not publicly \textit{instantiable}. For classes the underscore prefix is used for the class name, to make it private, similar to a field, i.e. \verb|class HourMatrix| becomes \verb|class _HourMatrix|.
-
-On the note of constructors, this package makes use of factory constructors which are effectively just methods that generate an object using the normal constructor. A factory constructor may be used to construct an object from JSON data, where each relevant field is extracted from the JSON data and passed onto the real constructor. A factory constructor is defined as follows:
-\begin{minted}{dart}
-    factory Stop._fromLocationSamples(...) {
-        return Stop._(...);
-    }
-\end{minted}
+The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the overall data model was outlined. This section will go through selected examples of source code as well as the general principles applied, to achieve the specified design, when implementing in Flutter and Dart. In the Dart programming language, fields, constructors and methods are declared private by using the underscore prefix, i.e. the field \verb|routineIndex| becomes \verb|_routineIndex|. This is used throughout the implementation to prevent the application programmer to access the inner parts of the package. The parts of the implementation related to storage of historical data can be found in Appendix \ref{appendix:source-code}.
 
 \subsection{Domain Model Implementation}
 All the components specified in the Domain Model Chapter \ref{chapter:04} were implemented with their respective relations to each other. As specified in the component diagram \ref{fig:component-diagram} the only component with a public-facing constructor was LocationSample, and by transitivity, also GeoPosition. This is done, as mentioned, to allow the user instantiate a LocationSample with data from a given Location DTO. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
@@ -66,96 +25,11 @@ This interface allows other classes to promise the Dart compiler that it has a G
     }
 \end{minted}
 
-\subsection{Storing and Loading Data}
-The storing and loading of data, which includes Location Samples, Stops, and Moves happen through the MobilitySerializer class. This class allows classes that implement the Serializable interface to be serialized and de-serialized. Just like the GeoSpatial interface, the Serializable interface is also implemented as a private abstract class only used internally in the package library. The interface contains a method for serializing a class to JSON, named \verb|toJson()| which takes no parameters and produces a HashMap of Strings to the dynamic, the dynamic type meaning any type. This is the Dart equivalent of a JSON object. Another method the interface forces other classes to implement is the deserialization method \verb|fromJson(json)| which takes a JSON object as a parameter and creates a runtime object of the given type, from the JSON object. The implementation of this method is left to the individual classes implementing the interface which is done by extracting data from the JSON object.
 
-\begin{minted}{dart}
-    abstract class _Serializable {
-      Map<String, dynamic> _toJson();
-    
-      _Serializable._fromJson(Map<String, dynamic> json);
-    }
-\end{minted}
-
-The MobilitySerializer class is a generic which allows the type \verb|E| to be specified later, with \verb|E| referring to either a Location Sample, Stop or Move which all implement the Serializable interface. The MobilitySerializer is constructed using a reference to a File object. The File object is used for storing the data of the given type i.e. Location Samples are stored one file, Stops in another, and Moves in a third.
-
-\begin{minted}{dart}
-    class MobilitySerializer<E> {
-      File file;
-      
-      MobilitySerializer._(this.file) {
-        bool exists = file.existsSync();
-        if (!exists) {
-          flush();
-        }
-      }
-      
-      Future<void> flush() async =>
-          await file.writeAsString('', mode: FileMode.write);
-    ...
-    }
-\end{minted}
-
-When initialized, it is checked whether or not the specified file exists, and if not the \verb|flush| method is called, which simply writes an empty string to the file, overriding any content, which has the effect of creating the file, should it not already exist. A concrete example of instantiated the MobilitySerializer for Stops is shown below, where \textit{stops.json} refers to the file in which Stops should be stored.
-
-\begin{minted}{dart}
-    MobilitySerializer<Stop> stopSerializer =
-            MobilitySerializer<Stop>._(await _file('stops.json'));
-\end{minted}
-
-For storing data the \verb|save| method is used which takes in a list of objects which all implement the Serializable interface. Each element in the list is serialized via its \verb|toJson| method and concatenated into one big string separated by a delimiter token, and this string is then written to the specific file of the MobilitySerializer object.
-
-\begin{minted}{dart}
-    Future<void> save(List<_Serializable> elements) async {
-      String jsonString = "";
-      for (_Serializable e in elements) {
-        jsonString += json.encode(e._toJson()) + delimiter;
-      }
-      await file.writeAsString(jsonString, 
-        mode: FileMode.writeOnlyAppend);
-    }
-\end{minted}
-
-Loading works in the reverse order, where the contents of the specified file are loaded into a string, the string is then split into elements using the delimiter token and each of these elements is de-serialized using the \verb|fromJson| method.  For deciding which type to de-serialize the elements into, a switch statement is used that checks the type of \verb|E| which is specified when the MobilitySerializer object is instantiated.
-
-\begin{minted}{dart}
-    Future<List<_Serializable>> load() async {
-        String content = await file.readAsString();
-    
-        List<String> lines = content.split(delimiter);
-    
-        Iterable<Map<String, dynamic>> jsonObjs = lines
-            .sublist(0, lines.length - 1)
-            .map((e) => json.decode(e))
-            .map((e) => Map<String, dynamic>.from(e));
-    
-        switch (E) {
-          case Move:
-            return jsonObjs.map((x) => 
-                Move._fromJson(x)).toList();
-          
-          case Stop:
-            return jsonObjs.map((x) => 
-                Stop._fromJson(x)).toList();
-          
-          default:
-            return jsonObjs.map((x) => 
-                LocationSample._fromJson(x)).toList();
-        }
-    }
-\end{minted}
-
-Ideally, the switch statement could have been replaced by the following one-liner:
-\begin{minted}{dart}
-    return jsonObjs.map((x) => E.fromJson(x)).toList();
-\end{minted}
-
-However, this relies on the language feature called reflection \footnote{\url{https://www.javaworld.com/article/2075801/reflection-vs--code-generation.html}} which allows the compiler to infer the type of \verb|E| at compile-time. However, Dart does not support \textit{reflection} which makes this impossible.
-
-\subsection{Finding Intermediate Features}
+\subsection{Computing Features}
 Finding the intermediate features Stops, Moves, and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
 
-\subsubsection{Finding Stops}
+\subsubsection{Computing Features}
 The Stop class has two constructors: A factory constructor which takes a set of LocationSamples from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
 
 \begin{minted}{dart}
@@ -283,7 +157,7 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
   }
 \end{minted}
 
-\subsection{Comuting Features}
+\subsection{Computing Features}
 A Mobility Context object represents features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
 
 \begin{minted}{dart}
@@ -475,35 +349,7 @@ The Routine Index is the most difficult to compute by far. The method for comput
 \subsection{Context Generation}
 The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. 
 
-\subsubsection{Accessing the File System}
-For storing collected location data the MobilitySerializer for Location Samples can be retrieved through this class, with a getter method. 
-);
-\begin{minted}{dart}
-static Future<MobilitySerializer<LocationSample>>
-      get locationSampleSerializer async =>
-          MobilitySerializer<LocationSample>._(await _file(LOCATION_SAMPLES)
-\end{minted}
 
-Internally this class has a method for creating a file system reference, which relies on the platform the application is running on. For mobile apps, the file system must be accessed through the \verb|path_provider| package with the \verb|getApplicationDocumentsDirectory()| method. If the application is run on the desktop, such as when unit testing the file system can be accessed by specifying a file name directly. This is a textbook example of hiding complexity from the application programmer.
-
-\begin{figure}
-    \centering
-    \begin{minted}{dart}
-    static Future<File> _file(String type) async {
-      bool isMobile = Platform.isAndroid || Platform.isIOS;
-    
-      String path;
-      if (isMobile) {
-        path = (await getApplicationDocumentsDirectory()).path;
-      } else {
-        path = 'test/data';
-      }
-      return new File('$path/$type.json');
-    }
-    \end{minted}
-    \caption{Lazy evaluation of a feature}
-    \label{fig:lazy-evaluation}
-\end{figure}
 
 \subsubsection{Context Computation and Historical Data}
 Without a doubt, the most interesting part of the ContextGenerator class is the \verb|generate()| method, which is where MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
