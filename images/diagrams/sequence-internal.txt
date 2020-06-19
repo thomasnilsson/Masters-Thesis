@@ -1,0 +1,14 @@
+title Mobility Features Package (Internal)
+
+ContextGenerator->MobilitySerializer: store()
+activate MobilitySerializer
+MobilitySerializer->ContextGenerator: return void
+deactivate MobilitySerializer
+ContextGenerator->MobilitySerializer: load()
+activate MobilitySerializer
+MobilitySerializer->ContextGenerator: return historical data
+deactivate MobilitySerializer
+ContextGenerator->MobilityContext: generate()
+activate MobilityContext
+MobilityContext->ContextGenerator: return MobilityContext object
+deactivate MobilityContext
