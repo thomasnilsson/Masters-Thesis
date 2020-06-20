@@ -43,14 +43,14 @@ Saeb et al. find that depressive symptoms tend to change slowly over weeks, with
 \begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
 \hline
 {\ul \textbf{Feature}}      & {\ul \textbf{Description}}                                                                                                                     \\ \hline
-Number of Clusters          & \textit{\begin{tabular}[c]{@{}l@{}}Number of clusters found by the clustering algorithm\end{tabular}}                                       \\ \hline
-Home Stay                   & \textit{\begin{tabular}[c]{@{}l@{}}Percentage of time stayed at the home cluster\end{tabular}}                                              \\ \hline
-Location Variance           & \textit{\begin{tabular}[c]{@{}l@{}}Variance of the location of stationary points\end{tabular}}                                              \\ \hline
-Location Entropy            & \textit{\begin{tabular}[c]{@{}l@{}}Entropy of the time distribution wrt. clusters\end{tabular}}                                             \\ \hline
-Normalized Location Entropy & \textit{\begin{tabular}[c]{@{}l@{}}Entropy normalized by the maximum possible entropy. Invariant to the number of clusters\end{tabular}} \\ \hline
+Number of Clusters          & \textit{Number of clusters found by the clustering algorithm}                                       \\ \hline
+Home Stay                   & \textit{Percentage of time stayed at the home cluster}                                              \\ \hline
+Location Variance           & \textit{Variance of the location of stationary points}                                              \\ \hline
+Location Entropy            & \textit{Entropy of the time distribution wrt. clusters}                                             \\ \hline
+Normalized Location Entropy & \textit{Entropy normalized by the maximum possible entropy. Invariant to the number of clusters} \\ \hline
 Transition Time             & \textit{Percentage of time in not stationary}                                                                                                  \\ \hline
 Total Distance              & \textit{Total distance travelled}                                                                                                              \\ \hline
-Circadian Movement          & \textit{\begin{tabular}[c]{@{}l@{}}The degree to which changes in the location follow a 24 hour rhythm\end{tabular}}                        \\ \hline
+Circadian Movement          & \textit{The degree to which changes in the location follow a 24 hour rhythm}                        \\ \hline
 \end{tabular}
     \caption{The Mobility Features defined by Saeb et al. \cite{Saeb2015}}
     \label{tab:saeb-features}
@@ -129,34 +129,6 @@ Stop            & \textit{A visit to a POI with an arrival- and departure timest
 \end{table}
 
 
-% Extraction of behavioural features
-% Provides a list of mobility features discussed by SAEB
-% Main idea of the paper is to provide a list of featues for different data channels
-% By covering all data channels the less the chance of losing out on data
 
-% Doryab et al. proposes a method for extracting a series of behavioural features from smartphone data channels. These channels include GPS data, as well as sleep, steps and much more. The general idea of the paper GPS coordinates collected throughout the day have a time stamp connected to them, which makes it possible to calculate a list of interesting features within a day of the user moving around. The features are similar to those found in \cite{Saeb2015} adds two additional features, namely \textit{Radius of gyration} and \textit{Time spent at top3 clusters}. However a couple of additional contributions are found. Doryab et al. defines a \textit{bout} as a small window of time, which can be defined based on the granularity wanted, i.e. 5 minutes. Furthermore, a clear definition for the \textit{home} cluster is given as being everything within 10 meters of the center of the home location center. Time spent at home is defined at the time spent within 100 meters of the home centroid. The activity of studying is defined as spending 30 minutes or more in an academic building, while sedentary, which is taking fewer than 10 steps per \textit{bout}.
-% \begin{table}[]
-%     \centering
-% \begin{tabular}{|l|l|}
-% \hline
-% {\ul \textbf{Feature}}        & {\ul \textbf{Description}}                                                                                            \\ \hline
-% Significant Places            & \textit{Location clusters for samples with a speed \textless 1 km/h}                                                  \\ \hline
-% Location Variance             & \textit{A collection of location samples representing visit at a known place with an arrival and departure timestamp} \\ \hline
-% Distance Travelled            & \textit{A cluster of stops found the DBSCAN algorithm}                                                                \\ \hline
-% Average Speed                 & \textit{A travel between two stops with a path of location samples}                                                   \\ \hline
-% Variance in Speed             & \textit{The number of places visited today}                                                                           \\ \hline
-% Circadian Movement            & \textit{See Saeb et al.}                                                                                              \\ \hline
-% Number of Significant Places  & \textit{The number or of}                                                                                             \\ \hline
-% Number of Transitions         & \textit{Number of transitions between places}                                                                         \\ \hline
-% Radius of Gyration            & \textit{The radius of the area covered}                                                                               \\ \hline
-% Time Spent at Top 3 Places    & \textit{The percentage of time spent at the top 3 most significant places}                                            \\ \hline
-% Percentage of Time Moving     & \textit{The percentage of the time with a speed \textgreater 1 km/h}                                                  \\ \hline
-% Time at Ingsignificant Places & \textit{The percentage of time spent at places that are rarely visited}                                               \\ \hline
-% Length of Stay at Clusters    & \textit{Statistics for the time spent at different clusters}                                                          \\ \hline
-% Location Entropy              & \textit{See Saeb et al.}                                                                                              \\ \hline
-% \end{tabular}
-%     \caption{The Mobility Features defined by Doryab et a. \cite{extraction-of-behavioural-features}}
-%     \label{tab:features-doryab}
-% \end{table}
 
 

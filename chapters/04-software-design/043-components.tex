@@ -9,7 +9,7 @@ Figure \ref{fig:component-diagram-internal} displays how the final iteration loo
 \centering
 \includegraphics[width=\textwidth]{images/diagrams/component-external.pdf}
 \caption{Component diagram for the \textit{Mobility Feature Package} from an internal point of view}
-\label{fig:component-diagram-external}
+\label{fig:component-diagram-internal}
 \end{figure}
 
 Figure \ref{fig:component-diagram-external} shows the external software system that includes the mobile application using the package. Another design choice is reflected in this figure which is the usage of an external location plugin which must be done by the programmer. This means task the programmer has to collect their own location data through their location plugin which will collect location \textit{Data Transfer Objects} (DTOs) \cite{fowler-PEEA} [p. 401]. These objects hold location data, i.e. latitude, longitude, and a timestamp and can be converted to \textit{LocationSamples} and saved through the \textit{Mobility Feature Package.}
@@ -30,7 +30,7 @@ To display the interactions between the components, sequence diagrams are used. 
 \centering
 \includegraphics[width=\textwidth]{images/diagrams/sequence-external.png}
 \caption{Component diagram for the \textit{Mobility Feature Package} from an internal point of view}
-\label{fig:sequence-diagram-external}
+\label{fig:sequence-diagram-internal}
 \end{figure}
 
 From an internal point of view, the \textit{Context Generator} component calls the \textit{Mobility Serializer} for storing and loading historical data, uses the loaded data to generate a \textit{Mobility Context} by calling the MobilityContext component.
