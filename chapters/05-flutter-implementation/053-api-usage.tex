@@ -11,23 +11,22 @@ Once the dependency has been downloaded it can be imported as follows:
 import 'package:mobility_features/mobility_features.dart';
 \end{minted}
 
-Computing features can essentially be done in just 3 lines of code, excluding collecting Location Samples:
+Features are computed using the 3 lines of code displayed in Figure \ref{fig:code-example-intro}:
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
-    /// Get serializer
-    MobilitySerializer<LocationSample> serializer =
-          await ContextGenerator.locationSampleSerializer;
+    /// Collect data with a location plugin
+    List<LocationSample> locationSamples = ///
+
+    /// Store data via the package
+    await ContextGenerator.saveSamples(locationSamples);
     
-    /// Save Location Samples      
-    await serializer.save(locationSamples);
-    
-    /// Compute Features
+    /// Compute Features via the package
     MobilityContext context = await ContextGenerator.generate();
     \end{minted}
-    \caption{Caption}
-    \label{fig:my_label}
+    \caption{All the three lines of code necessary for the application developer to write}
+    \label{fig:code-example-intro}
 \end{figure}
 
 The exact method for arriving at this stage is outlined in the following 4 steps.

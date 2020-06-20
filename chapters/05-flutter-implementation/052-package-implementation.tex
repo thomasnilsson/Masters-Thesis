@@ -347,29 +347,14 @@ The Routine Index is the most difficult to compute by far. The method for comput
 \end{figure}
 
 \subsection{Context Generation}
-The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. 
-
-
-
-\subsubsection{Context Computation and Historical Data}
-Without a doubt, the most interesting part of the ContextGenerator class is the \verb|generate()| method, which is where MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
+The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. The central part of the ContextGenerator class is the \verb|generate()| method, which is where a MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
 
 \begin{minted}{dart}
 static Future<MobilityContext> generate(
       {bool usePriorContexts: false, DateTime today}) {...}
 \end{minted}
 
-First, the file system is queried by initializing the three different MobilitySerializers, i.e. one for Location Samples, another for Stops and a third one for Moves. 
-\begin{minted}{dart}
-MobilitySerializer<LocationSample> sampleSerializer =
-    await locationSampleSerializer;
-MobilitySerializer<Stop> stopSerializer =
-    MobilitySerializer<Stop>._(await _file(STOPS));
-MobilitySerializer<Move> moveSerializer =
-    MobilitySerializer<Move>._(await _file(MOVES));
-\end{minted}
-
-Next, Location Samples are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
+First, the file system is queried by initializing the three different MobilitySerializers, i.e. one for Location Samples, another for Stops and a third one for Moves. Next, Location Samples are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
 
 \begin{minted}{dart}
 List<LocationSample> samplesToday = await sampleSerializer.load();
@@ -382,6 +367,7 @@ movesHist = _movesHistoric(movesHist, today);
 \end{minted}
 
 The reason for throwing away elements from today is that they need to be recomputing using all the recent Location Samples which can alter the old results. Also, in extreme cases, not recomputing Stops and Moves in this manner could lead to none being found throughout the day, because of how the dataset is segmented. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
+
 \begin{minted}{dart}
 List<Stop> stopsToday = _findStops(samplesToday, today);
 List<Move> movesToday = _findMoves(samplesToday, stopsToday);

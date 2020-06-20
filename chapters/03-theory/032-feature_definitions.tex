@@ -2,6 +2,28 @@
 \label{section:definitions}
 Here, an overview of the algorithms used by the \textit{Mobility Features Package} will be provided. The overview will not discuss implementation details but will provide precise definitions for how these are computed and the considerations which were made. Most of the features were simple to implement with support for real-time computation and were just a matter of performing arithmetic with regards to distance and time spent and places, however, the ones which need some explanation are outlined in this section. 
 
+The Mobility Features included in the Mobility Features package are a subset of the features described by Saeb et al. \cite{Saeb2015}, Canzian et al. \cite{Canzian2015} and Cuttone et al. \cite{sparse-location-2014} and are outlined in Table \ref{tab:features-nilsson}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|p{0.3\textwidth}|p{0.6\textwidth}|}
+\hline
+\textbf{Feature}   & \textbf{Description}                                                                                                  \\ \hline
+Stop               & \textit{A collection of location samples representing visit at a known place with an arrival and departure timestamp} \\ \hline
+Place              & \textit{A cluster of stops found the DBSCAN algorithm}                                                                \\ \hline
+Move               & \textit{A travel between two stops with a path of location samples}                                                   \\ \hline
+Number of Places   & \textit{The number of places visited today}                                                                           \\ \hline
+Home Stay          & \textit{The percentage of the time spent at the home place today}                                                     \\ \hline
+Routine Index      & \textit{The overlap of the time-place distribution that between today and the max 28 previous days}                   \\ \hline
+Location Variance  & \textit{The statistical variance in the latitude and longitude coordinates today}                                     \\ \hline
+Distance Travelled & \textit{The total distance travelled today in meters}                                                                 \\ \hline
+Entropy            & \textit{The entropy of the time-place distribution today}                                                             \\ \hline
+Normalized Entropy & \textit{The entropy normalized the by the max possible entropy. Invariant to the number of places visited today}      \\ \hline
+\end{tabular}
+    \caption{The features included in the Mobility Features Package}
+    \label{tab:features-nilsson}
+\end{table}
+
 \subsection{Period}
 A period is a set of several dates is defined as $D = \{d_1, d_2, ..., d_{|D|}\}$ with $|D| \leq 28$ and the date following the period being $d_t$. This can also be translated as $D$ are the historical dates to the date $d_t$.\\
 
@@ -40,16 +62,16 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 \end{figure}
 
 \subsection{Place}
-\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. This means all \textit{Stops} from previous dates need to be stored on the device. 
+\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. 
 
-The set of Places found for the period $D$ is defined as 
+Given a set of Stops $S$, the set of Places $P$ found for the period $D$ is defined by Equation \eqref{eq:feature-places}.
 
 \begin{equation}
 \label{eq:feature-places}
 P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}
 \end{equation}
 
-Places are found using the following procedure:
+The procedure for finding Places defined in Figure \fig{fig:find_places}.
 
 \begin{figure}[h]
     \centering
@@ -99,7 +121,26 @@ is a set of time-ordered Location Samples. Moves are found using the following p
 \end{figure}
 
 \subsection{Hour Matrix}
-This matrix is made from all the \textit{Stops} on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the \textit{Hour Matrix}:
+The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} and \textit{Routine Index} feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The \textit{Hour Matrix} represents the time-place distribution for the user during a day.
+\begin{figure}
+    \centering
+    \begin{tabular}{|l|l|l|l|l|}
+    \hline
+    \textbf{}        & \textbf{Place \#1} & \textbf{Place \#2} & \textbf{...} & \textbf{Place \#N} \\ \hline
+    \textbf{00 - 01} &                    &                    &              &                    \\ \hline
+    \textbf{01 - 02} &                    &                    &              &                    \\ \hline
+    \textbf{...}     &                    &                    &              &                    \\ \hline
+    \textbf{16 - 17} &                    &                    &              &                    \\ \hline
+    \textbf{17 - 18} &                    &                    &              &                    \\ \hline
+    \textbf{18 - 19} &                    &                    &              &                    \\ \hline
+    \textbf{...}     &                    &                    &              &                    \\ \hline
+    \textbf{23 - 00} &                    &                    &              &                    \\ \hline
+    \end{tabular}
+    \caption{An \textit{Hour Matrix}}
+    \label{fig:time-table}
+\end{figure}
+
+This matrix is constructed from all the \textit{Stops} on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the \textit{Hour Matrix}:
 
 \begin{itemize}
     \item The \textit{Hour Matrix} has exactly 24 rows, each representing 1 hour in a day.
@@ -249,14 +290,7 @@ H_N(P) = \frac{H(P)}{H_{max}(P)} \in [0,1]
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that such that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined.. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
 \subsection{The Routine Index}
-The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} was highly complicated to compute, and therefore a more straightforward definition of the Routine Index was chosen for the sake of simplicity. This definition is novel to the best of our knowledge and defined the Routine Index as a similarity measure between two matrices. This measure has a value between 0 and 1, a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. By representing days using Hour Matrices the similarity function can be defined from today and the 'average' Hour Matrix for the last 28 days. An illustration of the Hour Matrix for two different days is shown in Figure \ref{fig:routine-matrix}, from which a Routine Index can be computed.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\textwidth]{images/routine.png}
-    \caption{An illustration of the Hour Matrix for the a given day and the 'average day', i.e. the Routine}
-    \label{fig:routine-matrix}
-\end{figure}
+The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} was highly complicated to compute, and therefore a more straightforward definition of the Routine Index was chosen for the sake of simplicity. This definition is novel to the best of our knowledge and defined the Routine Index as a similarity measure between two matrices. This measure has a value between 0 and 1, a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. By representing days using Hour Matrices the similarity function can be defined from today and the 'average' Hour Matrix for the last 28 days. 
 
 For the overlap function we define a union operator $A \cap B$ defining the \textit{overlap} of two matrices $A$ and $B$ as 
 
@@ -285,5 +319,31 @@ defines the \textit{actual overlap} as the sum of the overlapping entries betwee
 \min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{H}^{\mu} (D) \Big)
 \end{equation}
 
-is the smallest sum of either matrix, whichever is smaller, and defines the \textit{maximum potential overlap} between the two matrices. If one matrix is very sparse then the potential overlap is very low, and vice versa. If the \textit{actual overlap} and the \textit{maximum potential overlap} are the same, it means the matrices are the same and the Routine Index will have a value of 1. 
+is the smallest sum of either matrix, whichever is smaller, and defines the \textit{maximum potential overlap} between the two matrices. If one matrix is very sparse then the potential overlap is very low, and vice versa. If the \textit{actual overlap} and the \textit{maximum potential overlap} are the same, it means the matrices are the same and the Routine Index will have a value of 1. Figure \ref{fig:routine-matrix-1} and \ref{fig:routine-matrix-2} provide two examples of caluclating the Routine Index.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/routine-numbers-1.pdf}
+    \caption{An example of the matrix R is computed with the overlap function of A and B. Here only 1 entry overlaps}
+    \label{fig:routine-matrix-1}
+\end{figure}
+
+For Figure \ref{fig:routine-matrix-1} the Routine Index becomes 
+
+\begin{equation}
+RI = \frac{1}{1 + 1 + 1} = \frac{1}{3}
+\end{equation}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/routine-numbers-2.pdf}
+        \caption{An example of the matrix R is computed with the overlap function of A and B. Here several entries overlap}
+    \label{fig:routine-matrix-2}
+\end{figure}
+
+For Figure \ref{fig:routine-matrix-2} the Routine Index becomes
+
+\begin{equation}
+RI = \frac{1 + 2\cdot 0.5}{2} = 1
+\end{equation}
 

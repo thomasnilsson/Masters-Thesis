@@ -1,28 +1,30 @@
-\section{Location Data}
+\section{Inferring User State from Location Data}
+
+% Ashbrook, stops with k means,
+% Cuttone
 % Saeb
 % Canzian
-% Trajectories of depression
-% Cuttone
-% Ashbrook, stops with k means,
 % Extraction of behavioural features
 
 % By mobility features we mean both complex features such as stops, moves and places, as well as scalars/integers, i.e. number of places, distance travelled.
 
-
 The work done by Saeb et al. \cite{Saeb2015} and Canzian et al. \cite{Canzian2015} forms the basis feature computation in this thesis. These contributions give definitions of a wide list of mobility features with some amount of overlap between the two papers. In addition, this paper also shows how certain features, in particular, correlate strongly with a \textit{PHQ-9} questionnaire score, which is relevant in a mental health context. Since the \textit{PHQ-9} questionnaire requires manual input from the user, and the user may forget to fill out the questionnaire, the strong correlation is great news. This could imply that it is possible to automate the patient data gathering process by simply tracking the location of the patient with a high frequency, and thus get around the issue of manually gathering biweekly subjective questionnaire data. The \textit{PHQ-9} questionnaire (see Appendix \ref{appendix:questionnaires}).
 
-\begin{table}[]
+Saeb et al. find that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it makes more sensors to group data on a weekly basis. This may explain why two weeks of sensor feature correlated more strongly with the \textit{PHQ-9} than either daily sensor features or EMA measures. Unlike EMA ratings, which are momentary, the \textit{PHQ-9} assessment reports symptoms over a period of two weeks. The study conducted suggests that it is possible to monitor depression passively using phone sensor data, and in particular, GPS. Most people are unwilling to answer questions repeatedly over long periods of time, while passive monitoring could improve the management of depression in populations, allowing at-risk patients to be treated more quickly as symptoms emerge, or monitoring patients’ responses during treatment. Pre-processing of GPS data is split into two phases: Initially each data point is labeled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous, and the next data point is used. By using this time difference as well as the distance between points the average velocity is calculated. After this, labeling is done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analyzing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
+
+\begin{table}[h]
     \centering
-    \begin{tabular}{|l|l|}
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
 \hline
-\textbf{Feature Name} & \textbf{Description}                                                                                                                                     \\ \hline
-Number of Clusters    & \textit{The number of clusters found by the clustering algorithm}                                                                                        \\ \hline
-Home Stay             & \textit{\begin{tabular}[c]{@{}l@{}}The variability of a participant’s location data from \\ stationary states\end{tabular}}                              \\ \hline
-Location Entropy (LE) & \textit{The entropy of the time distribution wrt. to clusters.}                                                                                          \\ \hline
-Normalized LE         & \textit{\begin{tabular}[c]{@{}l@{}}The entropy normalized by the maximum possible entropy.  \\ Invariant to the number of clusters.\end{tabular}}        \\ \hline
-Transition Time       & \textit{The percentage of time the participant has been in the transition state}                                                                         \\ \hline
-Total Distance        & \textit{The total distance travelled}                                                                                                                    \\ \hline
-Circadian Movement    & \textit{\begin{tabular}[c]{@{}l@{}}The extent to which the changes in a participant’s location follows \\ a 24-hour, or circadian, rhythm.\end{tabular}} \\ \hline
+{\ul \textbf{Feature}}      & {\ul \textbf{Description}}                                                                                                                     \\ \hline
+Number of Clusters          & \textit{\begin{tabular}[c]{@{}l@{}}Number of clusters found by the clustering algorithm\end{tabular}}                                       \\ \hline
+Home Stay                   & \textit{\begin{tabular}[c]{@{}l@{}}Percentage of time stayed at the home cluster\end{tabular}}                                              \\ \hline
+Location Variance           & \textit{\begin{tabular}[c]{@{}l@{}}Variance of the location of stationary points\end{tabular}}                                              \\ \hline
+Location Entropy            & \textit{\begin{tabular}[c]{@{}l@{}}Entropy of the time distribution wrt. clusters\end{tabular}}                                             \\ \hline
+Normalized Location Entropy & \textit{\begin{tabular}[c]{@{}l@{}}Entropy normalized by the maximum possible entropy. Invariant to the number of clusters\end{tabular}} \\ \hline
+Transition Time             & \textit{Percentage of time in not stationary}                                                                                                  \\ \hline
+Total Distance              & \textit{Total distance travelled}                                                                                                              \\ \hline
+Circadian Movement          & \textit{\begin{tabular}[c]{@{}l@{}}The degree to which changes in the location follow a 24 hour rhythm\end{tabular}}                        \\ \hline
 \end{tabular}
     \caption{The Mobility Features defined by Saeb et al. \cite{Saeb2015}}
     \label{tab:saeb-features}
@@ -34,26 +36,25 @@ Canzian et al. \cite{Canzian2015} uses the notion of trajectories including stop
 
 % The key question of this paper, which is illustrated in Fig. 1, is whether the mobility behavior of an individual can give information about his/her current depressive state, which is quantified by a PHQ score. In order to answer this question, we first need to introduce the key definitions and notations that we use in this work. In the following we provide a formal definition of mobility traces and we define a set of mobility metrics, i.e., a set of statistical summaries characterizing the movement of individuals.
 
-\begin{table}[]
+\begin{table}[h]
     \centering
-    \begin{tabular}{ll}
-    \hline
-    \multicolumn{1}{|l|}{\textbf{Feature Name}}                  & \multicolumn{1}{l|}{\textbf{Description}}                                                                                                                                                                                                  \\ \hline
-    \multicolumn{1}{|l|}{Place}                                  & \multicolumn{1}{l|}{\textit{A location the user frequently visits}}                                                                                                                                                                        \\ \hline
-    \multicolumn{1}{|l|}{Significant Place}                      & \multicolumn{1}{l|}{\textit{\begin{tabular}[c]{@{}l@{}}Significant places are the top 10 most visited \\ places out of all places\end{tabular}}}                                                                                           \\ \hline
-    \multicolumn{1}{|l|}{Stop}                                   & \multicolumn{1}{l|}{\textit{A visit at a place}}                                                                                                                                                                                           \\ \hline
-    \multicolumn{1}{|l|}{Move}                                   & \multicolumn{1}{l|}{\textit{A trajectory between two places}}                                                                                                                                                                              \\ \hline
-    \multicolumn{1}{|l|}{Mobility trace}                         & \multicolumn{1}{l|}{\textit{The stops and moves for a given time interval}}                                                                                                                                                                \\ \hline
-    \multicolumn{1}{|l|}{Total distance}                         & \multicolumn{1}{l|}{\textit{Distance travelled for a given time interval}}                                                                                                                                                                 \\ \hline
-    \multicolumn{1}{|l|}{Max distance}                           & \multicolumn{1}{l|}{\textit{\begin{tabular}[c]{@{}l@{}}The maximum distance between two points for\\  a given time interval\end{tabular}}}                                                                                                 \\ \hline
-    \multicolumn{1}{|l|}{Radius of gyration}                     & \multicolumn{1}{l|}{\textit{The area covered for a given time interval}}                                                                                                                                                                   \\ \hline
-    \multicolumn{1}{|l|}{Std. of displacement}                   & \multicolumn{1}{l|}{\textit{The standard deviation of stops for a given time interval}}                                                                                                                                                    \\ \hline
-    \multicolumn{1}{|l|}{Max distance from home}                 & \multicolumn{1}{l|}{\textit{The maximum distance to any visited place for a given time interval}}                                                                                                                                          \\ \hline
-    \multicolumn{1}{|l|}{Number of different places}             & \multicolumn{1}{l|}{\textit{The number of different places visited for a given time interval}}                                                                                                                                             \\ \hline
-    \multicolumn{1}{|l|}{Number of different significant places} & \multicolumn{1}{l|}{\textit{\begin{tabular}[c]{@{}l@{}}The number of different significant places visited for a given \\ time interval.\end{tabular}}}                                                                                     \\ \hline
-    \multicolumn{1}{|l|}{Routine index}                          & \multicolumn{1}{l|}{\textit{\begin{tabular}[c]{@{}l@{}}The average difference between the mobility \\ behavior of the user for a given time interval,\\ on a given day, compared to the same time interval\\ on other days.\end{tabular}}} \\ \hline
-                                                                 &                                                                                                                                                                                                                                           
-    \end{tabular}
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
+\hline
+{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
+Place                        & \textit{A location the user frequently visits}                                                                                                                    \\ \hline
+Significant Place            & \textit{Significant places are the top 10 most visited places out of all places}                                                                                  \\ \hline
+Stop                         & \textit{A visit at a place}                                                                                                                                       \\ \hline
+Move                         & \textit{A trajectory between two places}                                                                                                                          \\ \hline
+Mobility Trace               & \textit{The stops and moves a given time interval}                                                                                                                \\ \hline
+Total Distance               & \textit{Distance travelled for a given time interval}                                                                                                             \\ \hline
+Max Distance                 & \textit{Maximum distance between any two points for a given time interval}                                                                                        \\ \hline
+Radius of Gyration           & \textit{Radius of the area covered for a given time interval}                                                                                                     \\ \hline
+Std. of Displacement         & \textit{Standard deviation for stop locations for a given time interval}                                                                                          \\ \hline
+Max Distance from Home       & \textit{Maximum distance from home to any place visited in a given time interval}                                                                                 \\ \hline
+Number of Places             & \textit{The number of unique places visisted for a given time interval}                                                                                           \\ \hline
+Number of Significant Places & \textit{The number of unique significant places visited for a given time interval}                                                                                \\ \hline
+Routine Index                & \textit{The average difference between the mobility behaviour of the user for a given interval, on a given day, compared to the same time interval on other days} \\ \hline
+\end{tabular}
     \caption{The Mobility Features defined by Canzian et al. \cite{Canzian2015}}
     \label{tab:canzian-features}
 \end{table}
@@ -61,100 +62,12 @@ Canzian et al. \cite{Canzian2015} uses the notion of trajectories including stop
 Cuttone et al. 
 \begin{table}[]
     \centering
-CUTTONE 14
-\begin{tabular}{|l|l|}
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
 \hline
-\textbf{Feature Name}   & \textbf{Description}                                                                                                           \\ \hline
-Place of Interest (POI) & \textit{\begin{tabular}[c]{@{}l@{}}Location of relevance frequented by the user, \\ e.g. home, gym or workplace.\end{tabular}} \\ \hline
-Stop                    & \textit{\begin{tabular}[c]{@{}l@{}}A visit to a POI with an arrival- and \\ departure timestamp\end{tabular}}                  \\ \hline
+{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
+Place of Interest (POI)                        & \textit{Location of relevance frequented by the user, e.g. home, gym or workplace}                                                                                                                    \\ \hline
+Stop            & \textit{A visit to a POI with an arrival- and departure timestamp}                                                                                  \\ \hline
 \end{tabular}
     \caption{The Mobility Features defined by Cuttone et al. \cite{sparse-location-2014}}
     \label{tab:my_label}
 \end{table}
-
-
-\subsection{Pre-processing of GPS Data}
-The pre-processing of GPS data is split into two phases: Initially each data point is labeled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous, and the next data point is used. By using this time difference as well as the distance between points the average velocity is calculated. After this, labeling is done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analyzing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
-
-\subsection{Feature Computation}
-\label{ref:features-saeb2015}
-After the pre-processing step, the following features can be computed:\\
-
-\textbf{Number of Clusters}: This feature represents the total number of clusters found by the clustering algorithm.\\
-\textit{'Cluster' and 'Place' may be used interchangeably when describing features. A cluster is simply the mathematical term for a collection of data points which corresponds to a place with some GPS coordinates in the real world.}\\
-
-
-\begin{table}[]
-    \centering
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
-\begin{table}[]
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Feature Name} & \textbf{Description}                                                                                                                                     \\ \hline
-Number of Clusters    & \textit{The number of clusters found by the clustering algorithm}                                                                                        \\ \hline
-Home Stay             & \textit{\begin{tabular}[c]{@{}l@{}}The variability of a participant’s location data from \\ stationary states\end{tabular}}                              \\ \hline
-Location Entropy (LE) & \textit{The entropy of the time distribution wrt. to clusters.}                                                                                          \\ \hline
-Normalized LE         & \textit{\begin{tabular}[c]{@{}l@{}}The entropy normalized by the maximum possible entropy.  \\ Invariant to the number of clusters.\end{tabular}}        \\ \hline
-Transition Time       & \textit{The percentage of time the participant has been in the transition state}                                                                         \\ \hline
-Total Distance        & \textit{The total distance travelled}                                                                                                                    \\ \hline
-Circadian Movement    & \textit{\begin{tabular}[c]{@{}l@{}}The extent to which the changes in a participant’s location follows \\ a 24-hour, or circadian, rhythm.\end{tabular}} \\ \hline
-\end{tabular}
-\end{table}
-    \caption{The Features defined by Saeb et al. \cite{Saeb2015}}
-    \label{tab:saeb-features}
-\end{table}
-
-\begin{equation}
-\label{eq:saeb-num-places}
-N = K
-\end{equation}
-
-\textbf{Location Variance (LV)}: This feature measures the variability of a participant’s location data from stationary states. LV was computed as the natural logarithm of the sum of the statistical variances of the latitude and the longitude components of the location data.\\
-
-\begin{equation}
-\label{eq:saeb-loc-var}
-\sigma^2 = \log (\sigma^2_{lat} + \sigma^2_{lon} + 1) 
-\end{equation}
-
-\textbf{Location Entropy (LE)}: A measure of points of interest. High
-entropy indicates that the participant spent time more uniformly across different location
-clusters, while lower entropy indicates the participant spent most of the time at some
-specific clusters. The entropy is calculated as 
-
-\begin{equation}
-\label{eq:saeb-num-places}
-H = - \sum_{i=1}^N p_i \cdot \log p_i
-\end{equation}
-
-where each $i$ represents a location cluster, $N$ denotes the total number of location clusters, and $p_i$ is the percentage of time the participant spent at the location cluster $i$. \\
-
-\textbf{Normalized LE}: Normalized entropy is calculated by dividing the cluster entropy by its maximum value, which is the logarithm of the total number of clusters. 
-
-\begin{equation}
-\label{eq:saeb-num-places}
-H_N = \frac{H}{\log N}
-\end{equation}
-
-Normalized entropy is invariant to the number of clusters and thus solely depends on their visiting distribution. The value of normalized entropy ranges from 0 to 1, where 0 indicates the participant has spent their time at only one location, and 1 indicates that the participant has spent an equal amount of time to visit each location cluster.\\
-
-\textbf{Home Stay}: The percentage of time the participant has been at the cluster that represents home. We define the home cluster as the cluster, which is mostly visited during the period between 12 am and 6 am.\\
-
-\textbf{Transition Time}: Transition Time measures the percentage of time the participant has been in the transition state.\\
-
-\textbf{Total Distance}: This feature measures the total distance the participant has traveled in the transition state.\\
-
-\textbf{Circadian Movement}: This feature measures to what extent the changes in a
-participant’s location follow a 24-hour, or circadian, rhythm. To calculate the circadian movement, we obtained the distribution of the periodicity of the stationary location data and then calculated the percentage of it that falls in the 24±0.5 hour periodicity. However, the paper does not describe in great detail how this feature is implemented.\\
-
-\subsection{Correlations with PHQ-9}
-The features which correlated strongest with the \textit{PHQ-9} scores over two weeks were the following:\\
-
-\textbf{Circadian Movement}: This features correlated negatively with the \textit{PHQ-9} score, and can be interpreted as depressed individuals tend to have less of a routine than healthy individuals. \\
-
-\textbf{Location Variance \& Normalized Location Entropy}: These features have a similar meaning and both correlate negatively with the \textit{PHQ-9} score. The takeaway here is likely that visiting very different places every single day can be seen as a sign that the individual is depressed, which also correlates with the Circadian Movement, since visiting different places every day results in a low level of routine.\\
-
-\textbf{Home Stay}: This feature had a Strong positive correlation with the \textit{PHQ-9} score, and thus the main take away from this feature is that spending a lot of time at home is an indicator of being depressed.
-
-\subsection{Findings}
-The paper finds that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it makes more sensors to group data on a weekly basis. This may explain why two weeks of sensor feature correlated more strongly with the \textit{PHQ-9} than either daily sensor features or EMA measures. Unlike EMA ratings, which are momentary, the \textit{PHQ-9} assessment reports symptoms over a period of two weeks. The study conducted suggests that it is possible to monitor depression passively using phone sensor data, and in particular, GPS. Most people are unwilling to answer questions repeatedly over long periods of time, while passive monitoring could improve the management of depression in populations, allowing at-risk patients to be treated more quickly as symptoms emerge, or monitoring patients’ responses during treatment.
