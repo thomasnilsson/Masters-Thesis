@@ -1,16 +1,42 @@
 \section{Inferring User State from Location Data}
 
-% Ashbrook, stops with k means,
-% Cuttone
+
+% Using location data to infer behaviour and mental state
+% Litterature review should indicate which features are relevant
+% Feature are anything derived from the location data, i.e. clusters, trajectories, number of clusters etc.
+
+
 % Saeb
+%   More related to mental health
+%   Can we infer users mental state from location data
+%   A list of mobility features provided, which this thesis to large extent is based upon
+%   Does not discuss how the Circadian Movement feature is computed exactly
+%   It was not defined in a way which allowed it to be directly replicated
+%   PHQ9 questionnaire
+%   Our study suggests that it is possible to monitor depression passively using phone sensor data, and in particular, GPS. This has significant public health implications. Most people are unwilling to answer questions repeatedly over long periods of time, while passive monitoring could improve the management of depression in populations, allowing at risk patients to be treated more quickly as symptoms emerge, or monitoring patients’ responses during treatment.
+
+The work done by Saeb et al. \cite{Saeb2015, saeb2016} and Canzian et al. \cite{Canzian2015} forms the basis of this thesis with regard to mobility features. These two contributions give definitions of a wide list of mobility features and relate them to mental state and user behaviour. The mobility features proposed by Saeb et al. are outlined in Table \ref{tab:saeb-features} and of these features the authors found that Home Stay, Location Variance, Normalized Entropy and Circadian movement correlate strongly with the PHQ9 score. Clinical assessment of depressive symptoms is usually done using questionnaires, such as the patient health questionnaire (PHQ-9). These questionnaires evaluate symptoms related to the patients state of mind, which for depressed patients tend to change. Saeb et al. finds a strong correlation between certain mobility features and the PHQ9 score obtained by the patients in a field study. Their findings therefore indicate that it is possible to monitor depression passively using GPS data tracked via the smart-phone. They explain that most people are unwilling to answer questions repeatedly over long periods of time, which is the case with an evaluation system based on the PHQ9 questionnaire. Passive monitoring via the patients smartphone could great improve the management of depression in populations by discovering relapses of high-risk patients earlier, so that they may receive the treatment they need before it is too late. 
+
 % Canzian
-% Extraction of behavioural features
+%   Very much like Saeb
+%   Provides more details wrt to how features are computed
+%   Uses PHQ8 as reference 
+%   In this work we have demonstrated that it is possible to ob- serve a significant correlation between mobility patterns and depressive mood using data collected by means of smart- phones. We have also shown that it is possible to develop in- ference algorithms as a basis for unobtrusive monitoring and prediction of depressive mood disorders.
 
-% By mobility features we mean both complex features such as stops, moves and places, as well as scalars/integers, i.e. number of places, distance travelled.
+The work by Canzian et al. is similar is discusses how existing digital systems for diagnosing depression require the user to interact with the device. These interactions can be inputs such as mood-state provided a few times a day, which is highly subjective and thus error-prone. Canzian et al. addresses this issue via objective patient data, namely the mobility patterns of users. These patterns were derived from location data gathering through smartphone apps, which as Canzian et al. puts it, is unobtrusive monitoring. These patterns are described by the mobility metrics (i.e. features) listed in Table \ref{tab:canzian-features}. The authors found a significant correlation between these metrics and depressive moods similar to \cite{Saeb2015} for which the \textit{PHQ-8} questionnaire is used as  reference. This is the same questionnaire as the PHQ9, although only containing the first 8 questions. While Canzian et al. and Saeb et al. describe many of the same features, Canzian provides much more detailed definitions of the features. A good example of this is the \textit{Routine Index} feature, which loosely corresponds to the \textit{Circadian Rhythm} feature in \cite{Saeb2015}. Canzian et al. \cite{Canzian2015} uses the notion of trajectories including \textit{stops} and \textit{moves} defined by \cite{trajectories2008} to define the mobility trace feature. This feature is used to derive the rest of the features, which is also the approach used for this thesis, although the terminology differs slightly.
 
-The work done by Saeb et al. \cite{Saeb2015} and Canzian et al. \cite{Canzian2015} forms the basis feature computation in this thesis. These contributions give definitions of a wide list of mobility features with some amount of overlap between the two papers. In addition, this paper also shows how certain features, in particular, correlate strongly with a \textit{PHQ-9} questionnaire score, which is relevant in a mental health context. Since the \textit{PHQ-9} questionnaire requires manual input from the user, and the user may forget to fill out the questionnaire, the strong correlation is great news. This could imply that it is possible to automate the patient data gathering process by simply tracking the location of the patient with a high frequency, and thus get around the issue of manually gathering biweekly subjective questionnaire data. The \textit{PHQ-9} questionnaire (see Appendix \ref{appendix:questionnaires}).
 
-Saeb et al. find that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it makes more sensors to group data on a weekly basis. This may explain why two weeks of sensor feature correlated more strongly with the \textit{PHQ-9} than either daily sensor features or EMA measures. Unlike EMA ratings, which are momentary, the \textit{PHQ-9} assessment reports symptoms over a period of two weeks. The study conducted suggests that it is possible to monitor depression passively using phone sensor data, and in particular, GPS. Most people are unwilling to answer questions repeatedly over long periods of time, while passive monitoring could improve the management of depression in populations, allowing at-risk patients to be treated more quickly as symptoms emerge, or monitoring patients’ responses during treatment. Pre-processing of GPS data is split into two phases: Initially each data point is labeled as either being in a stationary or transitional state, for which the time-stamp of the current, the previous, and the next data point is used. By using this time difference as well as the distance between points the average velocity is calculated. After this, labeling is done by using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. For analyzing the data further, only the stationary points are considered. Secondly, the stationary points are processed using k-means clustering to identify frequently visited places. Since the number of places, i.e. the number of clusters for the \textit{K-means} algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation. Concretely the algorithm for finding \textit{K} is to increase \textit{K} until the largest cluster found has a radius of 500 meters or lower.
+
+% Saeb method
+
+Saeb et al. conducted two different studies \cite{Saeb2015, saeb2016} in which data was collected through an Android application over a period of 2 weeks. After data collection the data was analyzed, i.e. features were computed in an offline fashion. For processing the data, a two-stage pipeline is used: 
+\begin{itemize}
+    \item Each data point is labeled as either being in a stationary or transitional state by using the speed of each data point. Points are labeled using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. 
+    \item The K-means clustering algorithm to group the \textit{stationary points} into frequently visited places. Since the number of places, i.e. the number of clusters for the K-means algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation.
+\end{itemize}
+
+After this pre-processing procedure was applied, the features described in Table \ref{tab:saeb-features} were derived.
+Saeb et al. find that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it makes more sensors to group data on a weekly basis.
 
 \begin{table}[h]
     \centering
@@ -32,9 +58,7 @@ Circadian Movement          & \textit{\begin{tabular}[c]{@{}l@{}}The degree to w
 
 
 
-Canzian et al. \cite{Canzian2015} uses the notion of trajectories including stops and moves defined by \cite{trajectories2008}
 
-% The key question of this paper, which is illustrated in Fig. 1, is whether the mobility behavior of an individual can give information about his/her current depressive state, which is quantified by a PHQ score. In order to answer this question, we first need to introduce the key definitions and notations that we use in this work. In the following we provide a formal definition of mobility traces and we define a set of mobility metrics, i.e., a set of statistical summaries characterizing the movement of individuals.
 
 \begin{table}[h]
     \centering
@@ -59,7 +83,39 @@ Routine Index                & \textit{The average difference between the mobili
     \label{tab:canzian-features}
 \end{table}
 
-Cuttone et al. 
+% Ashbrook
+%   Early contribution for generating features, POIs
+%   Parameter tuning for number of places found
+%   Tried to predict where the user would go next
+%   Not inferring mental state, but rather 'mobility state' 
+% We have demonstrated how locations of significance can be automatically learned from GPS data at mul- tiple scales. We have also shown a system that can incorporate these locations into a predictive model of the user’s movements. In addition, we have described several potential applications of such models, includ- ing both single– and multi–user scenarios. Poten- tially such methodologies might be extended to other sources of context as well. One day, such predictive models might become an integral part of intelligent wearable agents.
+The work by Ashbrook et al. \cite{learning_significant_locations} from 2002 is one of the earliest contributions to the field of GPS data based context. Here, user context refers to where the user will move next, given their current location. While this is not related to mental health necessarily, it is interesting to look into the approach taken given that it is a pioneering contribution. Smartphones did not exist in 2002 and therefore an old-fashioned GPS receiver was used for data colelction. This receiver could not receive signal inside most buildings and this was used to identify what the author refers to as \textit{places}. Places are physical locations where the GPS signal is interrupted for a period of time and by clustering these places, the \textit{location} features are computed. Sensors back then had a 15 meter accuracy meaning the location coordinates reported may be somewhat noisy from day to day. In order to identify the mean of these noisy place locations, a modified version of the \textit{K-means} clustering algorithm was applied to the data. Locations are therefore the centroids of place-clusters. Inside \textit{locations}, \textit{sub-locations} can be found, which are networks of smaller locations. A good example of a location with sub-locations is a university campus, where the sub-locations are the different department offices or even buildings. All these features are listed in Table \ref{tab:features-ashbrook}. 
+
+% Ashbrook et al. sums up their work by stating how they have demonstrated that locations of significance can be automatically learned from GPS data. In addition they also show that it is possible to build a system that can incorporate these location-features into a predictive model of the user’s movements. One day, such predictive models might become an integral part of intelligent wearable agents.
+
+\begin{table}[]
+    \centering
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
+\hline
+\textbf{Feature} & \textbf{Description}                                                               \\ \hline
+Place            & \textit{A geo-location at which the GPS signal could not reach such as a building} \\ \hline
+Location         & \textit{The centroid of a cluster of places}                                       \\ \hline
+Sublocation      & \textit{A location within a location, i.e. university building on a uni-campus}    \\ \hline
+\end{tabular}
+    \caption{The Mobility Features defined by Ashbrook et al. \cite{learning_significant_locations}}
+    \label{tab:features-ashbrook}
+\end{table}
+
+
+
+% Cuttone
+%   Idea: Cluster data into Stops and POIs
+%   Does low frequency sampling work, if we compare it to peoples diaries? Yes it does!
+%   Inspiration for conducting a study
+%   Spoke to Jakob Eg larsen, co author of the paper
+
+The work by Cuttone et al. \cite{sparse-location-2014} investigates how accurate significant locations can be inferred from sparsely sampled location data using the GPS tracker in smartphones. For longitudinal studies it can be a problem for the phone battery if the sampling rate is too high. Therefore a more low-energy approach is used where the sampling rate- and the location accuracy are low. A small-scale study was conducted in which location data collected continuously and the users filled out an online diary on a daily basis. The aim was to compute features \textit{Stops} and \textit{Places of Interest (POI)} for each user and match them with the provided answers. These features are described in Table \ref{tab:features-cuttone}.  To find Stops, both a \textit{Gaussian Mixture Model}, as well as the \textit{DBSCAN} algorithm, were applied for clustering. To evaluate the best model, the $f_1$ score of each model was computed, and in the end, it was found that both algorithms performed similarly for each of the participants. Inspiration was taken from this paper for conducting a small scale study where computed features were compared to subjective answers from the participants. 
+
 \begin{table}[]
     \centering
 \begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
@@ -69,5 +125,38 @@ Place of Interest (POI)                        & \textit{Location of relevance f
 Stop            & \textit{A visit to a POI with an arrival- and departure timestamp}                                                                                  \\ \hline
 \end{tabular}
     \caption{The Mobility Features defined by Cuttone et al. \cite{sparse-location-2014}}
-    \label{tab:my_label}
+    \label{tab:features-cuttone}
 \end{table}
+
+
+% Extraction of behavioural features
+% Provides a list of mobility features discussed by SAEB
+% Main idea of the paper is to provide a list of featues for different data channels
+% By covering all data channels the less the chance of losing out on data
+
+% Doryab et al. proposes a method for extracting a series of behavioural features from smartphone data channels. These channels include GPS data, as well as sleep, steps and much more. The general idea of the paper GPS coordinates collected throughout the day have a time stamp connected to them, which makes it possible to calculate a list of interesting features within a day of the user moving around. The features are similar to those found in \cite{Saeb2015} adds two additional features, namely \textit{Radius of gyration} and \textit{Time spent at top3 clusters}. However a couple of additional contributions are found. Doryab et al. defines a \textit{bout} as a small window of time, which can be defined based on the granularity wanted, i.e. 5 minutes. Furthermore, a clear definition for the \textit{home} cluster is given as being everything within 10 meters of the center of the home location center. Time spent at home is defined at the time spent within 100 meters of the home centroid. The activity of studying is defined as spending 30 minutes or more in an academic building, while sedentary, which is taking fewer than 10 steps per \textit{bout}.
+% \begin{table}[]
+%     \centering
+% \begin{tabular}{|l|l|}
+% \hline
+% {\ul \textbf{Feature}}        & {\ul \textbf{Description}}                                                                                            \\ \hline
+% Significant Places            & \textit{Location clusters for samples with a speed \textless 1 km/h}                                                  \\ \hline
+% Location Variance             & \textit{A collection of location samples representing visit at a known place with an arrival and departure timestamp} \\ \hline
+% Distance Travelled            & \textit{A cluster of stops found the DBSCAN algorithm}                                                                \\ \hline
+% Average Speed                 & \textit{A travel between two stops with a path of location samples}                                                   \\ \hline
+% Variance in Speed             & \textit{The number of places visited today}                                                                           \\ \hline
+% Circadian Movement            & \textit{See Saeb et al.}                                                                                              \\ \hline
+% Number of Significant Places  & \textit{The number or of}                                                                                             \\ \hline
+% Number of Transitions         & \textit{Number of transitions between places}                                                                         \\ \hline
+% Radius of Gyration            & \textit{The radius of the area covered}                                                                               \\ \hline
+% Time Spent at Top 3 Places    & \textit{The percentage of time spent at the top 3 most significant places}                                            \\ \hline
+% Percentage of Time Moving     & \textit{The percentage of the time with a speed \textgreater 1 km/h}                                                  \\ \hline
+% Time at Ingsignificant Places & \textit{The percentage of time spent at places that are rarely visited}                                               \\ \hline
+% Length of Stay at Clusters    & \textit{Statistics for the time spent at different clusters}                                                          \\ \hline
+% Location Entropy              & \textit{See Saeb et al.}                                                                                              \\ \hline
+% \end{tabular}
+%     \caption{The Mobility Features defined by Doryab et a. \cite{extraction-of-behavioural-features}}
+%     \label{tab:features-doryab}
+% \end{table}
+
+
