@@ -24,11 +24,18 @@ Normalized Entropy & \textit{The entropy normalized the by the max possible entr
     \label{tab:features-nilsson}
 \end{table}
 
-\subsection{Period}
-A period is a set of several dates is defined as $D = \{d_1, d_2, ..., d_{|D|}\}$ with $|D| \leq 28$ and the date following the period being $d_t$. This can also be translated as $D$ are the historical dates to the date $d_t$.\\
+When defining a \textit{Place}, several edge cases come to mind such as visiting multiple buildings on a university campus, visiting two stores right next to each other, walking around in a park, i.e. having a large dispersion of the data points. There are likely many more edge cases that exist which have not been considered, but we need to generalize when coming up with a definition. To generalize we define \textit{Stops} using a radius parameter $r_{stop}$ to group data points, and likewise a radius parameter $r_{place}$ to cluster Places. These parameters define the maximally allowed dispersion of the data points which allows us to filter out singular noisy data points. In order to find suitable values for these parameters, a small synthetic dataset was used, and afterward, a real-life dataset from the author moving around in Munich for 9 days was used. No in-depth parameter search was conducted, but the algorithms produce very precise results with the following parameter values:
+
+\begin{equation}
+\label{eq:stop-place-radius}
+r_{stop} = 25 \text{m}, \quad r_{place} = 25 \text{m}
+\end{equation}
+
+
+In addition we define a date as $d_t$ an the previous date as $d_{t-1}$ in order to define a period is a set of today and it's preceding 28 dates defined as $D = \{d_{t-28}, d_{t-27}, ..., d_{t}\}$\\
 
 \subsection{Location Sample}
-A \textit{Location Sample} is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two \textit{Location Samples} is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
+A \textit{Location Sample} is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two \textit{Location Samples} $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
 
 \subsection{Stop}
 Finding \textit{Stops} is done by traversing every \textit{Location Samples} in temporal order, i.e. the timestamp is used. The \textit{Stops} for a given date is found by clustering \text{Location Samples} on that date based on time and distance. The set of \textit{Stops} found for the period $D$ is defined as
@@ -39,27 +46,6 @@ S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)
 \end{equation}
 
 The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the Stop $s_i$, respectively. Stops are found using Algorithm \ref{algo:stops}.
-
-% \begin{figure}[h]
-%     \centering
-%     \begin{itemize}
-%         \item[(1)] \textsc{Let} $X$ be the set of time ordered data points
-%         \item[(2)] \textsc{Let} $S \leftarrow \{ \}$
-%         \item[(3)] \textsc{If} at least one point $x'$ remains in $X$:
-%             \begin{itemize}
-%                 \item[(I)] \textsc{Let} stop $s \leftarrow \{ x' \}$
-%             \item[(II)] \textsc{For} every remaining point $x \in X$:
-%             \begin{itemize}
-%                 \item[(i)] \textsc{Let} $X \leftarrow X - x$
-%                 \item[(ii)] \textsc{If} $p$ is close to the median location of $s$: $s \leftarrow s \cup \{ x \}$
-%                 \item[(iii)] \textsc{Else}: $S \leftarrow S \cup \{ s \}$ and go to \textsc{(3)}
-%             \end{itemize}
-%             \end{itemize}
-%         \item[(4)] \textsc{Return} S
-%     \end{itemize} 
-%     \caption{Procedure for finding \textit{Stops}}
-%     \label{fig:find_stops}
-% \end{figure}
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -86,7 +72,7 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 \end{algorithm}
 
 \subsection{Place}
-\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. 
+\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. On date $d_t$ all the Stops today as well as all stops on in period $D$ should used. It is \textit{Routine Index} for a $d_t$ date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. 
 
 Given a set of Stops $S$, the set of Places $P$ found for the period $D$ is defined by Equation \eqref{eq:feature-places}.
 
@@ -261,7 +247,7 @@ However in the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzi
 \Delta T(p_{h} (d_t) )= \frac{\sum_i \Delta_T (s_i) \;|\; s_i \in p_h (d_t)}{T_{now} - T_{0}}
 \end{equation}
 
-Where $T_{now} - T_0$ is the time elapsed since 00:00:00.
+Where $T_{now}$ is the departure time of the last known stop, and thus $T_{now} - T_0$ is the time elapsed since 00:00:00 today.
 
 \subsection{Total Distance Travelled}
 First we define the distance of a Move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
@@ -343,7 +329,9 @@ H_N(P) = \frac{H(P)}{H_{max}(P)} \in [0,1]
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that such that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined.. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
 \subsection{The Routine Index}
-The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} was highly complicated to compute, and therefore a more straightforward definition of the Routine Index was chosen for the sake of simplicity. This definition is novel to the best of our knowledge and defined the Routine Index as a similarity measure between two matrices. This measure has a value between 0 and 1, a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. By representing days using Hour Matrices the similarity function can be defined from today and the 'average' Hour Matrix for the last 28 days. 
+The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for some period of days. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} was highly complicated to compute, and therefore a more straightforward definition of the Routine Index was chosen for the sake of simplicity. This definition is novel to the best of our knowledge and defined the Routine Index as a similarity measure between two matrices. This measure has a value between 0 and 1, a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. By representing days using Hour Matrices the similarity function can be defined from today and the 'average' Hour Matrix for the last 28 days. In general, peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is not unlikely to be very different. However just because someone changes their routine over time, does not mean they don't currently possess one. Therefore it was chosen to base the \textit{Routine Index} on the last 4 weeks (28 days) of data in order to base the routine overlap on more recent days. 
+
+The feature can therefore indirectly be computed from the Stops of the last 28 days which means only the Stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 Stops for a 4 week period. Computing the feature requires the Places to be found, i.e. to run DBSCAN on the Stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 
 For the overlap function we define a union operator $A \cap B$ defining the \textit{overlap} of two matrices $A$ and $B$ as 
 

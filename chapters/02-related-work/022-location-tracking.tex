@@ -25,18 +25,20 @@ The work done by Saeb et al. \cite{Saeb2015, saeb2016} and Canzian et al. \cite{
 
 The work by Canzian et al. is similar is discusses how existing digital systems for diagnosing depression require the user to interact with the device. These interactions can be inputs such as mood-state provided a few times a day, which is highly subjective and thus error-prone. Canzian et al. addresses this issue via objective patient data, namely the mobility patterns of users. These patterns were derived from location data gathering through smartphone apps, which as Canzian et al. puts it, is unobtrusive monitoring. These patterns are described by the mobility metrics (i.e. features) listed in Table \ref{tab:canzian-features}. The authors found a significant correlation between these metrics and depressive moods similar to \cite{Saeb2015} for which the \textit{PHQ-8} questionnaire is used as  reference. This is the same questionnaire as the PHQ9, although only containing the first 8 questions. While Canzian et al. and Saeb et al. describe many of the same features, Canzian provides much more detailed definitions of the features. A good example of this is the \textit{Routine Index} feature, which loosely corresponds to the \textit{Circadian Rhythm} feature in \cite{Saeb2015}. Canzian et al. \cite{Canzian2015} uses the notion of trajectories including \textit{stops} and \textit{moves} defined by \cite{trajectories2008} to define the mobility trace feature. This feature is used to derive the rest of the features, which is also the approach used for this thesis, although the terminology differs slightly.
 
+The work by Cuttone et al. \cite{sparse-location-2014} investigates how accurate significant locations can be inferred from sparsely sampled location data using the GPS tracker in smartphones. For longitudinal studies it can be a problem for the phone battery if the sampling rate is too high. Therefore a more low-energy approach is used where the sampling rate- and the location accuracy are low. A small-scale study was conducted in which location data collected continuously and the users filled out an online diary on a daily basis. The aim was to compute features \textit{Stops} and \textit{Places of Interest (POI)} for each user and match them with the provided answers. These features are described in Table \ref{tab:features-cuttone}.  To find Stops, both a \textit{Gaussian Mixture Model}, as well as the \textit{DBSCAN} algorithm, were applied for clustering. To evaluate the best model, the $f_1$ score of each model was computed, and in the end, it was found that both algorithms performed similarly for each of the participants. Inspiration was taken from this paper for conducting a small scale study where computed features were compared to subjective answers from the participants. 
 
+\begin{table}[]
+    \centering
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
+\hline
+{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
+Place of Interest (POI)                        & \textit{Location of relevance frequented by the user, e.g. home, gym or workplace}                                                                                                                    \\ \hline
+Stop            & \textit{A visit to a POI with an arrival- and departure timestamp}                                                                                  \\ \hline
+\end{tabular}
+    \caption{The Mobility Features defined by Cuttone et al. \cite{sparse-location-2014}}
+    \label{tab:features-cuttone}
+\end{table}
 
-% Saeb method
-
-Saeb et al. conducted two different studies \cite{Saeb2015, saeb2016} in which data was collected through an Android application over a period of 2 weeks. After data collection the data was analyzed, i.e. features were computed in an offline fashion. For processing the data, a two-stage pipeline is used: 
-\begin{itemize}
-    \item Each data point is labeled as either being in a stationary or transitional state by using the speed of each data point. Points are labeled using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. 
-    \item The K-means clustering algorithm to group the \textit{stationary points} into frequently visited places. Since the number of places, i.e. the number of clusters for the K-means algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation.
-\end{itemize}
-
-After this pre-processing procedure was applied, the features described in Table \ref{tab:saeb-features} were derived.
-Saeb et al. find that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it makes more sensors to group data on a weekly basis.
 
 \begin{table}[h]
     \centering
@@ -55,8 +57,6 @@ Circadian Movement          & \textit{The degree to which changes in the locatio
     \caption{The Mobility Features defined by Saeb et al. \cite{Saeb2015}}
     \label{tab:saeb-features}
 \end{table}
-
-
 
 
 
@@ -83,15 +83,8 @@ Routine Index                & \textit{The average difference between the mobili
     \label{tab:canzian-features}
 \end{table}
 
-% Ashbrook
-%   Early contribution for generating features, POIs
-%   Parameter tuning for number of places found
-%   Tried to predict where the user would go next
-%   Not inferring mental state, but rather 'mobility state' 
-% We have demonstrated how locations of significance can be automatically learned from GPS data at mul- tiple scales. We have also shown a system that can incorporate these locations into a predictive model of the user’s movements. In addition, we have described several potential applications of such models, includ- ing both single– and multi–user scenarios. Poten- tially such methodologies might be extended to other sources of context as well. One day, such predictive models might become an integral part of intelligent wearable agents.
-The work by Ashbrook et al. \cite{learning_significant_locations} from 2002 is one of the earliest contributions to the field of GPS data based context. Here, user context refers to where the user will move next, given their current location. While this is not related to mental health necessarily, it is interesting to look into the approach taken given that it is a pioneering contribution. Smartphones did not exist in 2002 and therefore an old-fashioned GPS receiver was used for data colelction. This receiver could not receive signal inside most buildings and this was used to identify what the author refers to as \textit{places}. Places are physical locations where the GPS signal is interrupted for a period of time and by clustering these places, the \textit{location} features are computed. Sensors back then had a 15 meter accuracy meaning the location coordinates reported may be somewhat noisy from day to day. In order to identify the mean of these noisy place locations, a modified version of the \textit{K-means} clustering algorithm was applied to the data. Locations are therefore the centroids of place-clusters. Inside \textit{locations}, \textit{sub-locations} can be found, which are networks of smaller locations. A good example of a location with sub-locations is a university campus, where the sub-locations are the different department offices or even buildings. All these features are listed in Table \ref{tab:features-ashbrook}. 
 
-% Ashbrook et al. sums up their work by stating how they have demonstrated that locations of significance can be automatically learned from GPS data. In addition they also show that it is possible to build a system that can incorporate these location-features into a predictive model of the user’s movements. One day, such predictive models might become an integral part of intelligent wearable agents.
+The work by Ashbrook et al. \cite{learning_significant_locations} from 2002 is one of the earliest contributions to the field of GPS data based context. Here, user context refers to where the user will move next, given their current location. While this is not related to mental health necessarily, it is interesting to look into the approach taken given that it is a pioneering contribution. Smartphones did not exist in 2002 and therefore an old-fashioned GPS receiver was used for data colelction. This receiver could not receive signal inside most buildings and this was used to identify what the author refers to as \textit{places}. Places are physical locations where the GPS signal is interrupted for a period of time and by clustering these places, the \textit{location} features are computed. Sensors back then had a 15 meter accuracy meaning the location coordinates reported may be somewhat noisy from day to day. In order to identify the mean of these noisy place locations, a modified version of the \textit{K-means} clustering algorithm was applied to the data. Locations are therefore the centroids of place-clusters. Inside \textit{locations}, \textit{sub-locations} can be found, which are networks of smaller locations. A good example of a location with sub-locations is a university campus, where the sub-locations are the different department offices or even buildings. All these features are listed in Table \ref{tab:features-ashbrook}. 
 
 \begin{table}[]
     \centering
@@ -107,27 +100,18 @@ Sublocation      & \textit{A location within a location, i.e. university buildin
 \end{table}
 
 
+% Saeb method
+\subsection{Methods}
+Canzian collected data from 46 users over almost 10 months on a voluntary basis and had participants fill out a survey daily between 16:00 and 02:00 the subsequent day, where a phone notification prompted the participant to fill out the survey. Each survey contained a 'trap' question which asked whether the user was current at home or work. The answer to this question could be verified in the data analysis phase, and was used to filter out invalid surveys. The survey asked the user to name all the depressive symptoms they had on that day. PHQ8 score is normally done by asking every 14 days, and have the participant answer how many times they had a symptom over the last 14 days. By using the questionnaires, the PHQ8 scores could be computed by summing the amount of days with the symptoms, which in total add up to a score. It would happen that users forgot to fill out their questionnaire or gave an invalid survey reponse, in which case an interpolation method was used to cover gaps in the data. 
 
-% Cuttone
-%   Idea: Cluster data into Stops and POIs
-%   Does low frequency sampling work, if we compare it to peoples diaries? Yes it does!
-%   Inspiration for conducting a study
-%   Spoke to Jakob Eg larsen, co author of the paper
+For location data processing, Saeb et al. uses a two-stage pipeline: 
+\begin{itemize}
+    \item Each data point is labeled as either being in a stationary or transitional state by using the speed of each data point. Points are labeled using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. 
+    \item The K-means clustering algorithm to group the \textit{stationary points} into frequently visited places. Since the number of places, i.e. the number of clusters for the K-means algorithm (the parameter \textit{K}) is not known beforehand, the best parameter value is found using cross-validation.
+\end{itemize}
 
-The work by Cuttone et al. \cite{sparse-location-2014} investigates how accurate significant locations can be inferred from sparsely sampled location data using the GPS tracker in smartphones. For longitudinal studies it can be a problem for the phone battery if the sampling rate is too high. Therefore a more low-energy approach is used where the sampling rate- and the location accuracy are low. A small-scale study was conducted in which location data collected continuously and the users filled out an online diary on a daily basis. The aim was to compute features \textit{Stops} and \textit{Places of Interest (POI)} for each user and match them with the provided answers. These features are described in Table \ref{tab:features-cuttone}.  To find Stops, both a \textit{Gaussian Mixture Model}, as well as the \textit{DBSCAN} algorithm, were applied for clustering. To evaluate the best model, the $f_1$ score of each model was computed, and in the end, it was found that both algorithms performed similarly for each of the participants. Inspiration was taken from this paper for conducting a small scale study where computed features were compared to subjective answers from the participants. 
-
-\begin{table}[]
-    \centering
-\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
-\hline
-{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
-Place of Interest (POI)                        & \textit{Location of relevance frequented by the user, e.g. home, gym or workplace}                                                                                                                    \\ \hline
-Stop            & \textit{A visit to a POI with an arrival- and departure timestamp}                                                                                  \\ \hline
-\end{tabular}
-    \caption{The Mobility Features defined by Cuttone et al. \cite{sparse-location-2014}}
-    \label{tab:features-cuttone}
-\end{table}
-
+After this pre-processing procedure was applied, the features described in Table \ref{tab:saeb-features} were derived.
+Saeb et al. find that depressive symptoms tend to change slowly over weeks, with little day-to-day variation and thus it is more relevant to group data on a weekly basis.
 
 
 
