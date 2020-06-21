@@ -311,6 +311,9 @@
 %\usepackage{preamble/custom_packages/pythonhighlight}
 % https://github.com/olivierverdier/python-latex-highlighting
 \usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
 \usepackage[final]{pdfpages}
 \usepackage{amsfonts} % math
+
+\usepackage[ruled,vlined]{algorithm2e}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}

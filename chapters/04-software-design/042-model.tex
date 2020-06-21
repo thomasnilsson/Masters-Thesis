@@ -1,9 +1,9 @@
 \section{Domain Model}
-The domain model provides clarity and direction for a software system, even on a small scale such as in a library. In this section, the design choices of the data model will be discussed.
+The domain model aims to model the theoretical descriptions outlined in \ref{chapter:03} in an object-oriented manner.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.7\textwidth]{images/diagrams/data-model-diagram.pdf}
+    \includegraphics[width=0.9\textwidth]{images/diagrams/data-model-diagram.pdf}
     \caption{UML diagram for the classes used in the \textit{Mobility Features Package}}
     \label{fig:uml-diagram}
 \end{figure}
@@ -22,7 +22,7 @@ A \textbf{Place} is defined by a GeoPosition computed from a list of \textit{Sto
 
 A \textbf{Move} is constructed from a pair of \textit{Stops} as well as the set of \textit{LocationSamples} that was sampled in the time interval between the two \textit{Stops}. This set of LocationSamples is the path the user took between the two \textit{Stops}.\\
 
-A \textbf{Mobility Context} is a the component which holds all the mobility features. This includes the intermediate features as well as the derived features. The component is created from daily Stops and Moves as well as a list of \textit{Places} for the whole period. In addition, a set of \textit{Mobility Contexts} from previous days needs to provided if the Routine Index feature is to be calculated, but is optional. \\
+A \textbf{Mobility Context} is a the component which holds all the mobility features. This includes the location features (Stops, Places and Moves) as well as the derived features. The component is created from daily Stops and Moves as well as a list of \textit{Places} for the whole period. In addition, a set of \textit{Mobility Contexts} from previous days needs to provided if the Routine Index feature is to be calculated, but is optional. \\
 
 The \textbf{GeoSpatial (Interface)} forces any component implementing it to have a GeoPosition. This allows the Haversine distance to be calculated between components of different types.\\
 

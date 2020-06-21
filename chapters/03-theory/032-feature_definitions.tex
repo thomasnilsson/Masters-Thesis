@@ -38,28 +38,52 @@ Finding \textit{Stops} is done by traversing every \textit{Location Samples} in 
 S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)
 \end{equation}
 
-The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the Stop $s_i$, respectively. Stops are found using the following procedure:
+The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the Stop $s_i$, respectively. Stops are found using Algorithm \ref{algo:stops}.
 
-\begin{figure}[h]
-    \centering
-    \begin{itemize}
-        \item[(1)] \textsc{Let} $X$ be the set of time ordered data points
-        \item[(2)] \textsc{Let} $S \leftarrow \{ \}$
-        \item[(3)] \textsc{If} there is at least one data point $x'$ left in $X$:
-            \begin{itemize}
-                \item[(I)] \textsc{Let} stop $s \leftarrow \{ x' \}$
-            \item[(II)] \textsc{For} every remaining point $x \in X$:
-            \begin{itemize}
-                \item[(i)] \textsc{Let} $X \leftarrow X - x$
-                \item[(ii)] \textsc{If} $p$ is close to the median location of $s$: $s \leftarrow s \cup \{ x \}$
-                \item[(iii)] \textsc{Else}: $S \leftarrow S \cup \{ s \}$ and go to \textsc{(3)}
-            \end{itemize}
-            \end{itemize}
-        \item[(4)] \textsc{Return} S
-    \end{itemize} 
-    \caption{Procedure for finding \textit{Stops}}
-    \label{fig:find_stops}
-\end{figure}
+% \begin{figure}[h]
+%     \centering
+%     \begin{itemize}
+%         \item[(1)] \textsc{Let} $X$ be the set of time ordered data points
+%         \item[(2)] \textsc{Let} $S \leftarrow \{ \}$
+%         \item[(3)] \textsc{If} at least one point $x'$ remains in $X$:
+%             \begin{itemize}
+%                 \item[(I)] \textsc{Let} stop $s \leftarrow \{ x' \}$
+%             \item[(II)] \textsc{For} every remaining point $x \in X$:
+%             \begin{itemize}
+%                 \item[(i)] \textsc{Let} $X \leftarrow X - x$
+%                 \item[(ii)] \textsc{If} $p$ is close to the median location of $s$: $s \leftarrow s \cup \{ x \}$
+%                 \item[(iii)] \textsc{Else}: $S \leftarrow S \cup \{ s \}$ and go to \textsc{(3)}
+%             \end{itemize}
+%             \end{itemize}
+%         \item[(4)] \textsc{Return} S
+%     \end{itemize} 
+%     \caption{Procedure for finding \textit{Stops}}
+%     \label{fig:find_stops}
+% \end{figure}
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\algorithmicrequire{ set of time ordered data points, $X$}\\
+\algorithmicensure{ set of stops, $S$}\\
+
+ $S \leftarrow \{ \}$\;
+ \While{at least one point $x'$ remains in $X$}{
+    $X \leftarrow X - x'$;\\
+    $s \leftarrow \{ x' \}$;\\
+    \For{$x \in X$}{
+        \eIf{$\delta($x$, $s$) \leq r_{stop}$}{
+            $s \leftarrow s \cup \{ x \}$;\\
+            $X \leftarrow X - x$;
+        }{
+            $S \leftarrow S \cup \{ s \}$;\\
+            break \textbf{for}-loop;
+        }
+    }
+ }
+ \textbf{return} $S$\;
+ \label{algo:stops}
+ \caption{Find Stops}
+\end{algorithm}
 
 \subsection{Place}
 \textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. It is important to note that if the \textit{Routine Index} for a given date over a given period is to be evaluated later on, all \textit{Stops} found for this period should be used. 
@@ -71,22 +95,35 @@ Given a set of Stops $S$, the set of Places $P$ found for the period $D$ is defi
 P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}
 \end{equation}
 
-The procedure for finding Places defined in Figure \fig{fig:find_places}.
+The procedure for finding Places defined in Algorithm \ref{algo:places}.
 
-\begin{figure}[h]
-    \centering
-    \begin{center}
-    \begin{itemize}
-    \item[(1)] \textsc{Let} $S$ be the set of Stops.
-    \item[(2)] \textsc{Let} $L$ be the cluster labels found by  DBSCAN where $s_i$ has label $l_i$ 
-    \item[(3)] \textsc{Group} each stop $s \in S$ by its label, and let $S' = \{s_i \;|\; l_i \geq 0\}, \;|S'| = N$
-    \item[(4)] \textsc{Let} $p_i = S'_i$ where each stop $s \in S'_i$ has the label $l_i$
-    \item[(5)] \textsc{Return} $P = \{p_i : i = 0, ..., N\}$
-\end{itemize} 
-\end{center}
-    \caption{Procedure for finding \textit{Places}}
-    \label{fig:find_places}
-\end{figure}
+\begin{algorithm}[H]
+\SetAlgoLined
+\algorithmicrequire{ set of stops, $S$}\\
+\algorithmicensure{ set of places, $P$}\\
+    $L = DBSCAN(S)$ where $s_i$ has label $l_i$;\\
+    \textbf{group} each stop $s_i \in S$ by $l_i$;\\
+    $S' = \{s_i \;|\; l_i \geq 0\}, \;|S'| = N$;\\
+    $p_i = S'_i$ where each stop $s \in S'_i$ has the label $l_i$;\\
+    \textbf{return} $P = \{p_i : i = 0, ..., N\}$;\\
+ \label{algo:places}
+ \caption{Find Places}
+\end{algorithm}
+
+% \begin{figure}[h]
+%     \centering
+%     \begin{center}
+%     \begin{itemize}
+%     \item[(1)] \textsc{Let} $S$ be the set of Stops.
+%     \item[(2)] \textsc{Let} $L$ be the cluster labels found by  DBSCAN where $s_i$ has label $l_i$ 
+%     \item[(3)] \textsc{Group} each stop $s \in S$ by its label, and let $S' = \{s_i \;|\; l_i \geq 0\}, \;|S'| = N$
+%     \item[(4)] \textsc{Let} $p_i = S'_i$ where each stop $s \in S'_i$ has the label $l_i$
+%     \item[(5)] \textsc{Return} $P = \{p_i : i = 0, ..., N\}$
+% \end{itemize} 
+% \end{center}
+%     \caption{Procedure for finding \textit{Places}}
+%     \label{fig:find_places}
+% \end{figure}
 
 \subsection{Move}
 \textit{Moves} for a given can be calculated using the \textit{Stops}- and the \textit{Location Samples} from that date. The \textit{Moves} are found by going through each \textit{Stop} and calculating the distance between the current \textit{Stop} and the following \textit{Stop} by going through all the \textit{Location Samples} which were sampled in the time interval between these the \textit{Stops}. These points form the path which was taken between the two \textit{Stops} and the path is used to calculate the exact distance traveled.
@@ -98,27 +135,43 @@ A set of \textit{Moves} is defined as
 M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}
 \end{equation}
 
-is a set of time-ordered Location Samples. Moves are found using the following procedure:
+is a set of time-ordered Location Samples. Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
 
-\begin{figure}[h]
-    \centering
-    \begin{center}
-    \begin{itemize}
-    \item[(1)] \textsc{Let} $S$ be the set of stops and $X$ be the set of time-ordered data points
-    \item[(2)] \textsc{Let} $M = \{ \}$
-    \item[(3)] \textsc{For} each stop $s_i \in S$:
-    \begin{itemize}
-        \item[(I)] \textsc{Let} $X_i$ be the path of data points sampled between $s_i$ and $s_{i+1}$.
-        \item[(II)] \textsc{Let} $d_i = \sum_{x_j \in X_i} \delta(x_j, x_{j+1})$ 
-        \item[(III)] \textsc{Let} $m_i = (s_i, s_{i+1}, d_i)$ 
-        \item[(IV)] \textsc{Let} $M = M \cup \{m_i\}$ 
-    \end{itemize}
-    \item[(4)] \textsc{Return} $M$
-\end{itemize} 
-\end{center}
-    \caption{Procedure for finding \textit{Moves}}
-    \label{fig:find_moves}
-\end{figure}
+\begin{algorithm}[H]
+\SetAlgoLined
+\algorithmicrequire{ set of stops, $S$, set of time ordered data points, $X$}\\
+\algorithmicensure{ set of moves, $P$}\\
+    $M = \{ \}$\;
+    \For{$s_i \in S$}{
+    $X_i = x$ for which $s_{i}.departure \leq x.timestamp \leq s_{i+1}.arrival$;\\
+    $d_i = \sum_{x_j \in X_i} \delta(x_j, x_{j+1})$;\\
+    $m_i = (s_i, s_{i+1}, d_i)$;\\
+    $M = M \cup \{m_i\}$;\\
+    }
+    \textbf{return} $M$;
+ \label{algo:moves}
+ \caption{Find Moves}
+\end{algorithm}
+
+% \begin{figure}[h]
+%     \centering
+%     \begin{center}
+%     \begin{itemize}
+%     \item[(1)] \textsc{Let} $S$ be the set of stops and $X$ be the set of time-ordered data points
+%     \item[(2)] \textsc{Let} $M = \{ \}$
+%     \item[(3)] \textsc{For} each stop $s_i \in S$:
+%     \begin{itemize}
+%         \item[(I)] \textsc{Let} $X_i$ be the path of data points sampled between $s_i$ and $s_{i+1}$.
+%         \item[(II)] \textsc{Let} $d_i = \sum_{x_j \in X_i} \delta(x_j, x_{j+1})$ 
+%         \item[(III)] \textsc{Let} $m_i = (s_i, s_{i+1}, d_i)$ 
+%         \item[(IV)] \textsc{Let} $M = M \cup \{m_i\}$ 
+%     \end{itemize}
+%     \item[(4)] \textsc{Return} $M$
+% \end{itemize} 
+% \end{center}
+%     \caption{Procedure for finding \textit{Moves}}
+%     \label{fig:find_moves}
+% \end{figure}
 
 \subsection{Hour Matrix}
 The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} and \textit{Routine Index} feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The \textit{Hour Matrix} represents the time-place distribution for the user during a day.
@@ -319,9 +372,9 @@ defines the \textit{actual overlap} as the sum of the overlapping entries betwee
 \min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{H}^{\mu} (D) \Big)
 \end{equation}
 
-is the smallest sum of either matrix, whichever is smaller, and defines the \textit{maximum potential overlap} between the two matrices. If one matrix is very sparse then the potential overlap is very low, and vice versa. If the \textit{actual overlap} and the \textit{maximum potential overlap} are the same, it means the matrices are the same and the Routine Index will have a value of 1. Figure \ref{fig:routine-matrix-1} and \ref{fig:routine-matrix-2} provide two examples of caluclating the Routine Index.
+is the smallest sum of either matrix, whichever is smaller, and defines the \textit{maximum potential overlap} between the two matrices. If one matrix is very sparse then the potential overlap is very low, and vice versa. If the \textit{actual overlap} and the \textit{maximum potential overlap} are the same, it means the matrices are the same and the Routine Index will have a value of 1. Figure \ref{fig:routine-matrix-1} and \ref{fig:routine-matrix-2} provide two examples of calculating the Routine Index.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/routine-numbers-1.pdf}
     \caption{An example of the matrix R is computed with the overlap function of A and B. Here only 1 entry overlaps}
@@ -334,7 +387,7 @@ For Figure \ref{fig:routine-matrix-1} the Routine Index becomes
 RI = \frac{1}{1 + 1 + 1} = \frac{1}{3}
 \end{equation}
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/routine-numbers-2.pdf}
         \caption{An example of the matrix R is computed with the overlap function of A and B. Here several entries overlap}

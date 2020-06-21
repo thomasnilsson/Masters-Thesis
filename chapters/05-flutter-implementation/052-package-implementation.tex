@@ -27,9 +27,9 @@ This interface allows other classes to promise the Dart compiler that it has a G
 
 
 \subsection{Computing Features}
-Finding the intermediate features Stops, Moves, and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
+Finding the location features Stops, Moves, and Places were done according to the algorithms described in Chapter \ref{chapter:03}. 
 
-\subsubsection{Computing Features}
+\subsubsection*{Stops}
 The Stop class has two constructors: A factory constructor which takes a set of LocationSamples from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
 
 \begin{minted}{dart}
@@ -87,7 +87,7 @@ The distance calculation \verb|Distance.fromGeospatial(centroid, data[end]) <= s
     }
 \end{minted}
 
-\subsubsection{Finding Moves}
+\subsubsection*{Finding Moves}
 The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, with argument being either a path of Location Samples or a Distance, i.e. a double. The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor to create a Move. 
 \begin{minted}{dart}
     factory Move._fromPath(Stop a, Stop b, List<LocationSample> path) {
@@ -126,7 +126,7 @@ The algorithm for finding Moves takes a List of Location Samples and the Stops f
 
 The mentioned 'fake' Stops is an addition to the definition in Chapter \ref{chapter:03}. They are created to avoid situations in which tracking was started while moving, in this case, no Moves are created before the user is stationary for some time, and Stops are found. This situation will likely not be very common, but was found during self-study and therefore deemed worthy of covering. The extra Stops are only used for finding moves and will not be used for finding Places.
 
-\subsubsection{Finding Places}
+\subsubsection*{Finding Places}
 The Place class only has one normal constructor which takes an ID (an integer) and a List of Stops. 
 \begin{minted}{dart}
 Place._(this._id, this._stops);
@@ -157,60 +157,8 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
   }
 \end{minted}
 
-\subsection{Computing Features}
-A Mobility Context object represents features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
 
-\begin{minted}{dart}
-MobilityContext._(this._stops, this._allPlaces, this._moves,
-  {this.contexts, this.date}) {
-  _timestamp = DateTime.now();
-  date = date ?? _timestamp.midnight;
-}
-\end{minted}
-
-The other optional parameter is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
-
-\begin{figure}
-    \centering
-    \begin{minted}{dart}
-    class MobilityContext {
-        // Field
-        double _routineIndex;
-     
-         // Getter
-        double get routineIndex {
-            return _routineIndex;
-        }
-    }
-    \end{minted}
-    \caption{The getter method for a feature field}
-    \label{fig:feature-getter}
-\end{figure}
-
-\subsubsection{Lazy Evaluation}
-A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However, there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], which applied to this example is the idea of postponing computation of a given field until the first time it is needed. After being computed, the field is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
-
-\begin{figure}
-    \centering
-    \begin{minted}{dart}
-    class MobilityContext {
-        // Field
-        double _routineIndex;
-        
-        // Getter
-        double get routineIndex {
-            if (_routineIndex == null) {
-                _routineIndex = _calculateRoutineIndex();
-            }
-            return _routineIndex;
-        }
-    }
-    \end{minted}
-    \caption{Lazy evaluation of a feature}
-    \label{fig:lazy-evaluation}
-\end{figure}
-
-\subsubsection{Hour Matrix Computation}
+\subsubsection*{Hour Matrix Computation}
 The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. From this, the matrix is created and filled out. Each Stop can be converted into an array of doubles that tells which place and how much was visited.
 
 \begin{figure}
@@ -290,7 +238,7 @@ The maximum possible overlap is computed as the minimum of the two matrix sums, 
 \end{figure}
 
 
-\subsubsection{Home Stay Computation}
+\subsubsection*{Home Stay Computation}
 The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is no exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
 
 \begin{figure}
@@ -319,7 +267,7 @@ double _calculateHomeStay() {
     \label{fig:home-stay-code}
 \end{figure}
 
-\subsubsection{Routine Index}
+\subsubsection*{Routine Index}
 The Routine Index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the average Hour Matrix is computed. Lastly, the Routine Index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
 
 \begin{figure}
@@ -345,6 +293,60 @@ The Routine Index is the most difficult to compute by far. The method for comput
     \caption{The method for computing the Routine Index feature}
     \label{fig:routine-index-code}
 \end{figure}
+
+\subsection{Mobility Context}
+A Mobility Context object represents features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
+
+\begin{minted}{dart}
+MobilityContext._(this._stops, this._allPlaces, this._moves,
+  {this.contexts, this.date}) {
+  _timestamp = DateTime.now();
+  date = date ?? _timestamp.midnight;
+}
+\end{minted}
+
+The other optional parameter is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    class MobilityContext {
+        // Field
+        double _routineIndex;
+     
+         // Getter
+        double get routineIndex {
+            return _routineIndex;
+        }
+    }
+    \end{minted}
+    \caption{The getter method for a feature field}
+    \label{fig:feature-getter}
+\end{figure}
+
+\subsubsection*{Lazy Evaluation}
+A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However, there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], which applied to this example is the idea of postponing computation of a given field until the first time it is needed. After being computed, the field is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+    class MobilityContext {
+        // Field
+        double _routineIndex;
+        
+        // Getter
+        double get routineIndex {
+            if (_routineIndex == null) {
+                _routineIndex = _calculateRoutineIndex();
+            }
+            return _routineIndex;
+        }
+    }
+    \end{minted}
+    \caption{Lazy evaluation of a feature}
+    \label{fig:lazy-evaluation}
+\end{figure}
+
 
 \subsection{Context Generation}
 The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values - they can however take parameters, which by nature are static. The central part of the ContextGenerator class is the \verb|generate()| method, which is where a MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
