@@ -1,5 +1,12 @@
 \section{System Design}
-The core idea of the \textit{Mobility Feature Package} is to provide a very simple programming interface such that computing features can be done with very few lines of code. This requires closing of the internal working of the package off, such that the programmer has very limited ways in which he/she can interface with it. The design of the package API went through two main iterations which consisted of many smaller iterations. Mainly, the difference between the final iteration and the earlier iterations is the amount of code required for managing historical data that the programmer has to write. Early iterations put the responsibility on the application programmer to manage historical data. After developing the field study app discussed in chapter \ref{chapter:06} it was decided to move most of this logic inside the package; it became glaringly apparent that the package was too cumbersome to use. The final iteration is the one discussed in this thesis including the choices and lessons learned on the way of designing and developing it. 
+The core idea of the \textit{Mobility Feature Package} is to provide a very simple programming interface such that computing features can be done with very few lines of code. This requires closing of the internal working of the package off, such that the programmer has very limited ways in which he/she can interface with it. The design of the package API went through two main iterations which consisted of many smaller iterations. Mainly, the difference between the final iteration and the earlier iterations is the amount of code required for managing historical data that the programmer has to write. Early iterations put the responsibility on the application programmer to manage historical data. After developing the field study app discussed in chapter \ref{chapter:06} it was decided to move most of this logic inside the package; it became glaringly apparent that the package was too cumbersome to use. The final iteration is the one discussed in this thesis including the choices and lessons learned on the way of designing and developing it. The flowchart in Figure \ref{fig:flowchart-features} displays the task which the software system must be able to carry out.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{images/diagrams/flowchart.pdf}
+    \caption{Flowchart of the feature computatation process}
+    \label{fig:my_label}
+\end{figure}
 
 
 \subsection{Component Overview}
