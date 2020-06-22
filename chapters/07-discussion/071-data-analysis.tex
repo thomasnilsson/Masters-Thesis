@@ -37,32 +37,33 @@ For the \textit{Routine Index}, the answer (a number of 0 to 5) was transformed 
     r = \frac{s}{s_{max}}, \quad s_{max} = 5
 \end{equation}
 
-Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but Stops with a longer duration being found. 
+Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but stops with a longer duration being found. 
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/study/storage/num_points.png}
     \includegraphics[width=\textwidth]{images/study/storage/num_stops.png}
     \includegraphics[width=\textwidth]{images/study/storage/compression_N.png}
-    \caption{The number of raw Location Samples (top) and the number of Stops (middle) collected, and the ratio between the two, for each participant}
+    \caption{The number of raw location samples (top) and the number of stops (middle) collected, and the ratio between the two, for each participant}
     \label{fig:plot-num-points-stops}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{images/study/storage/compression_mb.png}
-    \caption{The ratio between Location Samples and Stops expressed in terms of storage, in MB}
+    \caption{The ratio between location samples and stops expressed in terms of storage, in MB}
     \label{fig:plot-num-points-stops}
 \end{figure}
 
-It was computed based on file size, the average size of a serialized \textit{LocationSample} is 100 bytes, and a \textit{Stop} is 139 bytes. With this information, it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting Location Samples into Stops, and this is shown in Figure \ref{fig:plot-num-points-stops}. The number of valid days for a specific feature is a day for which the user gave answers, and the feature could be calculated. If the user for example turned off their phone during the night, the Home Stay feature could not be calculated, but the routine index feature and the number of places will likely still have been calculated.
+It was computed based on file size, the average size of a serialized \textit{LocationSample} is 100 bytes, and a stop is 139 bytes. With this information, it is possible to calculate the compression rate for each participant, i.e. how much their dataset was reduced by converting location samples into stops, and this is shown in Figure \ref{fig:plot-num-points-stops}. The number of valid days for a specific feature is a day for which the user gave answers, and the feature could be calculated. If the user for example turned off their phone during the night, the Home Stay feature could not be calculated, but the routine index feature and the number of places will likely still have been calculated.
 
 \subsection{Subjectivity of Answers and Ground Truth}
 A thing to keep in mind is that the participants' answers are not ground truth, and there are multiple reasons why a participant's answer may be inaccurate. Firstly, people's subjective recollection is not necessarily as accurate as they think it might me. Secondly, it was not communicated explicitly to the participants what exactly counts as a place, and how their 'routine' is calculated - this means that participants may have filled out the questionnaire differently, given the same ground truth data - for example, whether or not being in the garden counts as being home. Thirdly, some users misunderstood the routine scale, and users whose data looked strange were contacted afterward to enquire about whether they had misunderstood the question, and if so the answers were corrected as much as could be done. Lastly, the hour away from home and routine index answers were very course-grained, and therefore the participants were probably rarely able to give exact answers, according to their own recollection. 
 
 \subsection{Missing Data and Correcting Data}
 Some users missed several days of filling out the diary which meant the computed features for that day could not be compared to subjective measurement. Figure \ref{fig:plot-days-answered} shows the number of total days where a participant participated in the study where data was collected vs the days on which they provided an answer. For data analysis, it was only possible to calculate the error between computed features and the answers given if the participant actually gave an answer. This means that for some participants, a lot of data was unfortunately not usable for the data analysis. As an example, it was considered whether or not to entirely get rid of P9 since he or she has very little data both terms of total days collected and even fewer in terms of days with answers. 
-\begin{figure}
+
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/study/storage/answers_days_plot.png}
     \caption{The total number of days of participation vs the days for which the diary was filled out by the participant. As can be seen, some users often forgot to give an answer}
@@ -74,19 +75,18 @@ Another problem that was encountered was when participants would fill out the qu
 \subsection{Feature Evaluation}
 The Home Stay feature required the participant to track their location during the night, as previously mentioned. This meant that if they did not, the Home Stay feature could not be evaluated for that particular day, however other features might still be available for computation, such as the Number of Places. This meant that the number of days for which a given feature can be compared to the answers is not necessarily the same for all features. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/study/homestay_valid_days.png}
     \includegraphics[width=\textwidth]{images/study/numplaces_valid_days.png}
     \includegraphics[width=\textwidth]{images/study/routine_valid_days.png}
-    \caption{The days for which a given feature could be evaluated, out of the total days for which an answer was given and features were computed}
+    \caption{The days for which a given feature could be evaluated, out of the total days for which an answer was given and features were computed. As can be seen from the top plot, participant P4 had very few days where the home stay could be computed in comparison to the total number of days tracked which are above 20}
     \label{fig:plot-daily}
 \end{figure}
 
 Since the Home Stay feature is calculated by using the \textit{tracked} time at home, divided by the total time midnight, it only takes a few minutes of missing data to make the Home Stay feature undershoot. It is therefore to be expected that this feature will lie somewhat lower than the answer given by the user, given the user did not round up excessively.
 
-
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/study/places_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
     \includegraphics[width=\textwidth]{images/study/homestay_d6b2d9b9-398b-4e0d-b52b-224747f515c8.png}
@@ -97,24 +97,24 @@ Since the Home Stay feature is calculated by using the \textit{tracked} time at 
 
 The day-by-day results for the author are displayed in figure \ref{fig:plot-daily} and from this plot, the computed features have a high correspondence with the provided answers. However, the feature computation is based on the author's own definitions which mean the computed features and answers of the author are also expected to be highly correlated. It is therefore relevant to show another participant, namely participant P8, who was very diligent in answering and tracking their location data. For this participant, very promising results were also produced which can be seen in Figure \ref{fig:plot-participant-features}.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/study/places_ec110976-0192-436d-b451-4f5dd97e71d8.png}
     \includegraphics[width=\textwidth]{images/study/homestay_ec110976-0192-436d-b451-4f5dd97e71d8.png}
     \includegraphics[width=\textwidth]{images/study/routine_ec110976-0192-436d-b451-4f5dd97e71d8.png}
-    \caption{The answered and calculated data for each day for a participant P7}
+    \caption{The answered and calculated data for each day for participant P7}
     \label{fig:plot-participant-features}
 \end{figure}
 \subsection{Measuring Errors}
 
 To say something about whether or not the algorithms undershoots or overshoots, the difference in sum was calculated as $ME = \frac{\sum(A) - \sum(F)}{N}$ ($N$ is the total number of days for the specific feature) meaning that if the result is positive then the answered result was on average higher and vice versa if the result is negative. The alternative is to calculate the mean error one can also calculate the mean of the difference per observation $ME = \frac{1}{N} \sum_{i=0}^{N} (a_i - f_i)$ however this the downside of canceling out certain observations when the sign differs. Figure \ref{fig:plot-mean-error} shows the mean error for each feature, for each participant. It can be observed that participants generally answer that they have been at more places than the algorithms calculate. The Home Stay feature generally lies 10\% lower for half the participants (i.e. positive mean error), which was to be expected for reasons discussed earlier. For a couple of participants it overshoots (i.e. negative mean error) although still within 10\% error. For participant 2 however it averages out to near zero percent and for participant P1 the feature undershoots dramatically with an error of 30\%. The Routine Index feature is a mixed bag, with 6 participants answering higher than the algorithm and the remaining 4 being lower. All except for participant 6 deviating with almost 40\%. An important detail here is that the Routine Index answer was given on scale with 20 percent increments which means that the mean error is likely to lie much higher percentage-wise than the other two features.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/study/me_places.png}
     \includegraphics[width=\textwidth]{images/study/me_homestay.png}
     \includegraphics[width=\textwidth]{images/study/me_routine.png}
-    \caption{The number of data points in terms of days which could be evaluated, for each participant}
+    \caption{The mean error for each participant for each of the three featutes}
     \label{fig:plot-mean-error}
 \end{figure}
 

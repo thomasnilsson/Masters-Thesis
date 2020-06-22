@@ -1,10 +1,10 @@
 \section{System Design}
-The core idea of the \textit{Mobility Feature Package} is to provide a very simple programming interface such that computing features can be done with very few lines of code. This requires closing of the internal working of the package off, such that the programmer has very limited ways in which he/she can interface with it. The design of the package API went through two main iterations which consisted of many smaller iterations. Mainly, the difference between the final iteration and the earlier iterations is the amount of code required for managing historical data that the programmer has to write. Early iterations put the responsibility on the application programmer to manage historical data. After developing the field study app discussed in chapter \ref{chapter:06} it was decided to move most of this logic inside the package; it became glaringly apparent that the package was too cumbersome to use. The final iteration is the one discussed in this thesis including the choices and lessons learned on the way of designing and developing it. The flowchart in Figure \ref{fig:flowchart-features} displays the task which the software system must be able to carry out.
+The core idea of the \textit{Mobility Feature Package} is to provide a very simple programming interface such that computing features can be done with very few lines of code. This requires closing of the internal working of the package off, such that the programmer has very limited ways in which he/she can interface with it. The design of the package API went through two main iterations which consisted of many smaller iterations. Mainly, the difference between the final iteration and the earlier iterations is the amount of code required for managing historical data that the programmer has to write. Early iterations put the responsibility on the application programmer to manage historical data. After developing the field study app discussed in chapter \ref{chapter:06} it was decided to move most of this logic inside the package; it became glaringly apparent that the package was too cumbersome to use. The final iteration is the one discussed in this thesis including the choices and lessons learned on the way of designing and developing it. The flowchart in Figure \ref{fig:flowchart-features} displays the task which the software system must be able to carry out, as well as which parts are done by the package, and which are done by the programmer. Namely, the task of collecting location data was chosen to be carried out by the programmer which was a major design choice. Two reasons led to this decision, the first of which being that the Mobility Features Package becomes more loosely coupled and modular. The second reason relates to maintenance; if the package was to implement location data collection then it becomes harder to maintain since any change to the location plugin would imply changes to the Mobility Features Package as well. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{images/diagrams/flowchart.pdf}
-    \caption{Flowchart of the feature computatation process}
+    \includegraphics[width=\textwidth]{images/diagrams/flowchart.pdf}
+    \caption{Flowchart of the feature computation process}
     \label{fig:my_label}
 \end{figure}
 
@@ -14,17 +14,17 @@ Figure \ref{fig:component-diagram-internal} displays how the final iteration loo
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{images/diagrams/component-external.pdf}
+\includegraphics[width=0.8\textwidth]{images/diagrams/component-internal.pdf}
 \caption{Component diagram for the \textit{Mobility Feature Package} from an internal point of view}
 \label{fig:component-diagram-internal}
 \end{figure}
 
-Figure \ref{fig:component-diagram-external} shows the external software system that includes the mobile application using the package. Another design choice is reflected in this figure which is the usage of an external location plugin which must be done by the programmer. This means task the programmer has to collect their own location data through their location plugin which will collect location \textit{Data Transfer Objects} (DTOs) \cite{fowler-PEEA} [p. 401]. These objects hold location data, i.e. latitude, longitude, and a timestamp and can be converted to \textit{LocationSamples} and saved through the \textit{Mobility Feature Package.}
-Two reasons led to this decision, the first of which being that the Mobility Features Package becomes more loosely coupled and modular. The second reason relates to maintenance; if the package was to implement location data collection then it becomes harder to maintain since any change to the location plugin would imply changes to the Mobility Features Package as well. 
+Figure \ref{fig:component-diagram-external} shows the external software system that includes the mobile application using the package. The design choice of letting the programmer collect location data themselves is also reflected with the usage of an external location plugin. This location plugin will deliver location \textit{Data Transfer Objects} (DTOs) \cite{fowler-PEEA} [p. 401] to the mobile health application. These objects hold location data, i.e. latitude, longitude, and a timestamp and can be converted to \textit{LocationSamples} and saved through the \textit{Mobility Feature Package.}
+
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.5\textwidth]{images/diagrams/component-external.pdf}
+\includegraphics[width=0.7\textwidth]{images/diagrams/component-external.pdf}
 \caption{Component diagram for the \textit{Mobility Feature Package} from an internal point of view}
 \label{fig:component-diagram-external}
 \end{figure}
@@ -35,7 +35,7 @@ To display the interactions between the components, sequence diagrams are used. 
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\textwidth]{images/diagrams/sequence-external.png}
+\includegraphics[width=0.8\textwidth]{images/diagrams/sequence-external.png}
 \caption{Component diagram for the \textit{Mobility Feature Package} from an internal point of view}
 \label{fig:sequence-diagram-internal}
 \end{figure}
@@ -43,7 +43,7 @@ To display the interactions between the components, sequence diagrams are used. 
 From an internal point of view, the \textit{Context Generator} component calls the \textit{Mobility Serializer} for storing and loading historical data, uses the loaded data to generate a \textit{Mobility Context} by calling the MobilityContext component.
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\textwidth]{images/diagrams/sequence-internal.png}
+\includegraphics[width=0.8\textwidth]{images/diagrams/sequence-internal.png}
 \caption{Sequence diagram for mobile health application using the Mobility Features Package, i.e. viewed externally from the package}
 \label{fig:sequence-diagram-external}
 \end{figure}

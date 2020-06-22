@@ -24,28 +24,21 @@ The Mobility Features included in the Mobility Features package are a subset of 
     \label{tab:features-nilsson}
 \end{table}
 
-When defining a \textit{Place}, several edge cases come to mind such as visiting multiple buildings on a university campus, visiting two stores right next to each other, walking around in a park, i.e. having a large dispersion of the data points. There are likely many more edge cases that exist which have not been considered, but we need to generalize when coming up with a definition. To generalize we define \textit{Stops} using a radius parameter $r_{stop}$ to group data points, and likewise a radius parameter $r_{place}$ to cluster Places. These parameters define the maximally allowed dispersion of the data points which allows us to filter out singular noisy data points. In order to find suitable values for these parameters, a small synthetic dataset was used, and afterward, a real-life dataset from the author moving around in Munich for 9 days was used. No in-depth parameter search was conducted, but the algorithms produce very precise results with the following parameter values:
-
-\begin{equation}
-\label{eq:stop-place-radius}
-r_{stop} = 25 \text{m}, \quad r_{place} = 25 \text{m}
-\end{equation}
-
-
-In addition we define a date as $d_t$ an the previous date as $d_{t-1}$ in order to define a period is a set of today and it's preceding 28 dates defined as $D = \{d_{t-28}, d_{t-27}, ..., d_{t}\}$\\
+\subsection{Dates and Periods}
+For collecting data over time, we define a date as $d_t$ an the previous date as $d_{t-1}$ in order to define a period is a set of today and it's preceding 28 dates defined as $D = \{d_{t-28}, d_{t-27}, ..., d_{t}\}$. This definition is necessary for computing the Routine Index feature, since the feature is computed by comparing today with the last 28 days. The reason for choosen 28 days, i.e. 4 weeks is that we wish to capture people's routine at the moment. Peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is likely somewhat different. But just because a routine changes over time, does not mean it does not exist presently.
 
 \subsection{Location Sample}
-A \textit{Location Sample} is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two \textit{Location Samples} $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
+A location sample is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two location samples $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ and $\delta$ is the \textit{Haversine} distance function.
 
 \subsection{Stop}
-Finding \textit{Stops} is done by traversing every \textit{Location Samples} in temporal order, i.e. the timestamp is used. The \textit{Stops} for a given date is found by clustering \text{Location Samples} on that date based on time and distance. The set of \textit{Stops} found for the period $D$ is defined as
+Finding stops is done by traversing every location samples in temporal order, i.e. the timestamp is used. The stops for a given date is found by clustering location samples on that date based on distance, using a \textit{stop radius} parameter of $r_{stop} = 25 \text{meters}$. The set of stops found for the period $D$ is defined as
 
 \begin{equation}
 \label{eq:feature-stops}
 S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)
 \end{equation}
 
-The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the Stop $s_i$, respectively. Stops are found using Algorithm \ref{algo:stops}.
+The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the stop $s_i$, respectively. Stops are found using Algorithm \ref{algo:stops}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -71,15 +64,17 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
  \caption{Find Stops}
 \end{algorithm}
 
+Given a stop $s$, the arrival is denoted $s.arrival$ and departure $s.departure$.
+
 \subsection{Place}
-\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the \textit{Stops} found. All the Stops today in the period $D$ should used to identify places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of Stops $S$ for the period $D$, the set of Places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}.
+\textit{Places} can now be found by applying the \textit{DBSCAN} algorithm to the stops found. All the stops today in the period $D$ should used to identify places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}.
 
 \begin{equation}
 \label{eq:feature-places}
 P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}
 \end{equation}
 
-The procedure for finding Places defined in Algorithm \ref{algo:places}.
+The procedure for finding places defined in Algorithm \ref{algo:places}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -95,16 +90,16 @@ The procedure for finding Places defined in Algorithm \ref{algo:places}.
 \end{algorithm}
 
 \subsection{Move}
-\textit{Moves} for a given can be calculated using the \textit{Stops}- and the \textit{Location Samples} from that date. The \textit{Moves} are found by going through each \textit{Stop} and calculating the distance between the current \textit{Stop} and the following \textit{Stop} by going through all the \textit{Location Samples} which were sampled in the time interval between these the \textit{Stops}. These points form the path which was taken between the two \textit{Stops} and the path is used to calculate the exact distance traveled.
+A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stop and the path is used to calculate the exact distance traveled.
 
-A set of \textit{Moves} is defined as 
+A set of moves is defined as 
 
 \begin{equation}
 \label{eq:feature-moves}
 M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}
 \end{equation}
 
-is a set of time-ordered Location Samples. Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
+is a set of time-ordered location samples. Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -125,7 +120,7 @@ is a set of time-ordered Location Samples. Moves are found using the following p
 
 \subsection{Hour Matrix}
 \label{sub:hour-matrix}
-The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} and \textit{Routine Index} feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The \textit{Hour Matrix} represents the time-place distribution for the user during a day.
+The hour matrix is an auxiliary feature used to compute the \textit{Home Stay} and \textit{Routine Index} feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The hour matrix represents the time-place distribution for the user during a day.
 \begin{figure}
     \centering
     \begin{tabular}{|l|l|l|l|l|}
@@ -144,39 +139,30 @@ The Hour Matrix is an auxiliary feature used to compute the \textit{Home Stay} a
     \label{fig:time-table}
 \end{figure}
 
-This matrix is constructed from all the \textit{Stops} on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the \textit{Hour Matrix}:
+This matrix is constructed from all the stops on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the hour matrix:
 
 \begin{itemize}
-    \item The \textit{Hour Matrix} has exactly 24 rows, each representing 1 hour in a day.
-    \item The number of columns represents the number of \textit{Places} for the period. 
-    \item An entry represents the portion of the given hour-slot that was spent at a given \textit{Place}.
+    \item The hour matrix has exactly 24 rows, each representing 1 hour in a day.
+    \item The number of columns represents the number of places for the period. 
+    \item An entry represents the portion of the given hour-slot that was spent at a given place.
     \item Each row can maximally sum to 1.
 \end{itemize}
 
-Formally, given a period ($D$) for which the number of \textit{Places} is given as $N$ the \textit{Hour Matrix} $\mathsf{H}$ for today ($d_t$) is defined as:
+Formally, given a period ($D$) for which the number of places is given as $N$ the hour matrix $\mathsf{H}$ for today ($d_t$) is defined as:
 
 \begin{equation}
 \label{eq:feature-hour-matrix-def}
 \mathsf{H}(d_t) \in [0,1]^{24 \times N}, \sum_{j=1}^N \mathsf{H}^{d_t}_{i,j} \leq 1
 \end{equation}
 
-Given an array of \textit{Hour Matrices} for a period $D' = D - d_t$ (i.e. the historical dates preceding today $d_t$) the \textit{Routine Matrix} is defined as the average entry for each \textit{Hour Matrix} given in Equation \eqref{eq:feature-hour-matrix-mean}. Here, $|D'|$ defines the number of preceding dates for which $1 \leq |D'| \leq 28$ holds.
-
-\begin{equation}
-\label{eq:feature-hour-matrix-mean}
-\mathsf{H}^{\mu} (D) _{i,j} = \sum_{k=0}^{|D'|} \frac{1}{|D'|} \mathsf{H}(d_{|D'|-k})_{i,j}
-\end{equation}
-
-Given a Stop $s$ with arrival $T_{arr}$ and departure $T_{dep}$ the hour matrix as follows:
-
-Let $i = hour(T_{arr})$, $j = hour(T_{dep})$ and $\Delta_ T(\cdot)$ is the function for calculating the duration in hours.
+Given a stop $s$, let $i = hour(s.arrival)$, $j = hour(s.departure)$ and $\Delta_ T(\cdot)$ is the function for calculating the duration in hours.
 
 \begin{equation}
 \label{eq:feature-hour-matrix-computation}
 \mathsf{H}_{i,p} \leftarrow \mathsf{H}_{i,p} + T
 \end{equation}
 
-If $i = j$ then $T = \Delta_T (T_{dep} - T_{arr})$, otherwise the following algorithm is applied:
+If $i = j$ then $T = \Delta_T (s.departure - s.arrival)$, otherwise the following algorithm is applied:
 
 \begin{equation}
 \label{eq:feature-hour-computaion2}
@@ -198,14 +184,14 @@ T(k) =
 
 
 \subsection{Home Stay}
-The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. In the literature, the home cluster is defined as the cluster which the user spends the most time at between 00:00 and 06:00. In the work by Saeb et al. and Canzian et al. \cite{Saeb2015, saeb2016, Canzian2015} the home cluster was evaluated over the duration of the whole study, however we define it on a daily basis since the home cluster may change from day to day. Formally, the \textit{Home Place} $p_h (d_t)$ for the date $d_t$ where the index $h$ is found using Equation \eqref{eq:feature-home-place}.
+The \text{Home Stay} feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. In the literature, the home cluster is defined as the cluster which the user spends the most time at between 00:00 and 06:00. In the work by Saeb et al. and Canzian et al. \cite{Saeb2015, saeb2016, Canzian2015} the home cluster was evaluated over the duration of the whole study, however we define it on a daily basis since the home cluster may change from day to day. Formally, the \textit{home place} $p_h (d_t)$ for the date $d_t$ where the index $h$ is found using Equation \eqref{eq:feature-home-place}.
 
 \begin{equation}
 \label{eq:feature-home-place}
 h = \operatorname*{argmax}_n \sum_{m=1}^{6} \sum_{n=1}^{N}  \mathsf{H}(d_t)_{m,n}
 \end{equation}
 
-In the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} it is not stated how this would be calculated for an incomplete day. It was chosen to  use the time elapsed from midnight until the departure of the last known Stop. The Home Stay feature is computed using \eqref{eq:feature-home-place} where the duration of a stop $s$ will be denoted $\Delta T (s)$ and similar the duration spent at a place $p$ is defined as $\Delta T (p)$.
+In the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} it is not stated how this would be calculated for an incomplete day. It was chosen to  use the time elapsed from midnight until the departure of the last known stop. The Home Stay feature is computed using \eqref{eq:feature-home-place} where the duration of a stop $s$ will be denoted $\Delta T (s)$ and similar the duration spent at a place $p$ is defined as $\Delta T (p)$.
 
 \begin{equation}
 \label{eq:feature-home-place}
@@ -215,7 +201,7 @@ In the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} 
 Where $T_{now}$ is the departure time of the last known stop, and thus $T_{now} - T_0$ is the time elapsed since 00:00:00 today.
 
 \subsection{Total Distance Travelled}
-First we define the distance of a Move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
+First we define the distance of a move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
 
 \begin{equation}
 \label{eq:feature-move-computation}
@@ -232,7 +218,7 @@ The \textit{Total Distance Travelled} for a date $d_t$ is defined as
 where $M$ refers to the moves on date $d_t$.
 
 \subsection{Number of Places}
-By using the DBSCAN algorithm to cluster a set of Stops, each Stop is given a cluster label, either being non-negative if it belongs to a cluster, or the label -1 if it is considered noise. The \textit{Number of Places} is therefore defined as the size of the set of non-negative cluster labels $K = \{k_1, k_2, ..., k_N\}$, i.e.
+By using the DBSCAN algorithm to cluster a set of stops, each stop is given a cluster label, either being non-negative if it belongs to a cluster, or the label -1 if it is considered noise. The \textit{Number of Places} is therefore defined as the size of the set of non-negative cluster labels $K = \{k_1, k_2, ..., k_N\}$, i.e.
 
 \begin{equation}
 \label{eq:feature-num-places}
@@ -274,9 +260,7 @@ H_N(X) = \frac{H(X)}{H_{max}(X)} \in [0,1]
 \cdot -\log n = \log n 
 \end{equation}
 
-The Normalized Entropy (NE) makes it easier to compare Entropy values of different distributions since they all reside on the same scale, being a scalar value between  0 and 1. A NE value near 1 indicates that the $X$ follows a uniform distribution where every outcome is equally likely. A small NE value indicates that the distribution is very skewed, with certain outcomes having very high likelihood and some having much lower likelihood. 
-
-In the context of user mobility, we can view the time user spends at a certain place as the outcome of the place variable, i.e. 
+The Normalized Entropy (NE) makes it easier to compare Entropy values of different distributions since they all reside on the same scale, being a scalar value between  0 and 1. A NE value near 1 indicates that the $X$ follows a uniform distribution where every outcome is equally likely. A small NE value indicates that the distribution is very skewed, with certain outcomes having very high likelihood and some having much lower likelihood.  In the context of user mobility, we can view the time user spends at a certain place as the outcome of the place variable, i.e. 
 
 \begin{equation}
 \label{eq:feature-normalized-entropy-places}
@@ -295,12 +279,16 @@ where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time sp
 
 \subsection{The Routine Index}
 \label{sub:routine-index}
-The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for a period $D$. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} involved using a different modelling approach and was therefore very complicate to compute.  Therefore, a more straightforward definition of the Routine Index was chosen. To the best of our knowledge this definition defined in Equation \eqref{eq:feature-routine-index} in conjunction with the concept of an Hour Matrix is novel, and models the feature as a similarly measure between two Hour Matrices. More exact, the Routine Index is a similarity measure between the Hour Matrix today and the 'average' Hour Matrix for the last 28 days. The result of the similarity measure is a scalar between 0 and 1 - a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. 
+The \textit{Routine Index} describes how similar the place-time distribution of a given day is, compared to previous days for a period $D$. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the \textit{Routine Index} of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} involved using a different modelling approach and was therefore very complicate to compute.  Therefore, a more straightforward definition of the Routine Index was chosen. To the best of our knowledge this definition defined in Equation \eqref{eq:feature-routine-index} in conjunction with the concept of an hour matrix is novel, and models the feature as a similarly measure between two Hour Matrices. More exact, the Routine Index is a similarity measure between the hour matrix today and the 'average' hour matrix for the last 28 days. The result of the similarity measure is a scalar between 0 and 1 - a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. 
 
+Given an array of \textit{Hour Matrices} for a period $D' = D - d_t$ (i.e. the historical dates preceding today $d_t$) the \textit{Routine Matrix} is defined as the average entry for each hour matrix given in Equation \eqref{eq:feature-hour-matrix-mean}. The days contained in $|D'|$ are indexed with the integer $k$:
 
-In general, peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is not unlikely to be very different. However just because someone changes their routine over time, does not mean they don't currently possess one. Therefore it was chosen to base the \textit{Routine Index} on the last 4 weeks (28 days) of data in order to base the routine overlap on more recent days. 
+\begin{equation}
+\label{eq:feature-hour-matrix-mean}
+\mathsf{R}(D) = \sum_{k=0}^{|D'|} \frac{1}{|D'|} \mathsf{H}(d_{k})_{i,j}
+\end{equation}
 
-The feature can therefore indirectly be computed from the Stops of the last 28 days which means only the Stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 Stops for a 4 week period. Computing the feature requires the Places to be found, i.e. to run DBSCAN on the Stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
+The feature can therefore indirectly be computed from the stops of the last 28 days which means only the stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 stops for a 4 week period. Computing the feature requires the places to be found, i.e. to run DBSCAN on the stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 
 The overlap function produces a matrix $\mathsf{O}$ given two matrices $\mathsf{A}$ and $\mathsf{b}$ of equal dimensions:
 
@@ -316,38 +304,33 @@ The maximum potential overlap is limited by the minimum of the two matrix sums, 
     \mathsf{O}_{max}(\mathsf{A}, \mathsf{B}) = \min (\sum \mathsf{A}, \sum \mathsf{B})
 \end{equation}
 
-The \textit{Routine Index} for today $d_t$ given the historical dates $D$, is defined as the overlap normalized by the maximum potential overlap of today's Hour Matrix and the Routine Matrix (Equation \eqref{eq:feature-routine-index}).
+The \textit{Routine Index} for today $d_t$ given the historical dates $D$, is defined as the overlap normalized by the maximum potential overlap of today's  and the Routine Matrix (Equation \eqref{eq:feature-routine-index}).
 
 \begin{equation}
 \label{eq:feature-routine-index}
-r(d_t, D) = \frac{\sum (\mathsf{H}(d_t) \cap \mathsf{H}^{\mu} (D) )}{\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{H}^{\mu} (D) \Big)}
+r(d_t, D) = \frac{\sum (\mathsf{O} (\mathsf{H}(d_t), \mathsf{R}(D)))}{\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{R}(D) \Big)}
 \end{equation}
 
+Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. Otherwise one could simple define the maximum potential overlap as 24 hours. However travels between places are not reflected in the  and therefore there will be gaps in the data. Ideally, travels such as commutes would also be included in the  by using both stops and moves to construct it.
 
-Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. Otherwise one could simple define the maximum potential overlap as 24 hours. However travels between places are not reflected in the Hour Matrix and therefore there will be gaps in the data. Ideally, travels such as commutes would also be included in the Hour Matrix by using both stops and moves to construct it.
-Below, in Figure \ref{routine-matrix-1} and Figure \ref{routine-matrix-1} are shown two examples of overlap matrices computed, and the resulting Routine Indices.
+\subsubsection*{Routine Index Example}
+Figure \ref{fig:fig:routine-matrix-example} displays two examples of the overlap matrix computed from two different set of matrices $\mathsf{A}$ and $\mathsf{B}$.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=\textwidth]{images/routine-numbers-1.pdf}
-    \caption{An example of the matrix R is computed with the overlap function of A and B. Here only 1 entry overlaps}
-    \label{fig:routine-matrix-1}
+    \includegraphics[width=0.7\textwidth]{images/routine-numbers-1.pdf}
+    \includegraphics[width=0.7\textwidth]{images/routine-numbers-2.pdf}
+    \caption{Two examples of the overlap function}
+    \label{fig:routine-matrix-example}
 \end{figure}
 
-For Figure \ref{fig:routine-matrix-1} the Routine Index becomes 
+For the first matrix, using Equation \eqref{eq:feature-routine-index}, the Routine Index becomes:
 
 \begin{equation}
 RI = \frac{1}{1 + 1 + 1} = \frac{1}{3}
 \end{equation}
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\textwidth]{images/routine-numbers-2.pdf}
-        \caption{An example of the matrix R is computed with the overlap function of A and B. Here several entries overlap}
-    \label{fig:routine-matrix-2}
-\end{figure}
-
-For Figure \ref{fig:routine-matrix-2} the Routine Index becomes
+For the second matrix, using Equation \eqref{eq:feature-routine-index}, the Routine Index becomes:
 
 \begin{equation}
 RI = \frac{1 + 2\cdot 0.5}{2} = 1

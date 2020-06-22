@@ -49,7 +49,7 @@ The normal constructor uses a GeoPosition, in addition to an arrival and departu
         this._departure, {this.placeId = -1});
 \end{minted}
 
-The Stop algorithm takes a List of LocationSamples as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) which delimit a subset of the input data we are currently considering with the outer loop. Every time the outer loop moves, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer., and the process is continued. Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a Place ID since Places have not yet been identified. Also, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency and likely won't be necessary in the general case.
+The Stop algorithm takes a List of LocationSamples as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) which delimit a subset of the input data we are currently considering with the outer loop. Every time the outer loop iterates, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer., and the process is continued. Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a Place ID since Places have not yet been identified. Also, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency and likely won't be necessary in the general case.
 
 \begin{minted}{dart}
     int start = 0;
@@ -58,7 +58,8 @@ The Stop algorithm takes a List of LocationSamples as input and uses two while-l
       List<LocationSample> subset = data.sublist(start, end);
       GeoPosition centroid = _computeCentroid(subset);
         
-      while (end < n && Distance.fromGeospatial(centroid, data[end]) <= stopRadius) {
+      while (end < n && 
+        Distance.fromGeospatial(centroid, data[end]) <= stopRadius) {
         end += 1;
         subset = data.sublist(start, end);
         centroid = _computeCentroid(subset);
@@ -136,9 +137,12 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
 
 \begin{minted}{dart}
   DBSCAN dbscan = DBSCAN(
-      epsilon: placeRadius, minPoints: 1, distanceMeasure: Distance.fromList);
+      epsilon: placeRadius, minPoints: 1, 
+      distanceMeasure: Distance.fromList);
+  
   List<List<double>> stopCoordinates =
-      stops.map((s) => ([s.geoPosition.latitude, s.geoPosition.longitude])).toList();
+      stops.map((s) => ([s.geoPosition.latitude, 
+        s.geoPosition.longitude])).toList();
 
   dbscan.run(stopCoordinates);
 
@@ -169,7 +173,8 @@ The Hour Matrix is an auxiliary feature used for internal computation and is the
           HOURS_IN_A_DAY, (_) => new List<double>.filled(numPlaces, 0.0));
     
       for (int j = 0; j < numPlaces; j++) {
-        List<Stop> stopsAtPlace = stops.where((s) => (s.placeId) == j).toList();
+        List<Stop> stopsAtPlace = stops
+            .where((s) => (s.placeId) == j).toList();
     
         for (Stop s in stopsAtPlace) {
           for (int i = 0; i < HOURS_IN_A_DAY; i++) {
