@@ -244,7 +244,7 @@ The maximum possible overlap is computed as the minimum of the two matrix sums, 
 
 
 \subsubsection*{Home Stay Computation}
-The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The Home Stay feature is no exception. The algorithm for computing Home Stay uses the Stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at home Place is calculated by summing the duration of the Stops which belong to the home Place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
+The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The home stay feature is no exception. The algorithm for computing home stay uses the stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home place is calculated by summing the duration of the Stops which belong to the home place. The home stay is then calculated as the time at home divided by the total time elapsed.
 
 \begin{figure}
     \centering
@@ -268,12 +268,12 @@ double _calculateHomeStay() {
   return homeTime.toDouble() / totalTime.toDouble();
 }
 \end{minted}
-    \caption{The method for computing the Home Stay feature}
+    \caption{The method for computing the home stay feature}
     \label{fig:home-stay-code}
 \end{figure}
 
 \subsubsection*{Routine Index}
-The Routine Index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the average Hour Matrix is computed. Lastly, the Routine Index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
+The routine index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the routine index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the average Hour Matrix is computed. Lastly, the routine index is found by computing the overlap between the two Hour Matrix of today, and the average Hour Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
 
 \begin{figure}
     \centering
@@ -295,7 +295,7 @@ The Routine Index is the most difficult to compute by far. The method for comput
       return this.hourMatrix.computeOverlap(avgMatrix);
     }
     \end{minted}
-    \caption{The method for computing the Routine Index feature}
+    \caption{The method for computing the routine index feature}
     \label{fig:routine-index-code}
 \end{figure}
 
@@ -310,7 +310,7 @@ MobilityContext._(this._stops, this._allPlaces, this._moves,
 }
 \end{minted}
 
-The other optional parameter is a List of Mobility Contexts is used for computing the Routine Index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
+The other optional parameter is a List of Mobility Contexts is used for computing the routine index - how this is achieved will be explained later in this section. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class. All of these features are accessed via getters, which retrieve the value of the field.
 
 \begin{figure}
     \centering
