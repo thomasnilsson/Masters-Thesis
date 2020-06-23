@@ -9,7 +9,7 @@ The features Number of Places, Home Stay, Entropy/Normalized Entropy, Location V
 \subsubsection*{How can these features be computed in real-time, on a smartphone device?}
 A combination of mathematical definitions and clever data storage and loading was necessary to achieve real-time feature computation: All features are computed using Location Samples collected from the current day. Certain mathematical re-definitions had to be made for the features such that they could be computed given a dataset from an incomplete day. A novel definition for the \textit{Routine Index} feature was in which \textit{Stops} from multiple days are used to compute the feature. These \textit{Stops} must be saved on the device and loaded whenever the feature computation takes place. \textit{Stops} effectively work as a compressed form of Location Samples and thus reduces the storage and allowed feature computation to be possible in real-time.
 
-\subsubsection*{How does the API design of such a software package look like?}
+\subsubsection*{How does the design of such a software package look like?}
 It was decided upon a design that provides an API with a high abstraction level that hides most of the feature computation implementation from the user. This design allows the programmer to compute the features with just 3 lines of code, excluding data collection. The implementation details hidden away from the user included storing and loading historical data as well as computing features using the historical- and daily data. 
 
 \subsubsection*{Validation of the Package}
