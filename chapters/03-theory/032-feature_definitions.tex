@@ -292,7 +292,7 @@ Given an array of \textit{Hour Matrices} for a period $D' = D - d_t$ (i.e. the h
 
 The feature can therefore indirectly be computed from the stops of the last 28 days which means only the stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 stops for a 4 week period. Computing the feature requires the places to be found, i.e. to run DBSCAN on the stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 
-The overlap function produces a matrix $\mathsf{O}$ given two matrices $\mathsf{A}$ and $\mathsf{b}$ of equal dimensions:
+The overlap function produces a matrix $\mathsf{O}$ given two matrices $\mathsf{A}$ and $\mathsf{B}$ of equal dimensions:
 
 \begin{equation}
 \label{eq:overlap-function}
@@ -313,16 +313,16 @@ The routine index for today $d_t$ given the historical dates $D$, is defined as 
 r(d_t, D) = \frac{\sum (\mathsf{O} (\mathsf{H}(d_t), \mathsf{R}(D)))}{\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{R}(D) \Big)}
 \end{equation}
 
-Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. Otherwise one could simple define the maximum potential overlap as 24 hours. However travels between places are not reflected in the  and therefore there will be gaps in the data. Ideally, travels such as commutes would also be included in the  by using both stops and moves to construct it.
+Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. Otherwise one could simple define the maximum potential overlap as 24 hours. However travels between places are not reflected in an Hour Matrix, which will lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.  
 
 \subsubsection*{Routine Index Examples}
 
 In Equation \eqref{eq:routine-example-1} we see the Hour Matrix (H) which tells the story of a user doing the following:
 
 \begin{itemize}
-    \item [Timeslot 1:] The user visits Place 1 for exactly one hour
-    \item [Timeslot 2:] The user visits Place 2 for exactly one hour
-    \item [Timeslot 3:] The user visits Place 1 again for exactly one hour
+    \item Timeslot 1: \textit{The user visits Place \#1 for exactly one hour}
+    \item Timeslot 2: \textit{The user visits Place \#2 for exactly one hour}
+    \item Timeslot 3: \textit{The user visits Place \#1 again for exactly one hour}
 \end{itemize}
 
 When compared to Routine Matrix (R) it only overlaps with one hour, where the maximum potential overlap is 3 hours, since both matrices sum to 3 hours. The routine index for these two matrices is thus  \label{eq:routine-index-1} 
@@ -358,9 +358,9 @@ For \eqref{eq:routine-example-1} the routine index becomes:
 In Equation \eqref{eq:routine-example-2} we see the Hour Matrix (H) which indicates the user does the following:
 
 \begin{itemize}
-    \item [Timeslot 1:] The user visits Place 1 and 3 for exactly half an hour each
-    \item [Timeslot 2:] The user visits Place 2 for exactly one hour
-    \item [Timeslot 3:] The user visits Place 1 and 3 for exactly half an hour each once again
+    \item Timeslot 1: \textit{The user visits Place \#1 and \#3 for exactly half an hour each}
+    \item Timeslot 2: \textit{The user visits Place \#2 for exactly one hour}
+    \item Timeslot 3: \textit{The user visits Place \#1 and \#3 for exactly half an hour each once again}
 \end{itemize}
 
 When compared to Routine Matrix (R) it overlaps with 2 hours in total. The maximum potential overlap is 2 hours, since the minimum matrix sum is $\sum \mathsf{R} = 2$ the routine index becomes 1 (See\label{eq:routine-index-2})

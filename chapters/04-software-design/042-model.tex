@@ -1,6 +1,6 @@
 \clearpage
 \section{Domain Model}
-The domain model aims to model the theoretical descriptions outlined in \ref{chapter:03} in an object-oriented manner.
+The domain model aims to model the theoretical descriptions outlined in Chapter \ref{chapter:03} in an object-oriented manner.
 
 \begin{figure}[h]
     \centering
@@ -21,9 +21,9 @@ An \textbf{Hour Matrix} class is used to calculate the \textit{Routine Index} fe
 
 A \textbf{Place} is defined by a GeoPosition computed from a list of \textit{Stops} and found with the DBSCAN algorithm. Many Stops can belong to the same Place, but a Stop can only belong to one specific place.\\
 
-A \textbf{Move} is constructed from a pair of \textit{Stops} as well as the set of \textit{LocationSamples} that was sampled in the time interval between the two \textit{Stops}. This set of LocationSamples is the path the user took between the two \textit{Stops}.\\
+A \textbf{Move} is constructed from a pair of \textit{Stops} as well as the set of \textit{Location Samples} that was sampled in the time interval between the two \textit{Stops}. This set of Location Samples is the path the user took between the two \textit{Stops}.\\
 
-A \textbf{Mobility Context} is a the component which holds all the mobility features. This includes the location features (i.e. stops, places and moves) as well as the derived features. The component is created from daily stops and moves as well as a list of places for the whole period. In addition, a set of Mobility Contexts from previous days needs to provided if the Routine Index feature is to be calculated, but is optional. \\
+A \textbf{Mobility Context} is a the component which holds all the mobility features. This includes the location features (i.e. stops, places and moves) as well as the derived features. The component is created from daily stops and moves as well as a list of places for the whole period. In addition, a set of Mobility Contexts from previous days needs to be provided if the Routine Index feature is to be calculated, but is optional. \\
 
 The \textbf{GeoSpatial (Interface)} forces any component implementing it to have a GeoPosition. This allows the Haversine distance to be calculated between components of different types.\\
 
