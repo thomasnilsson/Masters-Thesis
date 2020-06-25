@@ -118,16 +118,40 @@ The day-by-day results for the author are displayed in figure \ref{fig:plot-dail
     \caption{The answered and calculated data for each day for participant P8}
     \label{fig:plot-p8-features}
 \end{figure}
+
+
 \subsection{Measuring Errors}
+The RMSE was computed for all three features across participants and are shown in Table \ref{tab:error-table}. We observe the following:
 
-To say something about whether or not the algorithms undershoots or overshoots, the mean error for each participant was calculated as $ME = \frac{\sum(A) - \sum(F)}{N}$ (where $N$ is the total number of days for the specific feature, for the participant). If the result is \textit{positive} then the answered result was on average higher and vice versa if the result is \textit{negative}. Figure \ref{fig:plot-mean-error} shows the mean error for each feature, for each participant.\\
+\begin{itemize}
+    \item The Number of Places predicted deviates with almost 1 place daily.
 
-For the Number of Places feature, it can be observed that participants generally answer that they have been at more places than the algorithms calculate.\\
+    \item The Home Stay percentage deviates with 14\% daily.
 
-Regarding the Home Stay feature, it can be seen that it lies 10\% lower for half the participants (i.e. positive mean error), which was to be expected due to gaps in the sampled data. For a few participants the feature overshoots (i.e. negative mean error) although still within the 10\% error margin. For participant P2 it averages out to near zero percent and for participant P1 the feature undershoots dramatically with an error of 30\%.\\
+    \item The Routine Index deviates with 22.5\% daily. Here it is important to note than the Routine Index answer was given on scale with 20 percent increments which means that the 22.5\% RMSE is equivalent to one 'step' one the scale.
+\end{itemize}
 
-The Routine Index feature is very mixed with 6 participants answering higher than the algorithm and the remaining 4 being lower. All except for participant 6 deviating with almost 40\%. Routine Index answer was given on scale with 20 percent increments which means that the mean error is likely to lie much higher percentage-wise than the other two features.
-Very subjective\\
+\begin{table}[]
+    \centering
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+                        & \textbf{Number of Places} & \textbf{Home Stay} & \textbf{Routine Index} \\ \hline
+    \textbf{Mean RMSE}       & 0.99                      & 14.27 (\%)         & 22.5 (\%)              \\ \hline
+    \end{tabular}
+    \caption{The mean RMSE computed for all participants}
+    \label{tab:error-table}
+\end{table}
+
+
+To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as as $ME = \frac{\sum(F) - \sum(A)}{N}$ (where $N$ is the total number of days for the specific feature, for the participant). If the mean error is positive, the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has a sign, i.e. either positive or negative, the 'mean' mean error cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
+
+\begin{itemize}
+    \item The Number of Places feature undershoots by around 0.6 places or lower for most participants, with P7 being an outlier with -1.5 places. It is likely that the undershooting stems from gaps in the data, which can lead to places not being detected due to missing signal.
+
+    \item The Home Stay feature undershoots for 8/10 participants, most of these having an error under 10\%. For those two participants where the feature overshoots, the error is also within 10\%. It is highly likely that the undershooting stems from gaps in the data which will lead to an underestimation of the time spent at home.
+
+    \item The Routine Index feature is mixed with an equal number of participants for which it overshoots and undershoots. It is likely that both gaps in the data as well as subjectivity on a user basis leads to this varying result.
+\end{itemize}
 
 
 \begin{figure}[h]
@@ -135,8 +159,9 @@ Very subjective\\
     \includegraphics[width=\textwidth]{images/study/me_places.png}
     \includegraphics[width=\textwidth]{images/study/me_homestay.png}
     \includegraphics[width=\textwidth]{images/study/me_routine.png}
-    \caption{The mean error for each participant for each of the three features}
+    \caption{The mean error for each participant for each of the three features. A negative mean error means the computed feature undershoots, and a positive error means it overshoots}
     \label{fig:plot-mean-error}
 \end{figure}
+
 
 
