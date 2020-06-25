@@ -20,104 +20,45 @@ Mobile sensing is the ability to unobtrusively collect sensor data from built-in
 % \paragraph{Saeb et al.} 
 Saeb et al. provides a list of mobility features and relate them to mental state and user behaviour, the featueres are outlined in Table \ref{tab:saeb-features}. Out of these features the authors found that Home Stay, Location Variance, Normalized Entropy and Circadian movement correlate strongly with the PHQ9 score (see Appendix \ref{appendix:questionnaires}). Clinical assessment of depressive symptoms is usually done using questionnaires, such as the patient health questionnaire (PHQ-9). These questionnaires evaluate symptoms related to the patients state of mind, which for depressed patients tend to change. Saeb et al. finds a strong correlation between certain mobility features and the PHQ9 score obtained by the patients in a field study. Their findings therefore indicate that it is possible to monitor depression passively using GPS data tracked via the smart-phone. They explain that most people are unwilling to answer questions repeatedly over long periods of time, which is the case with an evaluation system based on the PHQ9 questionnaire. Passive monitoring via the patients smartphone could great improve the management of depression in populations by discovering relapses of high-risk patients earlier, so that they may receive the treatment they need before it is too late. \\
 
+\input{chapters/02-related-work/tables/saeb-table}
+
 % \paragraph{Canzian et al.} 
 Canzian et al. provides a contribution similar to Saeb et al. and additionally discusses how existing digital systems for diagnosing depression require the user to interact with the device. These interactions can be inputs such as mood-state provided a few times a day, which is highly subjective and thus error-prone. Canzian et al. addresses this issue via objective patient data, namely the mobility patterns of users. These patterns were derived from location data gathering through smartphone apps, which as Canzian et al. puts it, is unobtrusive monitoring. These patterns are described by the mobility metrics (i.e. features) listed in Table \ref{tab:canzian-features}. The authors found a significant correlation between these metrics and depressive moods similar to \cite{Saeb2015} for which the \textit{PHQ-8} questionnaire is used as  reference. This is the same questionnaire as the PHQ9, although only containing the first 8 questions. While Canzian et al. and Saeb et al. describe many of the same features, Canzian provides much more detailed definitions of the features. A good example of this is the \textit{Routine Index} feature, which loosely corresponds to the \textit{Circadian Rhythm} feature in \cite{Saeb2015}. Canzian et al. \cite{Canzian2015} uses the notion of trajectories including \textit{places} and \textit{moves} defined by Spaccapietra et al. \cite{trajectories2008} to define the \textit{mobility trace} feature. This feature is used to derive the rest of the features, which is also the approach used for this thesis, although the terminology differs slightly.\\
+
+\input{chapters/02-related-work/tables/canzian-table}
+
 
 % \paragraph{Cuttone et al.} 
 Cuttone et al. \cite{sparse-location-2014} investigates how accurate significant locations can be inferred from sparsely sampled location data using the GPS tracker in smartphones. For longitudinal studies it can be a problem for the phone battery if the sampling rate is too high. Therefore a more low-energy approach is used where the sampling rate- and the location accuracy are low. A small-scale study was conducted in which location data collected continuously and the users filled out an online diary on a daily basis. The aim was to compute features \textit{Stops} and \textit{Places of Interest (POI)} for each user and match them with the provided answers. These features are described in Table \ref{tab:features-cuttone}. \\
 
-\begin{table}[]
-    \centering
-\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
-\hline
-{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
-Place of Interest (POI)                        & \textit{Location of relevance frequented by the user, e.g. home, gym or workplace}                                                                                                                    \\ \hline
-Stop            & \textit{A visit to a POI with an arrival- and departure timestamp}                                                                                  \\ \hline
-\end{tabular}
-    \caption{The Mobility Features defined by Cuttone et al. \cite{sparse-location-2014}}
-    \label{tab:features-cuttone}
-\end{table}
+\input{chapters/02-related-work/tables/cuttone-table}
 
+The work by Palmius et al. \cite{palmius2017} aims to identify periods of depression using location data collected from mobile phones in a study of individuals suffering from bipolar disorder. The authors conclude that location data features can provide a useful tool for identifying depressive symptoms in bipolar patients. Palmius et al. uses many of the same features as Saeb et. al \cite{Saeb2015, saeb2016} which are found in Table \ref{tab:palmius-features}.
 
-\begin{table}[h]
-    \centering
-\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
-\hline
-{\ul \textbf{Feature}}      & {\ul \textbf{Description}}                                                                                                                     \\ \hline
-Number of Clusters          & \textit{Number of clusters found by the clustering algorithm}                                       \\ \hline
-Home Stay                   & \textit{Percentage of time stayed at the home cluster}                                              \\ \hline
-Location Variance           & \textit{Variance of the location of stationary points}                                              \\ \hline
-Location Entropy            & \textit{Entropy of the time distribution wrt. clusters}                                             \\ \hline
-Normalized Location Entropy & \textit{Entropy normalized by the maximum possible entropy. Invariant to the number of clusters} \\ \hline
-Transition Time             & \textit{Percentage of time not stationary}                                                                                                  \\ \hline
-Total Distance              & \textit{Total distance travelled}                                                                                                              \\ \hline
-Circadian Movement          & \textit{The degree to which changes in the location follow a 24 hour rhythm}                        \\ \hline
-\end{tabular}
-    \caption{The Mobility Features defined by Saeb et al. \cite{Saeb2015}}
-    \label{tab:saeb-features}
-\end{table}
-
-
-
-\begin{table}[h]
-    \centering
-\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
-\hline
-{\ul \textbf{Feature}}       & {\ul \textbf{Description}}                                                                                                                                        \\ \hline
-Place                        & \textit{A location the user frequently visits}                                                                                                                    \\ \hline
-Significant Place            & \textit{The top 10 most visited places out of all places}                                                                                  \\ \hline
-Move                         & \textit{A trajectory between two places}                                                                                                                          \\ \hline
-Mobility Trace               & \textit{The stops and moves a given time interval}                                                                                                                \\ \hline
-Total Distance               & \textit{Distance travelled for a given time interval}                                                                                                             \\ \hline
-Max Distance                 & \textit{Maximum distance between any two points for a given time interval}                                                                                        \\ \hline
-Radius of Gyration           & \textit{Radius of the area covered for a given time interval}                                                                                                     \\ \hline
-Standard deviation of Displacement         & \textit{Standard deviation for stop locations for a given time interval}                                                                                          \\ \hline
-Max Distance from Home       & \textit{Maximum distance from home to any place visited in a given time interval}                                                                                 \\ \hline
-Number of Places             & \textit{The number of unique places visisted for a given time interval}                                                                                           \\ \hline
-Number of Significant Places & \textit{The number of unique significant places visited for a given time interval}                                                                                \\ \hline
-Routine Index                & \textit{The average difference between the mobility behaviour of the user for a given interval, on a given day, compared to the same time interval on other days} \\ \hline
-\end{tabular}
-    \caption{The Mobility Features defined by Canzian et al. \cite{Canzian2015}}
-    \label{tab:canzian-features}
-\end{table}
-
-
-The work by Ashbrook et al. \cite{learning_significant_locations} from 2002 is one of the earliest contributions to the field of GPS data based user context. Here, user context refers to where the user will move next, given their current location. While this is not related to mental health necessarily, it is interesting to look into the approach taken given that it is a pioneering contribution. The features defined by Ashbrook are location features only, i.e. features consisting of a latitude and longitude and are shown in Table \ref{tab:features-ashbrook}. 
-
-
-
-\begin{table}[]
-    \centering
-\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
-\hline
-\textbf{Feature} & \textbf{Description}                                                               \\ \hline
-Place            & \textit{A geo-location at which the GPS signal could not reach such as a building} \\ \hline
-Location         & \textit{The centroid of a cluster of places}                                       \\ \hline
-Sublocation      & \textit{A location within a location, i.e. university building on a uni-campus}    \\ \hline
-\end{tabular}
-    \caption{The Mobility Features defined by Ashbrook et al. \cite{learning_significant_locations}}
-    \label{tab:features-ashbrook}
-\end{table}
-
+\input{chapters/02-related-work/tables/palmius-table}
 
 \subsection{Data Collection}
 % Canzian
-% \paragraph{Canzian et al.} 
 Canzian et al. built a custom Android app (MoodTraces) which collected data from 46 users over almost 10 months. The app had participants fill out a survey daily between 16:00 and 02:00 the subsequent day, where a phone notification prompted the participant to fill out the survey. Each survey contained a 'trap' question which asked whether the user was current at home or work. The answer to this question could be verified in the data analysis phase, and was used to filter out invalid surveys. The survey asked the user to name all the depressive symptoms they had on that day. PHQ8 score is normally done by asking every 14 days, and have the participant answer how many times they had a symptom over the last 14 days. By using the questionnaires, the PHQ8 scores could be computed by summing the amount of days with the symptoms, which in total add up to a score. It would happen that users forgot to fill out their questionnaire or gave an invalid survey response, in which case an interpolation method was used to cover gaps in the data.\\
 
 % Saeb
-% \paragraph{Saeb et al.} 
 Saeb et al. used a custom Android application, Purple Robot, which collected the users' GPS data with a sampling rate set to once every 5 minutes. Participants had the application manually installed on their existing phones or were given an Android phone with the app pre-installed on it which they were to use as their primary phone. Participants filled out a PHQ9 questionnaire just prior to starting the study, and once again once the study concluded after 14 days.\\
 
-% Ashbrook
-% \paragraph{Ashbrook et al.} 
-Ashbrook et al. wrote their contribution in 2002 where old-fashioned GPS receivers were the standard tool for collection location data. Sampling was done once per second which provides very high resolution, however GPS signals had less than ideal coverage in 2002 which meant that the receiver did not work indoors most of the time - which actually worked to their advantage since it made identifying places easier. In addition the GPS receiver also did not capture data if the user was moving at a speed of less than 1 kilometer per hour, to conserve battery. Six users participated in a 2002 study which lasted for seven months.\\
-
-% Cuttone
-% \paragraph{Cuttone et al.} 
+% Cuttone method
+ 
 Cuttone et al. conducted a study with 7 participants including the author, with the author being tracked for four months and the other participants being tracked for two months. Data collection was done with a custom smartphone app developed using the Funf Open Sensing framework \footnote{\url{https://www.funf.org/}}, where participants were provided an Android phone to use as their main phone. Sampling was carried out with a very low sampling rate of once were 15 minutes which had the upside of not draining the phone battery much. Participants were also instructed to fill out a daily diary of the place they had been at, and their movements. This was done through an online spreadsheet and participants were reminded via email. The authors comment that using diaries as ground truth is difficult due to participation compliance decreasing over time, since filling out a diary is tedious. In addition the concepts of stops and POIs are somewhat ambiguous and subjective which means that even if participants do fill out their diary, it is subjective and error-prone. This was evident in the study where participants would sometimes fill out sequences of POIs in the wrong temporal order, and entries were prone to have typos in them which later had to be manually corrected by the researcher. At the end of the study the participants were asked to create a subjective list of their POIs with coordinates obtained through Google Maps. \\
 
-\subsection{Computing Features}
+% Palmius method
+Palmius et al. collected data from 49 participants over 3 months in which a open-sourced Android application was used. Participants were provided an Android smart-phone with the app pre-installed in order to track their location for the duration of the study. Two groups of participants were recruited for the study:
+
+\begin{itemize}
+    \item Healthy patients with no symptoms (20)
+    \item Patients diagnosed with bipolar disorder or borderline personality disorder (29)
+\end{itemize}
+
+Patients self-reported via a questionnaire with 16 questions on a weekly basis which, similar to the PHQ questionnaire, scores the patient on a depression scale. Participants were reminded to fill out the questionnaire via e-mail on a weekly basis. The questionnaire could be completed until the next reminder was sent out, and because of this, an interpolation method was used to streamline the response times. This interpolation also corrected for whenever participants would forget to fill out the questionnaire. 
+
+\subsection{Data Processing}
 %Canzian features
 \paragraph{Canzian et al.} uses an algorithm for sampling location data in a way which saves phone battery but also helps identify places. For this, the accelerometer is used by an activity recognition algorithm to determine the user's activity state. This is done by modelling the user as being a state-machine with 3 states: 
 \begin{itemize}
@@ -129,7 +70,6 @@ Cuttone et al. conducted a study with 7 participants including the author, with 
 A user is said to arrive at a place if the transition $M \rightarrow U \rightarrow S$ happens and a departure is noted when $S \rightarrow U \rightarrow M$ happens. By using all the location samples in between the arrival and departure, the centroid of the place can be found using a clustering algorithm. In addition, an iterative clustering algorithm is used to merge places with close proximity to each other, specifically a distance of 200 meters is used as the merging criterion. \\ 
 
 % Saeb features
-% \paragraph{Saeb et al.} 
 Saeb et al. uses a two-stage pipeline for location data processing: 
 \begin{itemize}
     \item Each data point is labeled as either being in a stationary or transitional state by using the speed of each data point. Points are labeled using a threshold of 1 km/h; a speed lower than the threshold indicates the state is stationary and higher is a transitional point. 
@@ -138,12 +78,8 @@ Saeb et al. uses a two-stage pipeline for location data processing:
 
 After this pre-processing procedure was applied, the features described in Table \ref{tab:saeb-features} were derived.\\ 
 
-% Ashbrook Features
-% \paragraph{Ashbrook et al.} 
-Ashbrook et al. used the fact than the GPS receiver could not get a signal inside most buildings which was used to identify a user's \textit{places}. The GPS receiver used had a 15 meter accuracy meaning the location coordinates reported may be prone to noise. To remove noise the \textit{K-means} clustering algorithm was applied to the data which resulted in the \textit{locations} features. Inside \textit{locations}, a set of \textit{sub-locations} can be found, which are nodes in a network of small-scale locations. A prime example of a location with sub-locations is a university campus, where the sub-locations are the different department buildings. These features are listed in Table \ref{tab:features-ashbrook}. \\ 
-
 % Cuttone Features
-% \paragraph{Cuttone et al.} 
+
 Cuttone et al. used two main approaches for finding stops and POIs. The first in voles finding stops first and then grouping stops into POIs. The second approach works the other way around and identifies POIs first by clustering the location data, and infers the stops from these POIs afterward. For finding the stops, 2 different algorithms, Distance Grouping and Speed Thresholding, were tried each yielding similar results.
 
 \begin{itemize}
@@ -157,3 +93,20 @@ For both these algorithms, the DBSCAN clustering algorithm by Ester et al. \cite
 The second approach used a \textit{Gaussian Mixture Model} to cluster the raw location data into places, and infer the stops from these clusters. The upside to this method is that it is much simpler to perform on paper, but the downside is that it does not consider the temporal dimension at all which can contain a lot of useful information. This means the GMM uses more compute power than the other two approaches. \\
 
 For this thesis, a modified version of the distance grouping algorithm was chosen is described in Chapter \ref{chapter:03}.
+
+% Palmius Features
+Palmius et al. notes how the location data collected through the Android platform varies in accuracy based whether the data comes from a satelite, wireless access access points or cell-phone towers. The authors therefore performed a de-noising of the location data by removing points sampled close to each-other, analogous to how Cuttone et al. finds stops. The dataset was further down-sampled to a sample rate of 12 samples per hour. Additionally, data imputation was applied to cover gaps in the location data by using the mean latitude and longitude of the sample before and after the gap. \\
+
+For extracting location clusters, the down-sampled and imputed data was subjected to speed-thresholding using a speed of 1.5km/h as the threshold. Samples with a speed lower than this were considered stationary, and were clustered with the K-means++ algorithm, an improvement to the original K-means algorithm. The optimal number of clusters, $K$, was found by setting $K=1$ and increasing $K$ until a the centroids of all clusters were less than 400 meters apart. This parameter value was specific to their dataset.\\
+
+The home location cluster was identified by computing the most visited cluster between 02 AM and 07 AM. The remaining features were computed in a similar fashion to Saeb et al. from which the authors have drawn a lot of inspiration. Additionally, the \textit{Diurnal Movement} feature is equivalent to the \textit{Circadian Movement }feature from Saeb et al. (see Table \ref{tab:saeb-features}).\\
+
+A classification accuracy of 85\% was achieved by using 5 features found through cross-validation which were:
+
+\begin{itemize}
+    \item Entropy (WD)
+    \item Number of Clusters
+    \item Time Travelled (WD)
+    \item Diurnal Movement on the Distance From Home
+    \item Diurnal Movement
+\end{itemize}

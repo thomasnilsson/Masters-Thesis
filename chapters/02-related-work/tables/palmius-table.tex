@@ -1,0 +1,19 @@
+\begin{table}[]
+    \centering
+\begin{tabular}{|p{0.4\textwidth}|p{0.5\textwidth}|}
+\hline
+\textbf{Feature}                                 & \textbf{Description}                                                                                                                                                                                                      \\ \hline
+Entropy (E)                                      & \textit{A measure of the variability in the time that participants spend in the different locations recorded}                                                                                                             \\ \hline
+Normalized Entropy (NE)                          & \textit{Entropy normalized by the maximum possible entropy.}                                                                                                                                                              \\ \hline
+Location Variance (LV)                           & \textit{An indication of how much the individual is moving between different locations based on the sum of statistical variances in the latitude and longitude}                                                           \\ \hline
+Home Stay (HS)                                   & \textit{The percentage of time that the participant is recorded in their home location.}                                                                                                                                  \\ \hline
+Transition Time (TT)                             & \textit{The percentage of all the time spent travelling between stationary locations in the data recorded}                                                                                                                \\ \hline
+Total Distance (TD)                              & \textit{The sum of Euclidean distances between the consecutive location points recorded in the data}                                                                                                                      \\ \hline
+Number of Clusters (N)                           & \textit{The number of distinct location clusters extracted in the week-long data sections using the K-means method}                                                                                                       \\ \hline
+Diurnal Movement (DM)                            & \textit{A measure of daily regularity quantified using the Lomb-Scargle periodogram to determine the power in frequencies with wavelengths around 24 h.}                        \\ \hline
+Diurnal Movement on Normalised Coordinates (DMN) & \textit{Similar to the DM feature but calculated on a normalised set of coordinates, where the latitude and longitude are both scaled to have zero mean and unit variance within the period being classified.}            \\ \hline
+Diurnal Movement on the Distance From Home (DMD) & \textit{Similar to the DM and DMN features but calculated using the Euclidean distance from home, rather than latitude and longitude, normalised to have zero mean and unit variance within the period being classified.} \\ \hline
+\end{tabular}
+    \caption{The mobility features described by Palmius et al. \cite{palmius2017}}
+    \label{tab:palmius-features}
+\end{table}
