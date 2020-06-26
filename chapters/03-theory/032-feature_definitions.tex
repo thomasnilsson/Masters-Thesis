@@ -1,4 +1,4 @@
-\section{Feature Definitions}
+\section{Algorithms}
 \label{section:definitions}
 In this section, an overview of the algorithms used by the Mobility Feature Package will be provided including formal definitions and the considerations behind. The actual implementation will be discussed in chapter \ref{chapter:05}.\\
 
@@ -32,7 +32,20 @@ Peoples' habits will inevitably change somewhat over time, and if one compares t
 \subsection{Location Sample}
 A location sample is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two location samples $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ where $\delta$ is the \textit{Haversine} distance function.
 
-\subsection{Stop}
+
+\subsection{DBSCAN}
+The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an essential algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster location data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/dbscan-clusters.png}
+    \caption{Data from three different databases with very distinct cluster shapes. Database \#1 has very round clusters which would identified correctly with K-means whereas database \#2 and \#3 have clusters which would require a different clustering approach. Source: \cite{density-based-1996}}
+    \label{fig:dbscan_shapes}
+\end{figure}
+
+GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid. The DBSCAN algorithm will, given a set of geo-spatial data points find these dense clusters, as well as noisy data points. Clusters will in our case correspond to places and the noisy data points are outlier-stops which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.
+
+\subsection{Finding Stops}
 Finding stops is done by applying a modified version of the distance grouping procedure described by Cuttone et al. \cite{sparse-location-2014}. The modified algorithm traverses the location samples in temporal order, and adds the next location sample if it lies within the max-radius of the current stop. The modification is that when comparing each new location sample, the median location of the current stop is used rather than the distance between the current- and next location sample. The max-distance parameter therefore represents a stop-radius which is set to $r_{stop} = 25 \text{meters}$.  A stop is defined in Equation \eqref{eq:feature-stops}.
 
 \begin{equation}
@@ -68,7 +81,7 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 
 Given a stop $s$, the arrival is denoted $s.arrival$ and departure $s.departure$.
 
-\subsection{Place}
+\subsection{Finding Places}
 Similar to Cuttone et al. \textit{places} are found by clustering stops using the DBSCAN algorithm by Esther et al. \cite{density-based-1996}. All the stops today in the period $D$ should used to for finding places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}.
 
 \begin{equation}
@@ -91,7 +104,7 @@ The procedure for finding places defined in Algorithm \ref{algo:places}.
  \caption{Find Places}
 \end{algorithm}
 
-\subsection{Move}
+\subsection{Finding Moves}
 A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stop and the path is used to calculate the exact distance traveled.
 
 A set of moves is defined as 
@@ -185,7 +198,7 @@ T(k) =
 \end{equation}
 
 
-\subsection{Home Stay}
+\subsection{Home Stay Feature}
 The home stay feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. In the literature, the home cluster is defined as the cluster which the user spends the most time at between 00:00 and 06:00. In the work by Saeb et al. and Canzian et al. \cite{Saeb2015, saeb2016, Canzian2015} the home cluster was evaluated over the duration of the whole study, however we define it on a daily basis since the home cluster may change from day to day. Formally, the \textit{home place} $p_h (d_t)$ for the date $d_t$ where the index $h$ is found using Equation \eqref{eq:feature-home-place}.
 
 \begin{equation}
@@ -202,7 +215,7 @@ In the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} 
 
 Where $T_{now}$ is the departure time of the last known stop, and thus $T_{now} - T_0$ is the time elapsed since 00:00:00 today.
 
-\subsection{Total Distance Travelled}
+\subsection{Total Distance Travelled Feature}
 First we define the distance of a move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
 
 \begin{equation}
@@ -219,7 +232,7 @@ The \textit{Total Distance Travelled} for a date $d_t$ is defined as
 
 where $M$ refers to the moves on date $d_t$.
 
-\subsection{Number of Places}
+\subsection{Number of Places Feature}
 By using the DBSCAN algorithm to cluster a set of stops, each stop is given a cluster label, either being non-negative if it belongs to a cluster, or the label -1 if it is considered noise. The \textit{Number of Places} is therefore defined as the size of the set of non-negative cluster labels $K = \{k_1, k_2, ..., k_N\}$, i.e.
 
 \begin{equation}
@@ -227,7 +240,7 @@ By using the DBSCAN algorithm to cluster a set of stops, each stop is given a cl
 N = |K|
 \end{equation}
 
-\subsection{Location Variance}
+\subsection{Location Variance Feature}
 Defined by Saeb et al. \cite{Saeb2015}, the Location Variance is defined as the natural logarithm to the variance of the latitude and longitude coordinates summed together: 
 
 \begin{equation}
@@ -237,7 +250,7 @@ Defined by Saeb et al. \cite{Saeb2015}, the Location Variance is defined as the 
 
 The logarithm is applied in order to compensate for the skewness in the location distribution of location variances across users.
 
-\subsection{Entropy and Normalized Entropy}
+\subsection{Entropy and Normalized Entropy Features}
 Within the field of Information Theory, entropy is described in MacKay \cite{information-theory} as a quantity associated with a random variable, and can be interpreted as the average level of \textit{information} contained within the outcomes of that variable. 
 
 The Entropy $E(X)$ of the set of outcomes $X = \{x_1, x_2, ..., x_n\}$ is defined as
@@ -279,7 +292,7 @@ E_N(P) = \frac{E(P)}{E_{max}(P)} \in [0,1]
 
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
-\subsection{The Routine Index}
+\subsection{Routine Index Feature}
 \label{sub:routine-index}
 The routine index describes how similar the place-time distribution of a given day is, compared to previous days for a period $D$. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the routine index, a period length of 28 days was chosen, which means the routine index of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} involved using a different modelling approach and was therefore very complicate to compute.  Therefore, a more straightforward definition of the routine index was chosen. To the best of our knowledge this definition defined in Equation \eqref{eq:feature-routine-index} in conjunction with the concept of an hour matrix is novel, and models the feature as a similarly measure between two Hour Matrices. More exact, the routine index is a similarity measure between the hour matrix today and the 'average' hour matrix for the last 28 days. The result of the similarity measure is a scalar between 0 and 1 - a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. 
 
