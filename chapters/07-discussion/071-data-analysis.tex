@@ -64,7 +64,7 @@ The average size of a serialized \textit{LocationSample} was compted based on fi
 A thing to keep in mind is that the participants' answers are not ground truth, and there are multiple reasons why a participant's answer may be inaccurate. Firstly, people's subjective recollection is not necessarily as accurate as they think it might me. Secondly, it was not communicated explicitly to the participants what exactly counts as a place, and how their 'routine' is calculated - this means that participants may have filled out the questionnaire differently, given the same ground truth data - for example, whether or not being in the garden counts as being home. Thirdly, some users misunderstood the routine scale, and users whose data looked strange were contacted afterward to enquire about whether they had misunderstood the question, and if so the answers were corrected as much as could be done. Lastly, the hour away from home and routine index answers were very course-grained, and therefore the participants were probably rarely able to give exact answers, according to their own recollection. 
 
 \subsection{Missing Location Data and Answers}
-The sampling was set to once per second, yet data was not sampled uniformly. In fact, there were many gaps in the collected data. Figure \ref{fig:plot-gaps-data} shows the data of the author collected during the study over 24 days. The author was very diligent in tracking his location and yet substantial gaps in the data can be observed. These gaps are consistent in the morning where the phone is not moving around, but after 6 AM it seems there is no pattern for the gaps. This is a problem for computing the features, mostly the Routine Index feature due to relying on computing the overlap between days. The current implementation of the feature will ignore time-slots for which data is missing, which leads to a biased Routine Index.\\
+The sampling was set to once per second, yet data was not sampled uniformly. In fact, there were many gaps in the collected data. Figure \ref{fig:plot-gaps-data} shows the data of the author collected during the study over 24 days. The author was very diligent in tracking his location and yet substantial gaps in the data can be observed. These gaps are consistent in the morning where the phone is not moving around, but after 6 AM it seems there is no pattern for the gaps. The event plot for the collected data for particpant P8 is shown  in Figre \ref{fig:p8-gaps} in Appendix \ref{appendix:data-analysis}. \\
 
 
 \begin{figure}[h]
@@ -121,7 +121,15 @@ The day-by-day results for the author are displayed in figure \ref{fig:plot-dail
 
 
 \subsection{Measuring Errors}
-The RMSE was computed for all three features across participants and are shown in Table \ref{tab:error-table}. We observe the following:
+There are a few ways data errors can occur:
+
+\begin{itemize}
+    \item The computed feature can be wrong due to gaps in the data (\textit{data collection error})
+    \item The subjective answer from the user is wrong, e.g. if they misunderstood the concept of the question (\textit{answer error})
+    \item Both of a \textit{data collection error} and an \textit{answer error} are made at the same time
+\end{itemize}
+
+Given this can occur, the RMSE was still computed for all three features across participants is shown in Table \ref{tab:error-table}. We observe the following:
 
 \begin{itemize}
     \item The Number of Places predicted deviates with almost 1 place daily.
@@ -146,13 +154,12 @@ The RMSE was computed for all three features across participants and are shown i
 To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as as $ME = \frac{\sum(F) - \sum(A)}{N}$ (where $N$ is the total number of days for the specific feature, for the participant). If the mean error is positive, the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has a sign, i.e. either positive or negative, the 'mean' mean error cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
 
 \begin{itemize}
-    \item The Number of Places feature undershoots by around 0.6 places or lower for most participants, with P7 being an outlier with -1.5 places. It is likely that the undershooting stems from gaps in the data, which can lead to places not being detected due to missing signal.
+    \item The Number of Places feature undershoots by around 0.6 places or lower for most participants, with P7 being an outlier with -1.5 places. It is likely that the undershooting stems from \textit{data collection errors}, which can lead to places not being detected.
 
-    \item The Home Stay feature undershoots for 8/10 participants, most of these having an error under 10\%. For those two participants where the feature overshoots, the error is also within 10\%. It is highly likely that the undershooting stems from gaps in the data which will lead to an underestimation of the time spent at home.
+    \item The Home Stay feature undershoots for 8/10 participants, most of these having an error under 10\%. For those two participants where the feature overshoots, the error is also within 10\%. It is highly likely that the undershooting stems from \textit{data collection errors} leading to an underestimation of the time spent at home.
 
-    \item The Routine Index feature is mixed with an equal number of participants for which it overshoots and undershoots. It is likely that both gaps in the data as well as subjectivity on a user basis leads to this varying result.
+    \item The Routine Index feature is mixed with an equal number of participants for which it overshoots and undershoots. The current implementation of the feature will ignore time-slots for which data is missing, which leads to the Routine Index overshooting if a lot of data is missing. This feature is likely affected both by \textit{data collection errors} as well as \textit{answer errors}, hence the varying results.
 \end{itemize}
-
 
 \begin{figure}[h]
     \centering
