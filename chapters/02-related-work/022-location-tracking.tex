@@ -59,16 +59,6 @@ Palmius et al. collected data from 49 participants over 3 months in which a open
 Patients self-reported via a questionnaire with 16 questions on a weekly basis which, similar to the PHQ questionnaire, scores the patient on a depression scale. Participants were reminded to fill out the questionnaire via e-mail on a weekly basis. The questionnaire could be completed until the next reminder was sent out, and because of this, an interpolation method was used to streamline the response times. This interpolation also corrected for whenever participants would forget to fill out the questionnaire. 
 
 \subsection{Data Processing}
-%Canzian features
-\paragraph{Canzian et al.} uses an algorithm for sampling location data in a way which saves phone battery but also helps identify places. For this, the accelerometer is used by an activity recognition algorithm to determine the user's activity state. This is done by modelling the user as being a state-machine with 3 states: 
-\begin{itemize}
-    \item Static (S)
-    \item Moving (M)
-    \item Undecided (U)
-\end{itemize}
-
-A user is said to arrive at a place if the transition $M \rightarrow U \rightarrow S$ happens and a departure is noted when $S \rightarrow U \rightarrow M$ happens. By using all the location samples in between the arrival and departure, the centroid of the place can be found using a clustering algorithm. In addition, an iterative clustering algorithm is used to merge places with close proximity to each other, specifically a distance of 200 meters is used as the merging criterion. \\ 
-
 % Saeb features
 Saeb et al. uses a two-stage pipeline for location data processing: 
 \begin{itemize}
@@ -77,6 +67,16 @@ Saeb et al. uses a two-stage pipeline for location data processing:
 \end{itemize}
 
 After this pre-processing procedure was applied, the features described in Table \ref{tab:saeb-features} were derived.\\ 
+
+%Canzian features
+Canzian et al. uses an algorithm for sampling location data in a way which saves phone battery but also helps identify places. For this, the accelerometer is used by an activity recognition algorithm to determine the user's activity state. This is done by modelling the user as being a state-machine with 3 states: 
+\begin{itemize}
+    \item Static (S)
+    \item Moving (M)
+    \item Undecided (U)
+\end{itemize}
+
+A user is said to arrive at a place if the transition $M \rightarrow U \rightarrow S$ happens and a departure is noted when $S \rightarrow U \rightarrow M$ happens. By using all the location samples in between the arrival and departure, the centroid of the place can be found using a clustering algorithm. In addition, an iterative clustering algorithm is used to merge places with close proximity to each other, specifically a distance of 200 meters is used as the merging criterion. \\ 
 
 % Cuttone Features
 
@@ -99,7 +99,7 @@ Palmius et al. notes how the location data collected through the Android platfor
 
 For extracting location clusters, the down-sampled and imputed data was subjected to speed-thresholding using a speed of 1.5km/h as the threshold. Samples with a speed lower than this were considered stationary, and were clustered with the K-means++ algorithm, an improvement to the original K-means algorithm. The optimal number of clusters, $K$, was found by setting $K=1$ and increasing $K$ until a the centroids of all clusters were less than 400 meters apart. This parameter value was specific to their dataset.\\
 
-The home location cluster was identified by computing the most visited cluster between 02 AM and 07 AM. The remaining features were computed in a similar fashion to Saeb et al. from which the authors have drawn a lot of inspiration. Additionally, the \textit{Diurnal Movement} feature is equivalent to the \textit{Circadian Movement }feature from Saeb et al. (see Table \ref{tab:saeb-features}).\\
+The home location cluster was identified by computing the most visited cluster between 02 AM and 07 AM. The remaining features were computed in a similar fashion to Saeb et al. from which the authors have drawn a lot of inspiration. Additionally, the \textit{Diurnal Movement} feature is equivalent to the \textit{Circadian Movement }feature from Saeb et al. (see Table \ref{tab:saeb-features}). In addition to the features listed in Table \ref{tab:palmius-features}, Palmius et al. also creates a weekday and weekend subset of the features which are used in the feature selection process. It can expected for some individuals, namely full-time employees, to have very different feature values on weekdays where they work compared to the weekend.\\
 
 A classification accuracy of 85\% was achieved by using 5 features found through cross-validation which were:
 
@@ -110,3 +110,18 @@ A classification accuracy of 85\% was achieved by using 5 features found through
     \item Diurnal Movement on the Distance From Home
     \item Diurnal Movement
 \end{itemize}
+
+Here, WD refers to the feature computed on weekdays only.\\
+
+\subsection{Feature Discussion}
+Saeb et al. finds that the features that correlated the strongest with the PHQ9 score were 
+\begin{itemize}
+    \item Circadian Movement (negative)
+    \item Location Variance (negative)
+    \item Normalized Entropy (negative)
+    \item Home Stay (positive)
+\end{itemize}
+
+The authors discuss how the negative correlation of the Circadian Movement feature suggests that depressed individuals tend to have a less regular routine compared to people with non-symptomatic people. This relationship also exists for the Location Variance and Normalized Entropy which indicates that spending time at many different places is correlated with being depressed. A positive relationship exist between the Home Stay feature and the PHQ9 score, indicating that depressed individuals tend to stay at home a lot of the time. This means there is a duality; it is a sign of being depressed to be spend time at many places, but also to spend most of the time only at a single place, i.e. home.\\
+
+Palmius et al. also points this out and attributes their mis-classifications to how certain features may correlate differently with depressive symptoms, based on the patient. As an example they mention being employed at a full-time job, which keeps an individual tied to a routine, even if they are unwell. Another example provided is that some people choose to stay at home for reasons unrelated to their pathology. 
