@@ -38,7 +38,7 @@ For the \textit{Routine Index}, the answer (a number between 0 to 5) was transfo
     r = \frac{s}{5}
 \end{equation}
 
-Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but stops with a longer duration being found. The average size of a serialized LocationSample object was computed based on file size to be around 100 bytes, and serialized a Stop was 140 bytes. Since the number of stops vary to large degree, we will not compute the average, but will use the number of stops of participant P4, i.e. around 3000, as the upper bound. These stops were collected over 22 days (see Figure \ref{fig:plot-days-answered}), making for a total of 0.51 MB of stops if interpolated to 28 days. This is very much do-able from a storage perspective, but computationally speaking, it means that after 28 days over 3800 stops will have been accumulated. However this participant seems like an extreme outlier.\\
+Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but stops with a longer duration being found. The average size of a serialized LocationSample object was computed based on file size to be around 100 bytes and serialized a Stop was 140 bytes. Since the number of stops varies to a large degree, we will not compute the average but will use the number of stops of participant P4, i.e. around 3000, as the upper bound. These stops were collected over 22 days (see Figure \ref{fig:plot-days-answered}), making for a total of 0.51 MB of stops if interpolated to 28 days. This is very much doable from a storage perspective, but computationally speaking, it means that after 28 days over 3800 stops will have been accumulated. However, this participant seems like an extreme outlier.\\
 
 \begin{figure}
     \centering
@@ -51,7 +51,7 @@ Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how m
 
 
 \subsection{Missing Location Data and Answers}
-The sampling was set to once per second, yet data was not sampled uniformly. In fact, there were many gaps in the collected data. Figure \ref{fig:plot-gaps-data} shows the data of the author collected during the study over 24 days. The author had a relatively new phone (iPhone XS) and was diligent in making sure the phone was tracking the location as often as possible, yet still has significant gaps in his data. This means other participants that were less diligent or had older phones have even more gaps is still missing in certain periods. These gaps are consistent in the morning where the phone is not moving around, but after 6 AM it seems there is no pattern for the gaps. The event plot for the collected data for the diligent participant P8 is shown in Figure \ref{fig:p8-gaps} in Appendix \ref{appendix:data-analysis}. \\
+The sampling was set to once per second, yet data was not sampled uniformly. There were many gaps in the collected data. Figure \ref{fig:plot-gaps-data} shows the data of the author collected during the study over 24 days. The author had a relatively new phone (iPhone XS) and was diligent in making sure the phone was tracking the location as often as possible, yet still has significant gaps in his data. This means other participants that were less diligent or had older phones have even more gaps are still missing in certain periods. These gaps are consistent in the morning where the phone is not moving around, but after 6 AM it seems there is no pattern for the gaps. The event plot for the collected data for the diligent participant P8 is shown in Figure \ref{fig:p8-gaps} in Appendix \ref{appendix:data-analysis}. \\
 
 \begin{figure}[h]
     \centering
@@ -60,7 +60,7 @@ The sampling was set to once per second, yet data was not sampled uniformly. In 
     \label{fig:plot-gaps-data}
 \end{figure}
 
-Regarding the subjective user data, many users missed filling out the diary on several days. Figure \ref{fig:plot-days-answered} shows the number of total days where a participant participated in the study against the days on which they provided an answer. It was only possible to calculate the error between computed features and the answers on day, if the participant gave an answer. This means that for some participants, a lot of data was thrown away for the data analysis. As an example, it was considered whether or not to entirely get rid of P9 since he/she has very little data both terms of total days collected and even fewer in terms of days with answers. \\
+Regarding the subjective user data, many users missed filling out the diary on several days. Figure \ref{fig:plot-days-answered} shows the number of total days where a participant participated in the study against the days on which they provided an answer. It was only possible to calculate the error between computed features and the answers on the day if the participant answered. This means that for some participants, a lot of data was thrown away for the data analysis. As an example, it was considered whether or not to entirely get rid of P9 since he/she has very little data both terms of total days collected and even fewer in terms of days with answers. \\
 
 \begin{figure}[h]
     \centering
@@ -69,7 +69,7 @@ Regarding the subjective user data, many users missed filling out the diary on s
     \label{fig:plot-days-answered}
 \end{figure}
 
-Another problem that was encountered was when participants would fill out the questionnaire during the night, or the very next morning due to forgetting the previous evening. This meant the answer for day $n$ would be listed as date $n+1$, i.e. the wrong date.  In addition, some users entirely forgot certain days but remembered it the following day, and reported it manually to the researcher, and these answers were then added manually. These issues were rectified by changing all answers given between 00:00 and 10:00 to the previous date at 23:59:59.
+Another problem that was encountered was when participants would fill out the questionnaire during the night, or the very next morning due to forgetting the previous evening. This meant the answer for day $n$ would be listed as date $n+1$, i.e. the wrong date.  Also, some users entirely forgot certain days but remembered it the following day, and reported it manually to the researcher, and these answers were then added manually. These issues were rectified by changing all answers given between 00:00 and 10:00 to the previous date at 23:59:59.
 
 \subsection{Feature Evaluation}
 The Home Stay feature required the participant to track their location during the night, as previously mentioned. This meant that if they did not, the Home Stay feature could not be evaluated for that particular day, however other features might still be available for computation, such as the Number of Places. This meant that the number of days for which a given feature can be compared to the answers is not necessarily the same for all features. \\
@@ -107,7 +107,7 @@ The day-by-day results for the author are displayed in figure \ref{fig:plot-dail
 
 
 \subsection{Measuring Errors}
-A thing to keep in mind when comparing user answers to computed features is that the participants' answers are not ground truth, and there are multiple reasons why a participant's answer may be inaccurate. People's subjective recollection is not necessarily as accurate as they think it might me. Also, it was not communicated explicitly to the participants what exactly counts as a place, and how their 'routine' is calculated. This means that participants may have filled out the questionnaire differently. Lastly, the routine scale answer was very course-grained, and therefore the participants were probably rarely able to provide an exact answer, according to their own recollection. As such, there are a few ways \textit{data errors} may occur:
+A thing to keep in mind when comparing user answers to computed features is that the participants' answers are not ground truth, and there are multiple reasons why a participant's answer may be inaccurate. People's subjective recollection is not necessarily as accurate as they think it might me. Also, it was not communicated explicitly to the participants what exactly counts as a place, and how their 'routine' is calculated. This means that participants may have filled out the questionnaire differently. Lastly, the routine scale answer was very course-grained, and therefore the participants were probably rarely able to provide an exact answer, according to their recollection. As such, there are a few ways \textit{data errors} may occur:
 
 \begin{itemize}
     \item The computed feature can be wrong due to gaps in the data (\textit{data collection error})
@@ -118,11 +118,11 @@ A thing to keep in mind when comparing user answers to computed features is that
 The RMSE was computed for all three features across participants is shown in Table \ref{tab:error-table}. We observe the following:
 
 \begin{itemize}
-    \item The Number of Places features deviates with almost 1 place daily, compared the subjective answers.
+    \item The Number of Places features deviates with almost 1 place daily, compared to the subjective answers.
 
-    \item The Home Stay percentage deviates with 14\% daily, compared the subjective answers.
+    \item The Home Stay percentage deviates with 14\% daily, compared to the subjective answers.
 
-    \item The Routine Index deviates with 22.5\% daily, compared the subjective answers. Note that the Routine Index answer was given on scale with 20 \% increments, as such an RMSE of 22.5\% is equivalent to one step on the scale.
+    \item The Routine Index deviates with 22.5\% daily, compared to the subjective answers. Note that the Routine Index answer was given on scale with 20 \% increments, as such an RMSE of 22.5\% is equivalent to one step on the scale.
 \end{itemize}
 
 \begin{table}[]
@@ -137,7 +137,7 @@ The RMSE was computed for all three features across participants is shown in Tab
 \end{table}
 
 
-To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as as $ME = \frac{\sum f - \sum a}{N}$ where $f$ is a vector of the computed feature values, and $a$ is a vector the answer value. $N$ is the total number of days for which the specific feature could be evaluate for that participant. If the mean error is positive it means the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has a sign the values would be cancelling each other out and therefore the 'mean' mean error cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
+To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as $ME = \frac{\sum f - \sum a}{N}$ where $f$ is a vector of the computed feature values, and $a$ is a vector the answer value. $N$ is the total number of days for which the specific feature could be evaluated for that participant. If the mean error is positive it means the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has a sign the values would be canceling each other out and therefore the 'mean' mean error cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
 
 \begin{itemize}
     \item The Number of Places feature undershoots by around 0.6 places or lower for most participants, with P7 being an outlier with -1.5 places. It is likely that the undershooting stems from \textit{data collection errors}, which can lead to places not being detected.

@@ -1,9 +1,9 @@
 \section{Package Implementation}
-The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the domain data model were outlined. This section will go through selected examples of source code to demonstrate how the non-trivial parts of the package were built. This implementation deals with allowing features to be computed in real-time, on the device.\\
+The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the domain data model was outlined. This section will go through selected examples of source code to demonstrate how the non-trivial parts of the package were built. This implementation deals with allowing features to be computed in real-time, on the device.\\
 
-In the Dart programming language, fields, constructors and methods are declared private by using the underscore prefix, i.e. the field \verb|routineIndex| becomes \verb|_routineIndex|. This is used throughout the implementation to prevent the application programmer from access the inner parts of the package. Preventing access is a key factor is achieving a high level of abstraction.\\
+In the Dart programming language, fields, constructors, and methods are declared private by using the underscore prefix, i.e. the field \verb|routineIndex| becomes \verb|_routineIndex|. This is used throughout the implementation to prevent the application programmer from accessing the inner parts of the package. Preventing access is a key factor in achieving a high level of abstraction.\\
 
-Storing and loading data is a big part of the implementation, but is very generic nad has been moves to Appendix \ref{appendix:source-code}. Furthermore, the offline algorithms for computing features were developed in Python with a large part being carried out by Jonas Busk\footnote{\url{https://www.researchgate.net/scientific-contributions/2129480702_Jonas_Busk}}. Source code for these algorithms can be found in Appendix \ref{appendix:python-demo}.
+Storing and loading data is a big part of the implementation, but it is very generic and has been moved to Appendix \ref{appendix:source-code}. Furthermore, the offline algorithms for computing features were developed in Python with a large part being carried out by Jonas Busk\footnote{\url{https://www.researchgate.net/scientific-contributions/2129480702_Jonas_Busk}}. The source code for these algorithms can be found in Appendix \ref{appendix:python-demo}.
 
 \subsection{Domain Model Implementation}
 The components specified in the domain model in Chapter \ref{chapter:04} were implemented according to \ref{fig:uml-diagram}. All classes except LocationSample and GeoPosition were given private constructors. These two classes were given public constructors to allow the user instantiate a LocationSample with data from a given \textit{Location DTO}. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
@@ -56,8 +56,8 @@ The normal constructor uses a GeoPosition, in addition to an arrival and departu
 
 The Stop algorithm takes a List of LocationSample objects as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) to delimit a subset of the input data. Every time the outer loop iterates, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: \begin{itemize}
     \item With each iteration of the inner loop, the centroid of the current subset is computed.
-    \item If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer, and the process is continued.
-    \item Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a \textit{place ID} since Places  have not yet been identified.
+    \item If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer and the process is continued.
+    \item Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a \textit{place ID} since Places have not yet been identified.
 \end{itemize}
 
 Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. 
@@ -198,7 +198,7 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
 
 
 \subsubsection*{Hour Matrix Computation}
-The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. The matrix is filled out using the arrival- and depature timestamp of each Stop.
+The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. The matrix is filled out using the arrival- and departure timestamp of each Stop.
 
 \begin{figure}[h]
     \centering
@@ -341,7 +341,7 @@ The Routine Index is the most difficult to compute by far. The method for comput
 \end{figure}
 
 \subsection{MobilityContext}
-A MobilityContext object is an collection of features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the \verb|date| parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a MobilityContext for a date in the past.
+A MobilityContext object is a collection of features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the \verb|date| parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a MobilityContext for a date in the past.
 
 \begin{minted}{dart}
 MobilityContext._(this._stops, this._allPlaces, this._moves,
@@ -371,7 +371,7 @@ Another optional parameter is a List of MobilityContext objects is used for comp
 \end{figure}
 
 \subsubsection*{Lazy Evaluation}
-Lazy evaluation \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], in this context is the idea of postponing computation of a given feature until the first time it is needed. After being computed, the feature is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the features be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the its value is updated after the computation. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
+Lazy evaluation \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], in this context is the idea of postponing computation of a given feature until the first time it is needed. After being computed, the feature is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the features be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and then its value is updated after the computation. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
 
 \begin{figure}[h]
     \centering
@@ -407,7 +407,7 @@ static Future<MobilityContext> generate(
       {bool usePriorContexts: false, DateTime today}) {...}
 \end{minted}
 
-First, the file system is queried by initializing the three different MobilitySerializers (see Appendix \ref{appendix:source-code}), i.e. one for LocationSample objects, another for Stops and a third one for Moves. Next, LocationSample objects are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
+First, the file system is queried by initializing the three different MobilitySerializers (see Appendix \ref{appendix:source-code}), i.e. one for LocationSample objects, another for Stops and the third one for Moves. Next, LocationSample objects are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
 
 \begin{minted}{dart}
 List<LocationSample> samplesToday = await sampleSerializer.load();

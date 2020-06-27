@@ -32,7 +32,7 @@ Features are computed using the 3 lines of code displayed in Figure \ref{fig:cod
 The exact method for arriving at this stage is outlined in the following 4 steps.
 
 \subsection*{Step 1: Collect location data}
-Location data collection is, as mentioned, not part of the Mobility Features package. The location plugin can be flexibily chosen by the programmer. An example of such a plugin the \textit{GeoLocator} plugin\footnote{\url{https://pub.dev/packages/geolocator}}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
+Location data collection is, as mentioned, not part of the Mobility Features package. The location plugin can be flexibly chosen by the programmer. An example of such a plugin the \textit{GeoLocator} plugin\footnote{\url{https://pub.dev/packages/geolocator}}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
 
 Below is shown an example where incoming \verb|Position| objects are coming in from the \textit{GeoLocator} plugin and are being handled after saved to a list, in the \verb|_onData()| call-back method.
 
@@ -48,7 +48,7 @@ void _onData(Position d) async {
 \end{minted}
 
 \subsubsection*{Step 2: Save location data}
-The location data must be saved on the device such that it can be used in the future. Saving the data to persistent storage prevents it from being lost should the RAM reset. Given that the programmer has a collected the samples in a list, the samples can be serialized using the \verb|save()| method of the MobilitySerializer.
+The location data must be saved on the device such that it can be used in the future. Saving the data to persistent storage prevents it from being lost should the RAM reset. Given that the programmer has collected the samples in a list, the samples can be serialized using the \verb|save()| method of the MobilitySerializer.
 
 \begin{minted}{dart}
 await ContextGenerator.saveSamples(locationSamples)

@@ -2,7 +2,7 @@
 This section will describe the study application in terms of components and will illustrate how the application looked.
 
 \subsection{Installing the Application}
-The application was only released on iOS as previously mentioned and was distributed exclusively via the Apple's TestFlight service. 
+The application was only released on iOS as previously mentioned and was distributed exclusively via Apple's TestFlight service. 
 
 Once the user had such an invitation the installation process was the following: 
 \begin{itemize}
@@ -24,7 +24,7 @@ The location tracking is necessary for the collection of location data whereas n
 \end{figure}
 
 \subsection{App Screens}
-The Main Page of the application displays a list of instructions and does not have any interesting functionality. From the main screen it is possible to navigate to the Info Page and the Diary Page, from the navigation bar in the top. The Info Page is made to inform the user of how the data will be used, and an email to contact the researcher in case of any questions. \\
+The Main Page of the application displays a list of instructions and does not have any interesting functionality. From the main screen, it is possible to navigate to the Info Page and the Diary Page, from the navigation bar at the top. The Info Page is made to inform the user of how the data will be used, and an email to contact the researcher in case of any questions. \\
 
 The Diary Page contains the questionnaire the user has to answer daily. The user can either navigate to this page themselves or tap the notification they receive each evening. The four questions can be answered by pressing the \textit{Pick an Answer}-button which will show a wheel of possible values to pick an answer from. Once all questions have been answered, the submit button will be enabled. Submitting the answers will upload the answers to a server, and store them on the device as well. When storing is done, the last screen will appear which informs the user the answers have been saved and thanks them for their contribution.
 
@@ -46,4 +46,4 @@ An initial version of the application included a display of the real-time calcul
 \end{figure}
 
 \subsection{Data Storage}
-To store the data from the study online, such that it could later be extracted for data analysis, a Firebase file storage server was used for uploading files multiple times daily. Concretely, the LocationSamples, Stops, and Moves were stored locally on the device. Whenever a Feature calculation was triggered, the calculated MobilityContext was serialized and uploaded as a file, in addition to the data points for the day and all Stops and Moves on the phone for last 28 days (see Chapter \ref{chapter:03}).
+To store the data from the study online, such that it could later be extracted for data analysis, a Firebase file storage server was used for uploading files multiple times daily. Concretely, the LocationSamples, Stops, and Moves were stored locally on the device. Whenever a Feature calculation was triggered, the calculated MobilityContext was serialized and uploaded as a file, in addition to the data points for the day and all Stops and Moves on the phone for the last 28 days (see Chapter \ref{chapter:03}).
