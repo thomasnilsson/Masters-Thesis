@@ -1,5 +1,5 @@
 \section{Data Analysis of Study}
-As discussed, the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants. Table \ref{tab:location-samples} shows the overview of the data collected for each participant, including the number of points, number of days and the storage requirements for the collected data.\\
+As described in Chapter \ref{chapter:06} the participants had to fill out a small questionnaire every day in the evening and these answers were then matched against the computed results. The study resulted in a dataset with 205 days of data, corresponding to 2.51M timestamped location data points, spread over 10 participants. Table \ref{tab:location-samples} shows the overview of the data collected for each participant, including the number of points, number of days and the storage requirements for the collected data.\\
 
 Similar to Cuttone et al. \cite{sparse-location-2014}, the participants have been anonymized as \textit{P1} through \textit{P9}, and the author has been marked as \textit{R} (researcher).\\
 
@@ -38,7 +38,9 @@ For the \textit{Routine Index}, the answer (a number between 0 to 5) was transfo
     r = \frac{s}{5}
 \end{equation}
 
-Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but stops with a longer duration being found. The average size of a serialized LocationSample object was computed based on file size to be around 100 bytes and serialized a Stop was 140 bytes. Since the number of stops varies to a large degree, we will not compute the average but will use the number of stops of participant P4, i.e. around 3000, as the upper bound. These stops were collected over 22 days (see Figure \ref{fig:plot-days-answered}), making for a total of 0.51 MB of stops if interpolated to 28 days. This is very much doable from a storage perspective, but computationally speaking, it means that after 28 days over 3800 stops will have been accumulated. However, this participant seems like an extreme outlier.\\
+Regarding data collection, figure \ref{fig:plot-num-points-stops} displays how much data was collected per participant. From this figure, it is clear that some participants did not collect nearly as much data as others, and because of this their computed features are expected to be more inaccurate. It was also discovered that the number of stops found is not necessarily correlated with the number of location samples found, as can be seen for participant P7. This can be due to reasons such as moving around much less, which results in fewer but stops with a longer duration being found.\\
+
+The average size of a serialized LocationSample object was computed based on file size to be around 100 bytes and a serialized Stop was 140 bytes. Since the number of stops varies to a large degree, we will not compute the average but will instead use the number of stops of the participant with the most stops as the upper bound (i.e. participant P4). Participant P4 was tracked over over 22 days (see Figure \ref{fig:plot-days-answered}), making for a total of 0.51 MB of stops if interpolated to 28 days. This is very much doable from a storage perspective, but computationally speaking, it means that after 28 days over 3800 stops will have been accumulated. However, this participant seems like an extreme outlier.\\
 
 \begin{figure}
     \centering
@@ -83,7 +85,7 @@ The Home Stay feature required the participant to track their location during th
     \label{fig:plot-daily}
 \end{figure}
 
-The Home Stay feature is calculated by using the \textit{tracked} time at home, divided by the total time elapsed since midnight, and therefore a small gap in the data will make the feature undershoot. It is therefore to be expected that this feature will lie somewhat lower than the answer given by the user since there will be gaps in the data. \\
+The Home Stay feature is calculated by using the \textit{tracked} time at home, divided by the total time elapsed since midnight, and therefore a small gap in the data will make the feature undershoot. Due to the observed gaps in the data, it is expected that this feature will lie somewhat lower than the answer given by the user since there will be gaps in the data. \\
 
 \begin{figure}[h]
     \centering
@@ -137,7 +139,7 @@ The RMSE was computed for all three features across participants is shown in Tab
 \end{table}
 
 
-To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as $ME = \frac{\sum f - \sum a}{N}$ where $f$ is a vector of the computed feature values, and $a$ is a vector the answer value. $N$ is the total number of days for which the specific feature could be evaluated for that participant. If the mean error is positive it means the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has a sign the values would be canceling each other out and therefore the 'mean' mean error cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
+To say something about whether or not the features undershoot or overshoot, the mean error was calculated for each participant as $ME = \frac{\sum f - \sum a}{N}$ where $f$ is a vector of the computed feature values, and $a$ is a vector the answer value. $N$ is the total number of days for which the specific feature could be evaluated for that participant. If the mean error is positive it means the feature overshoots compared to the answered value, and vice versa if the error is negative. Since the mean error has either a positive or negative sign the values would be canceling each other out and therefore the mean of means cannot be computed. Instead, the individual mean error for each participant is plotted in Figure \ref{fig:plot-mean-error}. From this figure we observe the following:
 
 \begin{itemize}
     \item The Number of Places feature undershoots by around 0.6 places or lower for most participants, with P7 being an outlier with -1.5 places. It is likely that the undershooting stems from \textit{data collection errors}, which can lead to places not being detected.

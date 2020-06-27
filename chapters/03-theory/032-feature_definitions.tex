@@ -34,7 +34,7 @@ A location sample is a timestamped location and is defined by the tuple $x = (T,
 
 
 \subsection{DBSCAN}
-The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shape and size, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.\\
+The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is done in the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shape and size, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.\\
 
 \begin{figure}[h]
     \centering
@@ -50,7 +50,6 @@ The DBSCAN algorithm will, given a set of geospatial data points find these dens
 For finding clusters, DBSCAN takes three different parameters as input:
 
 \begin{itemize}
-    \itemsep0em 
     \item A distance measure, in the Mobility Feature Package the haversine distance function is used
     \item A distance threshold for two points to be considered to lie within the same cluster
     \item The minimum number of points required to make a cluster, which by default is 1. 
@@ -65,7 +64,7 @@ Finding stops is done by applying a modified version of the distance grouping pr
 S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)
 \end{equation}
 
-The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the stop $s_i$, respectively. Given a stop $s$, $\Delta_ T(s)$ is the function for calculating the duration of the stop. Stops are found using Algorithm \ref{algo:stops}.
+The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the stop $s_i$, respectively. Given a stop $s$, $\Delta_ T(s)$ is the function for calculating the duration of the stop. Stops are found using Algorithm 1.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -89,7 +88,7 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
  $S' \leftarrow S | \Delta_ T(s_i) > t_{stop}$ for all $s_i \in S$;\\
  \textbf{return} $S'$\;
  \label{algo:stops}
- \caption{Find Stops}
+ \caption{The algorithm for finding Stops}
 \end{algorithm}
 
 Given a stop $s$, the arrival is denoted $s.arrival$ and departure $s.departure$.
@@ -103,7 +102,7 @@ P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}
 \end{equation}
 
  
-The procedure for finding places defined in Algorithm \ref{algo:places}.
+The procedure for finding places defined in Algorithm 2.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -115,7 +114,7 @@ The procedure for finding places defined in Algorithm \ref{algo:places}.
     $p_i = S'_i$ where each stop $s \in S'_i$ has the label $l_i$;\\
     \textbf{return} $P = \{p_i : i = 0, ..., N\}$;\\
  \label{algo:places}
- \caption{Find Places}
+ \caption{The algorithm for finding Places}
 \end{algorithm}
 
 \subsection{Finding Moves}
@@ -126,7 +125,7 @@ A move is calculated using the stops- and the location sample by going through e
 M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}
 \end{equation}
 
-Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
+Moves are found using the following procedure outlined in Algorithm 3.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -142,14 +141,15 @@ Moves are found using the following procedure outlined in Algorithm \ref{algo:mo
     }
     \textbf{return} $M$;
  \label{algo:moves}
- \caption{Find Moves}
+ \caption{The algorithm for finding Moves}
 \end{algorithm}
 
 
 \subsection{Hour Matrix}
 \label{sub:hour-matrix}
 The Hour Matrix is an auxiliary feature used to compute the home stay and Routine Index feature. It is a matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The Hour Matrix represents the time-place distribution for the user during a day.
-\begin{figure}
+
+\begin{figure}[h]
     \centering
     \begin{tabular}{|l|l|l|l|l|}
     \hline
@@ -339,7 +339,7 @@ r(d_t, D) = \frac{\sum (\mathsf{O} (\mathsf{H}(d_t), \mathsf{R}(D)))}{\min \Big(
 \paragraph{Comments on the Routine Index}\\
 Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. In addition, this also makes the feature reflect the time of the day at which it is calculated: Entries for the hours later than the current time are not yet observed and are therefore ignored.\\
 
-An alternative, a simpler definition is to use 24 hours as the maximum potential overlap. However since travels between places are not reflected in an Hour Matrix, this would lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.\\
+An alternative, a simpler definition is to use 24 hours as the maximum potential overlap. However since travels between places are not reflected in an Hour Matrix, this would lead to gaps in the data since it takes time to move between places. \\
 
 Since the feature can indirectly be computed from the stops of the last 28 days, only the stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 stops for a 4 week period. Computing the feature requires the places to be found, i.e. to run DBSCAN on the stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 

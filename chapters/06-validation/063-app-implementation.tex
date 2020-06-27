@@ -4,10 +4,10 @@ The application used for the study used an earlier version of the Mobility Featu
 \subsection{Architecture Overview}
 To provide a high-level overview of the different classes which make up the study application, a high-level class diagram is displayed in Figure \ref{fig:app-class-diagram}. The MobilityStudy class is responsible for managing the application state but does not do much outside of this since the application state management required is minimal. The Main Screen class is spawned from the MobilityStudy class and runs an instance of the AppProcessor class. The AppProcessor instance is responsible for a multitude of tasks, such as asking for permissions, collection location data, and computing features. Storing and loading from the disk is done through the FileManager class which includes LocationSamples Stops, Moves, MobilityContexts, and diary answers. This class is also responsible for uploading the stored data to a Firebase server.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.7\textwidth]{images/diagrams/app-diagram.pdf}
-    \caption{class diagram for the study application displaying the different building blocks and the interactions between them}
+    \caption{The class diagram for the study application displaying the different building blocks and the interactions between them}
     \label{fig:app-class-diagram}
 \end{figure}
 
@@ -36,7 +36,7 @@ await _geoLocator.isLocationServiceEnabled().then((response) {
 
 This call-back method is the \verb|_onData| method which is responsible for saving the collected data. It does so by first converting the Position DTO object into a LocationSample DTO object, and then adding it to a buffer. This buffer is implemented as a List of LocationSamples and when the number of samples in this buffer exceeds 100, the content of the buffer will be stored to disk via the \verb|ContextGenerator|. Afterward, the buffer is emptied, and the process starts anew. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
       void _onData(Position x) async {
