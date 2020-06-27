@@ -103,7 +103,7 @@ The Move class has two constructors which are both private. Common for both cons
 \end{minted}
 The normal constructor is used for de-serialization whereas the factory constructor is used to create a Move given two Stops and the path of samples between them.
 
-The algorithm for finding Moves takes a List of \textit{LocationSamples} and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If, the set of Stops is not empty, then two 'fake' Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop, and the path between. 
+The algorithm for finding Moves takes a List of \textit{LocationSamples} and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If, the set of Stops is not empty, then the two placeholder Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop, and the path between. 
 
 \begin{minted}{dart}
   Stop first = Stop._fromLocationSamples([data.first]);
@@ -125,8 +125,6 @@ The algorithm for finding Moves takes a List of \textit{LocationSamples} and the
     moves.add(Move._fromPath(cur, next, samplesInBetween));
   }
 \end{minted}
-
-The notion of fake Stops is an addition to the definition in Chapter \ref{chapter:03}, and are created to avoid edge cases where tracking was started while moving. In such a case no Moves will be created before the user is stationary for some time at least one Stop is found. This situation will likely not be very common, but was found during self-study and therefore deemed worthy of covering. The extra Stops are only used for finding moves and will not be used for finding Places.
 
 \subsubsection*{Finding Places}
 The Place class only has one normal constructor which takes an ID (an integer) and a List of Stops. 

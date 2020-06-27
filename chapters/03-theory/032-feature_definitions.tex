@@ -34,7 +34,7 @@ A location sample is a timestamped location and is defined by the tuple $x = (T,
 
 
 \subsection{DBSCAN}
-The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an essential algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster location data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.
+The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an essential algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster location data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.\\
 
 \begin{figure}[h]
     \centering
@@ -43,17 +43,27 @@ The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an ess
     \label{fig:dbscan_shapes}
 \end{figure}
 
-GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid. The DBSCAN algorithm will, given a set of geo-spatial data points find these dense clusters, as well as noisy data points. Clusters will in our case correspond to places and the noisy data points are outlier-stops which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.
+GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid. The DBSCAN algorithm will, given a set of geo-spatial data points find these dense clusters, as well as noisy data points. Clusters will in our case correspond to places and the noisy data points are outlier-stops which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.\\
+
+DBSCAN takes as input three different parameters:
+
+\begin{itemize}
+    \item A distance measure
+    \item Epsilon
+    \item Minimum number of points
+\end{itemize}
+
+The distance measure in our case is the haversine distance function since we are computing distances on the Earth's surface. The epsilon parameter is a distance threshold for two points to be considered to lie within the same cluster. The last parameter is the minimum number of points required to make a cluster which by default is 1. 
 
 \subsection{Finding Stops}
-Finding stops is done by applying a modified version of the distance grouping procedure described by Cuttone et al. \cite{sparse-location-2014}. The modified algorithm traverses the location samples in temporal order, and adds the next location sample if it lies within the max-radius of the current stop. The modification is that when comparing each new location sample, the median location of the current stop is used rather than the distance between the current- and next location sample. The max-distance parameter therefore represents a stop-radius which is set to $r_{stop} = 25 \text{meters}$.  A stop is defined in Equation \eqref{eq:feature-stops}.
+Finding stops is done by applying a modified version of the distance grouping procedure described by Cuttone et al. \cite{sparse-location-2014}. The modified algorithm traverses the location samples in temporal order, and adds the next location sample if it lies within the max-radius of the current stop. The modification is that when comparing each new location sample, the median location of the current stop is used rather than the distance between the current- and next location sample. Another modification is the duration-filtering, which removes stops shorter than a given minimum duration. The max-distance parameter is set to $r_{stop} = 25 \text{meters}$ and the minimum duration is set to $t_{stop} = 3 \text{minutes}$. A stop is defined in Equation \eqref{eq:feature-stops}.
 
 \begin{equation}
 \label{eq:feature-stops}
 S = \{s_1, s_2, ..., s_{|S|}\} \;| \; s_i = (T_{arr}, T_{dep}, l)
 \end{equation}
 
-The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the stop $s_i$, respectively. Stops are found using Algorithm \ref{algo:stops}.
+The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure timestamp and the cluster location for the stop $s_i$, respectively. Given a stop $s$, $\Delta_ T(s)$ is the function for calculating the duration of the stop. Stops are found using Algorithm \ref{algo:stops}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -74,7 +84,8 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
         }
     }
  }
- \textbf{return} $S$\;
+ $S' \leftarrow S | \Delta_ T(s_i) > t_{stop}$ for all $s_i \in S$;\\
+ \textbf{return} $S'$\;
  \label{algo:stops}
  \caption{Find Stops}
 \end{algorithm}
@@ -82,7 +93,7 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 Given a stop $s$, the arrival is denoted $s.arrival$ and departure $s.departure$.
 
 \subsection{Finding Places}
-Similar to Cuttone et al. \textit{places} are found by clustering stops using the DBSCAN algorithm by Esther et al. \cite{density-based-1996}. All the stops today in the period $D$ should used to for finding places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}.
+Similar to Cuttone et al. \textit{places} are found by clustering stops using the DBSCAN algorithm by Esther et al. \cite{density-based-1996}. The epsilon parameter of the DBSCAN algorithm is set to 50 meters - this parameter value was found in a self-study described in Chapter \ref{chapter:06}. All the stops today in the period $D$ should used to for finding places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}. 
 
 \begin{equation}
 \label{eq:feature-places}
@@ -105,7 +116,7 @@ The procedure for finding places defined in Algorithm \ref{algo:places}.
 \end{algorithm}
 
 \subsection{Finding Moves}
-A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stop and the path is used to calculate the exact distance traveled.
+A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stop and the path is used to calculate the exact distance traveled. In addition, two placeholder stops are created by using the first and the latest location sample. This is done to avoid edge cases where tracking was started while moving. In such a case no moves can be created before the user is stationary for some time and at least one stop has been discovered. These stops are not used for finding places.\\
 
 A set of moves is defined as 
 
@@ -120,7 +131,8 @@ is a set of time-ordered location samples. Moves are found using the following p
 \SetAlgoLined
 \algorithmicrequire{ set of stops, $S$, set of time ordered data points, $X$}\\
 \algorithmicensure{ set of moves, $P$}\\
-    $M = \{ \}$\;
+    $M = \{ \}$\;\\
+    $S = S \cup \{x_0, x_|X|\}$;\\
     \For{$s_i \in S$}{
     $X_i = x$ for which $s_{i}.departure \leq x.timestamp \leq s_{i+1}.arrival$;\\
     $d_i = \sum_{x_j \in X_i} \delta(x_j, x_{j+1})$;\\
@@ -170,7 +182,7 @@ Formally, given a period ($D$) for which the number of places is given as $N$ th
 \mathsf{H}(d_t) \in [0,1]^{24 \times N}, \sum_{j=1}^N \mathsf{H}^{d_t}_{i,j} \leq 1
 \end{equation}
 
-Given a stop $s$, let $i = hour(s.arrival)$, $j = hour(s.departure)$ and $\Delta_ T(\cdot)$ is the function for calculating the duration in hours.
+Given a stop $s$, let $i = hour(s.arrival)$, $j = hour(s.departure)$.
 
 \begin{equation}
 \label{eq:feature-hour-matrix-computation}
@@ -326,7 +338,7 @@ The routine index for today $d_t$ given the historical dates $D$, is defined as 
 r(d_t, D) = \frac{\sum (\mathsf{O} (\mathsf{H}(d_t), \mathsf{R}(D)))}{\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{R}(D) \Big)}
 \end{equation}
 
-Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. Otherwise one could simple define the maximum potential overlap as 24 hours. However travels between places are not reflected in an Hour Matrix, which will lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.  
+Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. In addition this also makes the feature reflect the time of the day at which it is calculated: Entries for the hours later than the current time are not yet observed and are therefore ignored. An alternative, simpler definition is to use 24 hours as the maximum potential overlap. However since travels between places are not reflected in an Hour Matrix, this would lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.  
 
 \subsubsection*{Routine Index Examples}
 
