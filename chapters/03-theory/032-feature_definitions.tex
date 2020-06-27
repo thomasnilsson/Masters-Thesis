@@ -25,27 +25,29 @@ The Mobility Features included in the Mobility Features package are a subset of 
 \end{table}
 
 \subsection{Dates and Periods}
-For collecting data over time, we define today's date as $d_t$ an the yesterday as $d_{t-1}$ in order to define a period as the set of today's date and it's preceding 28 dates defined as $D = \{d_{t-28}, d_{t-27}, ..., d_{t}\}$. This definition is necessary for computing the routine index feature, since the feature is computed by comparing today with the last 28 days. The reason for choosing 28 days, i.e. 4 weeks is that we wish to capture people's routine at the moment. \\
+For collecting data over time, we define today's date as $d_t$ and the date yesterday as $d_{t-1}$ in order to define a period as the set of today's date and it's preceding 28 dates defined as $D = \{d_{t-28}, d_{t-27}, ..., d_{t}\}$. This definition is necessary for computing the Routine Index feature, since the feature is computed by comparing today with the last 28 days. 
 
-Peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is likely somewhat different. But just because a routine changes over time, does not mean it does not exist presently.
+The reason for choosing 28 days, i.e. 4 weeks is that we wish to capture people's routine at the moment. Peoples' habits will inevitably change somewhat over time, and if one compares the routine of a certain person now to what their routine looked like a year ago, it is likely somewhat different. A routine will change over time, and therefore it makes the most sense to base the Routine Index around recent dates.
 
 \subsection{Location Sample}
-A location sample is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the exact timestamp and $l$ is the Location defined as a geographical point on the globe. The distance between two location samples $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ where $\delta$ is the \textit{Haversine} distance function.
+A location sample is a timestamped location and is defined by the tuple $x = (T, l)$ where $T$ is the  timestamp and $l$ is the location defined as a geographical point on the globe. The distance between two location samples $x_a$ and $x_b$ is defined as $\delta(x_a, x_b) = \delta(l_a, l_b)$ where $\delta$ is the \textit{haversine} distance function.
 
 
 \subsection{DBSCAN}
-The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an essential algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster location data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shapes and sizes, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.\\
+The DBSCAN algorithm by Ester et al. in 1996 \cite{density-based-1996} is an algorithm for clustering GPS data points. The core concept of DBSCAN is to cluster data based on a \textit{density} measure rather than a pure \textit{distance} measure, such as is the case with the \textit{K-means} clustering algorithm. This allows the clusters to take on nearly any shape and size, in contrast to being constrained to rounder shapes by using the \textit{K-means} algorithm or a \textit{Gaussian Mixture Model}, see figure \ref{fig:dbscan_shapes} for examples.\\
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{images/dbscan-clusters.png}
-    \caption{Data from three different databases with very distinct cluster shapes. Database \#1 has very round clusters which would identified correctly with K-means whereas database \#2 and \#3 have clusters which would require a different clustering approach. Source: \cite{density-based-1996}}
+    \caption{Data from three different databases with very distinct cluster shapes. Database \#1 has very round clusters which would identified correctly with K-means whereas database \#2 and \#3 have clusters which would require a density-based clustering approach such as DBSCAN. Source: \cite{density-based-1996}}
     \label{fig:dbscan_shapes}
 \end{figure}
 
-GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid. The DBSCAN algorithm will, given a set of geo-spatial data points find these dense clusters, as well as noisy data points. Clusters will in our case correspond to places and the noisy data points are outlier-stops which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.\\
+GPS data has a higher density inside clusters than outside the clusters and the density in noisy areas is lower than density in clusters. Here, \textit{noisy} refers to points that are spread randomly within some areas and do not cluster around a centroid.\\
 
-DBSCAN takes as input three different parameters:
+The DBSCAN algorithm will, given a set of geo-spatial data points find these dense clusters, as well as noisy data points. Clusters will in our case correspond to places and the noisy data points are outlier-stops which do not belong to a place. The output of the algorithm is labeling of each point in the input dataset as either belonging to a cluster or being a noisy data point.\\
+
+For finding clusters, DBSCAN takes three different parameters as input:
 
 \begin{itemize}
     \item A distance measure
@@ -53,10 +55,10 @@ DBSCAN takes as input three different parameters:
     \item Minimum number of points
 \end{itemize}
 
-The distance measure in our case is the haversine distance function since we are computing distances on the Earth's surface. The epsilon parameter is a distance threshold for two points to be considered to lie within the same cluster. The last parameter is the minimum number of points required to make a cluster which by default is 1. 
+The distance measure used in the Mobility Feature Package is the haversine distance function. The epsilon parameter is a distance threshold for two points to be considered to lie within the same cluster. The last parameter is the minimum number of points required to make a cluster which by default is 1. 
 
 \subsection{Finding Stops}
-Finding stops is done by applying a modified version of the distance grouping procedure described by Cuttone et al. \cite{sparse-location-2014}. The modified algorithm traverses the location samples in temporal order, and adds the next location sample if it lies within the max-radius of the current stop. The modification is that when comparing each new location sample, the median location of the current stop is used rather than the distance between the current- and next location sample. Another modification is the duration-filtering, which removes stops shorter than a given minimum duration. The max-distance parameter is set to $r_{stop} = 25 \text{meters}$ and the minimum duration is set to $t_{stop} = 3 \text{minutes}$. A stop is defined in Equation \eqref{eq:feature-stops}.
+Finding stops is done by applying a modified version of the distance grouping procedure described by Cuttone et al. \cite{sparse-location-2014}. The modified algorithm traverses the location samples in temporal order, and adds the next location sample if it lies within the max-radius of the current stop. The modification is that when comparing each new location sample, the median location of the current stop is used rather than the distance between the current- and next location sample. Another modification is the duration-filtering, which removes stops shorter than a given minimum duration. The max-distance parameter is set to $r_{stop} = 25 \text{ meters}$ and the minimum duration is set to $t_{stop} = 3 \text{minutes}$. A stop is defined in Equation \eqref{eq:feature-stops}.
 
 \begin{equation}
 \label{eq:feature-stops}
@@ -93,20 +95,21 @@ The triple $(T_{arr}, T_{dep}, l)$ denotes the arrival timestamp, the departure 
 Given a stop $s$, the arrival is denoted $s.arrival$ and departure $s.departure$.
 
 \subsection{Finding Places}
-Similar to Cuttone et al. \textit{places} are found by clustering stops using the DBSCAN algorithm by Esther et al. \cite{density-based-1996}. The epsilon parameter of the DBSCAN algorithm is set to 50 meters - this parameter value was found in a self-study described in Chapter \ref{chapter:06}. All the stops today in the period $D$ should used to for finding places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}. 
+Similar to Cuttone et al. places are found by clustering stops using the DBSCAN algorithm by Esther et al. \cite{density-based-1996}. The epsilon parameter of the DBSCAN algorithm is set to $r_{place} = 50 \text{ meters}$ - this parameter value was found in a self-study described in Chapter \ref{chapter:06}. A single place consists of a set of unique stops, and each of these stops belong to exactly one place. All the stops today in the period $D$ should used to for finding places, for reasons explained in subsection \ref{sub:hour-matrix}. That is, given a set of stops $S$ for the period $D$, the set of places $P$ for the period $D$ is defined by Equation \eqref{eq:feature-places}. 
 
 \begin{equation}
 \label{eq:feature-places}
 P = {p_1, p_2, ..., p_N} \;|\; p_i = \{s_1, s_2, ..., s_{|p_i|}\}
 \end{equation}
 
+ 
 The procedure for finding places defined in Algorithm \ref{algo:places}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
 \algorithmicrequire{ set of stops, $S$}\\
 \algorithmicensure{ set of places, $P$}\\
-    $L = DBSCAN(S)$ where $s_i$ has label $l_i$;\\
+    $L = DBSCAN(S, r_{place})$ where $s_i$ has label $l_i$;\\
     \textbf{group} each stop $s_i \in S$ by $l_i$;\\
     $S' = \{s_i \;|\; l_i \geq 0\}, \;|S'| = N$;\\
     $p_i = S'_i$ where each stop $s \in S'_i$ has the label $l_i$;\\
@@ -116,16 +119,14 @@ The procedure for finding places defined in Algorithm \ref{algo:places}.
 \end{algorithm}
 
 \subsection{Finding Moves}
-A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stop and the path is used to calculate the exact distance traveled. In addition, two placeholder stops are created by using the first and the latest location sample. This is done to avoid edge cases where tracking was started while moving. In such a case no moves can be created before the user is stationary for some time and at least one stop has been discovered. These stops are not used for finding places.\\
-
-A set of moves is defined as 
+A move is calculated using the stops- and the location sample by going through each stop and calculating the distance between the current stop and the following stop. The distance is computed by going through all the location samples which were sampled in the time interval between the two stops. These points form the path which was taken between the two stops and the path is used to calculate the exact distance traveled. In addition, two placeholder stops are created by using the first and the latest location sample. This is done to avoid edge cases where tracking was started while moving. In such a case no moves can be created before the user is stationary for some time and at least one stop has been discovered. These stops are not used for finding places. A set of moves is defined in \eqref{eq:feature-moves}.
 
 \begin{equation}
 \label{eq:feature-moves}
 M = \{m_1, m_2, ..., m_{|M|}\} \;| \; m_i = (s_a, s_b, X_i), X_i = \{x_1, x_2, ..., x_{|X_i|}\}
 \end{equation}
 
-is a set of time-ordered location samples. Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
+Moves are found using the following procedure outlined in Algorithm \ref{algo:moves}.
 
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -147,7 +148,7 @@ is a set of time-ordered location samples. Moves are found using the following p
 
 \subsection{Hour Matrix}
 \label{sub:hour-matrix}
-The hour matrix is an auxiliary feature used to compute the home stay and routine index feature. A matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The hour matrix represents the time-place distribution for the user during a day.
+The Hour Matrix is an auxiliary feature used to compute the home stay and Routine Index feature. It is a matrix with 24 rows, each row representing an hour in a day, and columns equal to the number of places. The Hour Matrix represents the time-place distribution for the user during a day.
 \begin{figure}
     \centering
     \begin{tabular}{|l|l|l|l|l|}
@@ -166,16 +167,16 @@ The hour matrix is an auxiliary feature used to compute the home stay and routin
     \label{fig:time-table}
 \end{figure}
 
-This matrix is constructed from all the stops on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. For simplicity, we define a couple of constraints on the hour matrix:
+This matrix is constructed from all the stops on a given day, each of which belong to certain \textit{place} and has an \textit{arrival} and \textit{departure} timestamp. From this, it can be calculated exactly which hour slot(s) to fill out and the duration to fill that slot with. We define the following constraints on the Hour Matrix:
 
 \begin{itemize}
-    \item The hour matrix has exactly 24 rows, each representing 1 hour in a day.
+    \item The Hour Matrix has exactly 24 rows, each representing 1 hour in a day.
     \item The number of columns represents the number of places for the period. 
     \item An entry represents the portion of the given hour-slot that was spent at a given place.
     \item Each row can maximally sum to 1.
 \end{itemize}
 
-Formally, given a period ($D$) for which the number of places is given as $N$ the hour matrix $\mathsf{H}$ for today ($d_t$) is defined as:
+Formally, given a period ($D$) for which the number of places is given as $N$ the Hour Matrix $\mathsf{H}$ for today ($d_t$) is defined as:
 
 \begin{equation}
 \label{eq:feature-hour-matrix-def}
@@ -211,7 +212,7 @@ T(k) =
 
 
 \subsection{Home Stay Feature}
-The home stay feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. In the literature, the home cluster is defined as the cluster which the user spends the most time at between 00:00 and 06:00. In the work by Saeb et al. and Canzian et al. \cite{Saeb2015, saeb2016, Canzian2015} the home cluster was evaluated over the duration of the whole study, however we define it on a daily basis since the home cluster may change from day to day. Formally, the \textit{home place} $p_h (d_t)$ for the date $d_t$ where the index $h$ is found using Equation \eqref{eq:feature-home-place}.
+The home stay feature indicates the percentage of time spent at the Home cluster, out of all the time of the day. Saeb et al. defines the home cluster as the cluster which the user spends the most time at between 00:00 and 06:00. In the work by Saeb et al. and Canzian et al. \cite{Saeb2015, saeb2016, Canzian2015} the home cluster was evaluated over the duration of the whole study, however we define it on a daily basis since the home cluster may change from day to day. Formally, the \textit{home place} $p_h (d_t)$ for the date $d_t$ where the index $h$ is found using Equation \eqref{eq:feature-home-place}.
 
 \begin{equation}
 \label{eq:feature-home-place}
@@ -228,24 +229,24 @@ In the work by Saeb et al. \cite{Saeb2015} and Canzian et al.\cite{Canzian2015} 
 Where $T_{now}$ is the departure time of the last known stop, and thus $T_{now} - T_0$ is the time elapsed since 00:00:00 today.
 
 \subsection{Total Distance Travelled Feature}
-First we define the distance of a move $m_i$ as the sum of all the distances in the 'chain' of points in $X_i$, i.e.
+First we define the distance of a move $m_i$ as the sum of all the distances in the path of location samples in $X_i$, i.e.
 
 \begin{equation}
 \label{eq:feature-move-computation}
 \delta (m_i)  = \sum_{j=1}^{|X_i|-1} \delta (x_j, x_{j+1})
 \end{equation}
 
-The \textit{Total Distance Travelled} for a date $d_t$ is defined as 
+The \textit{Total Distance Travelled} for today $d_t$ is defined as 
 
 \begin{equation}
 \label{eq:feature-total-distance}
 \delta (d_t) = \sum_{i=1}^{|M|} \delta (m_i)
 \end{equation}
 
-where $M$ refers to the moves on date $d_t$.
+where $M$ refers to the moves today $d_t$.
 
 \subsection{Number of Places Feature}
-By using the DBSCAN algorithm to cluster a set of stops, each stop is given a cluster label, either being non-negative if it belongs to a cluster, or the label -1 if it is considered noise. The \textit{Number of Places} is therefore defined as the size of the set of non-negative cluster labels $K = \{k_1, k_2, ..., k_N\}$, i.e.
+By using the DBSCAN algorithm to cluster a set of stops, each stop is given a cluster label, either being non-negative if it belongs to a cluster, or the label -1 if it is considered noise. The \textit{Number of Places} is defined as the size of the set of non-negative cluster labels $K = \{k_1, k_2, ..., k_N\}$, i.e.
 
 \begin{equation}
 \label{eq:feature-num-places}
@@ -263,7 +264,7 @@ Defined by Saeb et al. \cite{Saeb2015}, the Location Variance is defined as the 
 The logarithm is applied in order to compensate for the skewness in the location distribution of location variances across users.
 
 \subsection{Entropy and Normalized Entropy Features}
-Within the field of Information Theory, entropy is described in MacKay \cite{information-theory} as a quantity associated with a random variable, and can be interpreted as the average level of \textit{information} contained within the outcomes of that variable. 
+Within the field of Information Theory, entropy is described in MacKay \cite{information-theory} as a quantity associated with a random variable, and can be interpreted as the average level of \textit{information} contained within the outcomes of that variable.\\
 
 The Entropy $E(X)$ of the set of outcomes $X = \{x_1, x_2, ..., x_n\}$ is defined as
 
@@ -284,38 +285,35 @@ We define the Normalized Entropy as the Entropy normalized using the maximum pos
 \begin{equation}
 \label{eq:feature-normalized-entropy}
 E_N(X) = \frac{E(X)}{E_{max}(X)} \in [0,1]
-\cdot -\log n = \log n 
 \end{equation}
 
 The Normalized Entropy (NE) makes it easier to compare Entropy values of different distributions since they all reside on the same scale, being a scalar value between  0 and 1. A NE value near 1 indicates that the $X$ follows a uniform distribution where every outcome is equally likely. A small NE value indicates that the distribution is very skewed, with certain outcomes having very high likelihood and some having much lower likelihood.  In the context of user mobility, we can view the time user spends at a certain place as the outcome of the place variable, i.e. 
 
 \begin{equation}
 \label{eq:feature-normalized-entropy-places}
-E(P) = - \sum_{i=1}^{n} Pr(p_i) \log Pr(p_i)
-\cdot -\log n = \log n 
+E(P) = - \sum_{i=1}^{N} Pr(p_i) \log Pr(p_i)
+\cdot -\log N = \log N 
 \end{equation}
 
-and by using \eqref{eq:feature-normalized-entropy} and \eqref{eq:feature-normalized-entropy-places} we get the Normalized Entropy for the time-place distribution:
+where $N$ is the Number of Places feature. By further using \eqref{eq:feature-normalized-entropy} and \eqref{eq:feature-normalized-entropy-places} we get the Normalized Entropy for the time-place distribution:
 
 \begin{equation}
 \label{eq:feature-normalized-entropy}
-E_N(P) = \frac{E(P)}{E_{max}(P)} \in [0,1]
+E_N(P) = \frac{E(P)}{\log N} \in [0,1]
 \end{equation}
 
 where $P$ is the set of places visited today and $Pr(p_i)$ refers to the time spent at place $p_i$ today. It must holds that $Pr(p) > 0$ for $p \in P$, otherwise the term $\log P(p_i)$ cannot be evaluated since $\log(0)$ is undefined. The concept of NE gives us a tool to say something about where the user spends their time; a high NE value indicates they spend their time uniformly among the places, whereas a low value indicates that the user spends most of their time at very few places. 
 
 \subsection{Routine Index Feature}
 \label{sub:routine-index}
-The routine index describes how similar the place-time distribution of a given day is, compared to previous days for a period $D$. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the routine index, a period length of 28 days was chosen, which means the routine index of today describes how similar today was to each day during the last month. The implementation by Canzian et al. \cite{Canzian2015} involved using a different modelling approach and was therefore very complicate to compute.  Therefore, a more straightforward definition of the routine index was chosen. To the best of our knowledge this definition defined in Equation \eqref{eq:feature-routine-index} in conjunction with the concept of an hour matrix is novel, and models the feature as a similarly measure between two Hour Matrices. More exact, the routine index is a similarity measure between the hour matrix today and the 'average' hour matrix for the last 28 days. The result of the similarity measure is a scalar between 0 and 1 - a low value indicating a small degree of overlap and a high value indicating a high degree of overlap. 
+The Routine Index describes how similar the place-time distribution of a given day is, compared to previous days for a period $D$. The place-time distribution for a day is defined by how much time was spent for each of the 24 hours, at different places. For computing the Routine Index, a period length of 28 days was chosen, which means the Routine Index of today describes how similar today was to each day during the last month. The definition of the Routine Index in Equation \eqref{eq:feature-routine-index} using the concept of an Hour Matrix is novel, and models the feature as a similarly measure between two Hour Matrices. More exact, the Routine Index is a similarity measure between the Hour Matrix today and the Routine Matrix for the last 28 days. The result of the similarity measure is a scalar between 0 and 1 - a low value indicating a small degree of overlap and a high value indicating a high degree of overlap.\\
 
-Given an array of \textit{Hour Matrices} for a period $D' = D - d_t$ (i.e. the historical dates preceding today $d_t$) the \textit{Routine Matrix} is defined as the average entry for each hour matrix given in Equation \eqref{eq:feature-hour-matrix-mean}. The days contained in $|D'|$ are indexed with the integer $k$:
+Given an array of \textit{Hour Matrices} for a period $D' = D - d_t$ (i.e. the historical dates preceding today $d_t$) the \textit{Routine Matrix} is defined as the average entry for each Hour Matrix given in Equation \eqref{eq:feature-hour-matrix-mean}. The days contained in $|D'|$ are indexed with the integer $k$:
 
 \begin{equation}
 \label{eq:feature-hour-matrix-mean}
 \mathsf{R}(D) = \sum_{k=0}^{|D'|} \frac{1}{|D'|} \mathsf{H}(d_{k})_{i,j}
 \end{equation}
-
-The feature can therefore indirectly be computed from the stops of the last 28 days which means only the stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 stops for a 4 week period. Computing the feature requires the places to be found, i.e. to run DBSCAN on the stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 
 The overlap function produces a matrix $\mathsf{O}$ given two matrices $\mathsf{A}$ and $\mathsf{B}$ of equal dimensions:
 
@@ -331,14 +329,19 @@ The maximum potential overlap is limited by the minimum of the two matrix sums, 
     \mathsf{O}_{max}(\mathsf{A}, \mathsf{B}) = \min (\sum \mathsf{A}, \sum \mathsf{B})
 \end{equation}
 
-The routine index for today $d_t$ given the historical dates $D$, is defined as the overlap normalized by the maximum potential overlap of today's  and the Routine Matrix (Equation \eqref{eq:feature-routine-index}).
+The Routine Index for today $d_t$ given the historical dates $D$, is defined as the overlap normalized by the maximum potential overlap of today's  and the Routine Matrix (Equation \eqref{eq:feature-routine-index}).
 
 \begin{equation}
 \label{eq:feature-routine-index}
 r(d_t, D) = \frac{\sum (\mathsf{O} (\mathsf{H}(d_t), \mathsf{R}(D)))}{\min \Big(\sum \mathsf{H}(d_t), \sum \mathsf{R}(D) \Big)}
 \end{equation}
 
-Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. In addition this also makes the feature reflect the time of the day at which it is calculated: Entries for the hours later than the current time are not yet observed and are therefore ignored. An alternative, simpler definition is to use 24 hours as the maximum potential overlap. However since travels between places are not reflected in an Hour Matrix, this would lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.  
+\paragraph{Comments on the Routine Index}\\
+Equation \eqref{eq:feature-routine-index} uses the smallest sum of the two matrices to normalize the overlap, which is done to avoid punishing days with gaps in the data too much. In addition this also makes the feature reflect the time of the day at which it is calculated: Entries for the hours later than the current time are not yet observed and are therefore ignored.\\
+
+An alternative, simpler definition is to use 24 hours as the maximum potential overlap. However since travels between places are not reflected in an Hour Matrix, this would lead to gaps in the data since it takes time to move between places. Ideally, both stops and moves should be used to construct the Hour Matrix, it is not at present clear how this would be done.\\
+
+Since the feature can indirectly be computed from the stops of the last 28 days, only the stops are necessary to store. In a field study (described in chapter \ref{chapter:06}), the author was found to have had just around 20 stops per day which amounts to under 600 stops for a 4 week period. Computing the feature requires the places to be found, i.e. to run DBSCAN on the stops, and can result in the feature being expensive to compute. However, 600 data points is a manageable number to work with.
 
 \subsubsection*{Routine Index Examples}
 
@@ -350,7 +353,7 @@ In Equation \eqref{eq:routine-example-1} we see the Hour Matrix (H) which tells 
     \item Timeslot 3: \textit{The user visits Place \#1 again for exactly one hour}
 \end{itemize}
 
-When compared to Routine Matrix (R) it only overlaps with one hour, where the maximum potential overlap is 3 hours, since both matrices sum to 3 hours. The routine index for these two matrices is thus  \label{eq:routine-index-1} 
+When compared to the Routine Matrix (R) it only overlaps with one hour in total, where the maximum potential overlap is 3 hours, since both matrices sum to 3 hours. The Routine Index for these two matrices is thus  \label{eq:routine-index-1} 
 
 \begin{equation}
 \label{eq:routine-example-1}
@@ -374,7 +377,7 @@ When compared to Routine Matrix (R) it only overlaps with one hour, where the ma
     \end{bmatrix}
 \end{equation}
 
-For \eqref{eq:routine-example-1} the routine index becomes:
+For \eqref{eq:routine-example-1} the Routine Index becomes:
 
 \begin{equation}
     RI = \frac{1}{1 + 1 + 1} = \frac{1}{3}
@@ -388,7 +391,7 @@ In Equation \eqref{eq:routine-example-2} we see the Hour Matrix (H) which indica
     \item Timeslot 3: \textit{The user visits Place \#1 and \#3 for exactly half an hour each once again}
 \end{itemize}
 
-When compared to Routine Matrix (R) it overlaps with 2 hours in total. The maximum potential overlap is 2 hours, since the minimum matrix sum is $\sum \mathsf{R} = 2$ the routine index becomes 1 (See \ref{eq:routine-index-2}).
+When compared to the Routine Matrix (R) there is a total overlap of 2 hours. The maximum potential overlap is 2 hours, since the minimum matrix sum is $\sum \mathsf{R} = 2$ the Routine Index becomes 1 (See \ref{eq:routine-index-2}).
 
 \begin{equation}
 \label{eq:routine-example-2}
