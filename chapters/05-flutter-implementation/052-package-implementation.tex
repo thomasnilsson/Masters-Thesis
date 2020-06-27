@@ -1,8 +1,12 @@
 \section{Package Implementation}
-The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the overall data model was outlined. This section will go through selected examples of source code as well as the general principles applied, to achieve the specified design, when implementing in Flutter and Dart. In the Dart programming language, fields, constructors and methods are declared private by using the underscore prefix, i.e. the field \verb|routineIndex| becomes \verb|_routineIndex|. This is used throughout the implementation to prevent the application programmer to access the inner parts of the package. The parts of the implementation related to storage of historical data can be found in Appendix \ref{appendix:source-code}. The offline algorithms for computing features were developed in Python with a large part being carried out by Jonas Busk\footnote{\url{https://www.researchgate.net/scientific-contributions/2129480702_Jonas_Busk}}. Source code for these algorithms can be found in Appendix \ref{appendix:python-demo}.
+The package was implemented in Flutter according to the design in Chapter \ref{chapter:04} in which a series of components and the domain data model were outlined. This section will go through selected examples of source code to demonstrate how the non-trivial parts of the package were built. This implementation deals with allowing features to be computed in real-time, on the device.\\
+
+In the Dart programming language, fields, constructors and methods are declared private by using the underscore prefix, i.e. the field \verb|routineIndex| becomes \verb|_routineIndex|. This is used throughout the implementation to prevent the application programmer from access the inner parts of the package. Preventing access is a key factor is achieving a high level of abstraction.\\
+
+Storing and loading data is a big part of the implementation, but is very generic nad has been moves to Appendix \ref{appendix:source-code}. Furthermore, the offline algorithms for computing features were developed in Python with a large part being carried out by Jonas Busk\footnote{\url{https://www.researchgate.net/scientific-contributions/2129480702_Jonas_Busk}}. Source code for these algorithms can be found in Appendix \ref{appendix:python-demo}.
 
 \subsection{Domain Model Implementation}
-All the components specified in the Domain Model Chapter \ref{chapter:04} were implemented with their respective relations to each other. The only class with a public-facing constructor is \textit{LocationSample}, and by transitivity, also \textit{GeoPosition}. This is done to allow the user instantiate a \textit{LocationSample} with data from a given \textit{Location DTO}. The \textit{GeoPosition} class a field for the latitude and one for the longitude and a fundamental class used by the \textit{GeoSpatial} interface. The interface is a private abstract class which means it is only visible internally in the package library.
+The components specified in the domain model in Chapter \ref{chapter:04} were implemented according to \ref{fig:uml-diagram}. All classes except LocationSample and GeoPosition were given private constructors. These two classes were given public constructors to allow the user instantiate a LocationSample with data from a given \textit{Location DTO}. The GeoPosition class a field for the latitude and one for the longitude and a fundamental class used by the GeoSpatial interface. The interface is a private abstract class which means it is only visible internally in the package library.
 
 \begin{minted}{dart}
     abstract class _Geospatial {
@@ -10,7 +14,7 @@ All the components specified in the Domain Model Chapter \ref{chapter:04} were i
     }
 \end{minted}
 
-This interface allows other classes to promise the Dart compiler that it has a \textit{GeoPosition} field which allows it to be compared to other classes that implement the same interface. In Dart interfaces and abstract classes are the same thing, and the \textit{abstract class} keyword is used for implementing them. The \textit{GeoPosition} class even implements this interface since a \textit{GeoPosition} object itself has a \textit{GeoPosition}. This may seem superfluous but will come in handy when finding Stops (see Subsection \ref{subsection:finding-features}).
+This interface allows other classes to promise the Dart compiler that it has a GeoPosition field which allows it to be compared to other classes that implement the same interface. In Dart interfaces and abstract classes are the same thing, and the \textit{abstract class} keyword is used for implementing them. The GeoPosition class even implements this interface since a GeoPosition object itself has a GeoPosition. This may seem superfluous but will come in handy when finding Stops (see Subsection \ref{subsection:finding-features}).
 
 \begin{minted}{dart}
     class GeoPosition implements _Serializable, _Geospatial {
@@ -31,7 +35,7 @@ This interface allows other classes to promise the Dart compiler that it has a \
 Finding the location features Stops, Moves, and Places  were done according to the algorithms described in Chapter \ref{chapter:03}. 
 
 \subsubsection*{Stops}
-The Stop class has two constructors: A factory constructor which takes a set of LocationSamples from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
+The Stop class has two constructors: A factory constructor which takes a set of LocationSample objects from which the centroid of the set is computed, as well as the earliest timestamp, which will be the arrival time, and the latest timestamp which will be the departure time. After these attributes are found, the normal constructor is used.
 
 \begin{minted}{dart}
     factory Stop._fromLocationSamples(List<LocationSample> locationSamples,
@@ -43,16 +47,24 @@ The Stop class has two constructors: A factory constructor which takes a set of 
     }
 \end{minted}
 
-The normal constructor uses a \textit{GeoPosition}, in addition to an arrival and departure time. A \textit{place ID }may also be specified at construction, but often it is not yet known at construction time hence it is optional.
+The normal constructor uses a GeoPosition, in addition to an arrival and departure time. A \textit{place ID }may also be specified at construction, but often it is not yet known at construction time hence it is optional.
 
 \begin{minted}{dart}
     Stop._(this._geoPosition, this._arrival, 
         this._departure, {this.placeId = -1});
 \end{minted}
 
-The Stop algorithm takes a List of \textit{LocationSamples} as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) to delimit a subset of the input data. Every time the outer loop iterates, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: With each iteration of the inner loop, the centroid of the current subset is computed. If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer, and the process is continued. Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a \textit{place ID} since Places  have not yet been identified. Also, Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. This is an addition to the algorithms previously described and is mostly used due to the very high sampling frequency which was not accounted for the in original implementation by Cuttone et al. \cite{sparse-location-2014}.
+The Stop algorithm takes a List of LocationSample objects as input and uses two while-loops, and two pointers (\textit{start} and \textit{end}) to delimit a subset of the input data. Every time the outer loop iterates, the \textit{start} pointer is moved past the end pointer, to skip already seen data. The inner loop is responsible for moving the \textit{end} pointer: \begin{itemize}
+    \item With each iteration of the inner loop, the centroid of the current subset is computed.
+    \item If the distance from this centroid to the latest added sample is within the given \verb|stopRadius| parameter, then the subset is expanded by incrementing the \textit{end} pointer, and the process is continued.
+    \item Otherwise, the inner loop terminates and a Stop is created from the subset. The Stop is created without a \textit{place ID} since Places  have not yet been identified.
+\end{itemize}
 
-\begin{minted}{dart}
+Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. 
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
     int start = 0;
     while (start < n) {
       int end = start + 1;
@@ -72,25 +84,33 @@ The Stop algorithm takes a List of \textit{LocationSamples} as input and uses tw
       start = end;
     }
 \end{minted}
+    \caption{Source code for finding Stops.}
+    \label{fig:source-code-stops}
+\end{figure}
 
 The distance calculation is carried out using the \verb|GeoSpatial| interface previously mentioned. The distance function \verb|fromGeoSpatial| takes two objects which implement the interface and unpacks the latitude and longitude from these objects. The haversine distance can then be computed afterward.
 
-\begin{minted}{dart}
-    class Distance {
-      static double fromGeospatial(_Geospatial a, _Geospatial b) {
-        return fromList(
-            [a.geoPosition._latitude, a.geoPosition._longitude],
-            [b.geoPosition._latitude, b.geoPosition._longitude]);
-      }
-    
-      static double fromList(List<double> p1, List<double> p2) {
-        /// Haversine implementation
-      }
-    }
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
+class Distance {
+  static double fromGeospatial(_Geospatial a, _Geospatial b) {
+    return fromList(
+        [a.geoPosition._latitude, a.geoPosition._longitude],
+        [b.geoPosition._latitude, b.geoPosition._longitude]);
+  }
+
+  static double fromList(List<double> p1, List<double> p2) {
+    /// Haversine implementation
+  }
+}
 \end{minted}
+    \caption{The source code for handling distance computation of objects of different types}
+    \label{fig:source-code-distance}
+\end{figure}
 
 \subsubsection*{Finding Moves}
-The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, with argument being either a path of \textit{LocationSamples} or a distance (a double). The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor to create a Move. 
+The Move class has two constructors which are both private. Common for both constructors is that they take two Stops as arguments, the third argument being either a path of LocationSample objects or a distance (a double). The factory constructor called \verb|_fromPath| calculates the distance of the path and then uses the normal constructor to create a Move. 
 \begin{minted}{dart}
     factory Move._fromPath(Stop a, Stop b, List<LocationSample> path) {
       double d = _computePathDistance(path);
@@ -101,11 +121,19 @@ The Move class has two constructors which are both private. Common for both cons
 \begin{minted}{dart}
     Move._(this._stopFrom, this._stopTo, this._distance);
 \end{minted}
-The normal constructor is used for de-serialization whereas the factory constructor is used to create a Move given two Stops and the path of samples between them.
+The normal constructor is used for de-serialization (see Appendix \ref{appendix:source-code}) whereas the factory constructor is used to create a Move given two Stops and the path of samples between them.
 
-The algorithm for finding Moves takes a List of \textit{LocationSamples} and the Stops found from the samples as input. The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. If, the set of Stops is not empty, then the two placeholder Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is then created using the current Stop, the next Stop, and the path between. 
+The algorithm for finding Moves takes a List of LocationSample objects and the Stops found from the samples as input. 
 
-\begin{minted}{dart}
+\begin{itemize}
+    \item The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. 
+    \item If the set of Stops is not empty, then the two placeholder Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. 
+    \item For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is created using the current Stop, the next Stop, and the path between. 
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \begin{minted}{dart}
   Stop first = Stop._fromLocationSamples([data.first]);
   List<Stop> allStops = [first] + stops;
 
@@ -125,6 +153,9 @@ The algorithm for finding Moves takes a List of \textit{LocationSamples} and the
     moves.add(Move._fromPath(cur, next, samplesInBetween));
   }
 \end{minted}
+    \caption{The source code for finding Moves}
+    \label{fig:source-code-modes}
+\end{figure}
 
 \subsubsection*{Finding Places}
 The Place class only has one normal constructor which takes an ID (an integer) and a List of Stops. 
@@ -132,9 +163,11 @@ The Place class only has one normal constructor which takes an ID (an integer) a
 Place._(this._id, this._stops);
 \end{minted}
 
-The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to find clusters in the Stops and label each Stop with a cluster-ID, this is the \textit{place ID} previously discussed. Once the labels are computed, the Stops are grouped by their \textit{place ID}. For each group, a Place object is created with the group label and all the Stops with that label. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
+The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to cluster the Stops and label each Stop with a cluster-ID, this is the \textit{place ID} previously discussed. Once the labels are computed, the Stops are grouped by their \textit{place ID} and for each group, a Place object is created with the group label and all the Stops with that label. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
 
-\begin{minted}{dart}
+\begin{figure}
+    \centering
+   \begin{minted}{dart}
   DBSCAN dbscan = DBSCAN(
       epsilon: placeRadius, minPoints: 1, 
       distanceMeasure: Distance.fromList);
@@ -159,10 +192,13 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
     stopsForPlace.forEach((s) => s.placeId = p._id);
   }
 \end{minted}
+    \caption{The source code for finding Places}
+    \label{fig:source-code-places}
+\end{figure}
 
 
 \subsubsection*{Hour Matrix Computation}
-The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. From this, the matrix is created and filled out. Each Stop can be converted into an array of doubles that tells which place and how much was visited.
+The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. The matrix is filled out using the arrival- and depature timestamp of each Stop.
 
 \begin{figure}
     \centering
@@ -188,7 +224,7 @@ The Hour Matrix is an auxiliary feature used for internal computation and is the
     \label{fig:hour-matrix-construction}
 \end{figure}
 
-Next, the \verb|routineMatrix()| factory constructor is discussed. This is a method for creating the RoutineroutineMatrix Matrix of the average day, given a list of other Hour Matrices. The method is quite simple since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.
+Next, the \verb|routineMatrix()| factory constructor is discussed. This is a method for creating the Routine Matrix, given a list of other Hour Matrices. The method is quite simple since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.\\
 
 \begin{figure}
     \centering
@@ -212,7 +248,7 @@ Next, the \verb|routineMatrix()| factory constructor is discussed. This is a met
     \label{fig:hour-matrix-average}
 \end{figure}
 
-Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \eqref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. 
+Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \eqref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. \\
 
 The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severely limited. If either of the sums is zero then -1 is returned, due to either matrix being empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position, the overlap for two scalars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \eqref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
 
