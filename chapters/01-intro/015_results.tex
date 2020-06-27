@@ -4,13 +4,11 @@ The Mobility Features Package was implemented in the Flutter framework and publi
 The package does not depend on any specific location plugin due to its design, which allows the programmer to flexibly choose their own plugin for tracking location data. Being independent of any specific location plugin enables easier maintenance and allows the package to be used among other packages dependent on location tracking, without causing dependency issues. Through a field study with 10 participants, the capabilities of the package were demonstrated. For this study a Flutter application collected the participants' location for 3 weeks and used the package to compute the participants' features multiple times daily. Participants also filled out a daily questionnaire pertaining to the features, which were compared to the computed features. In the 3-week study, the following insights concerning the Mobility Features Package were drawn:
 
 \begin{itemize}
-    \item The Mobility Features Packages successfully allowed mobility features to be computed several times a day.
+    \item The Mobility Features Packages successfully allowed mobility features to be computed several times a day. However, non-uniform gaps were observed in the collected location data, reducing the accuracy of the computed features. 
     
-    \item Non-uniform gaps were observed in the collected location data (as in similar 'in the wild' studies) which reduced the accuracy of the computed features. These gaps are likely due to the operating system on the smart-phones throttling background tracking.
+    \item When comparing the daily features with subjective user data we found that the Mobility Features Package computes the Number of Places visited with an RMSE of 0.5 places, the Home Stay percentage with an RMSE of 14.3\% and the Routine Index with an RMSE of 22.5\%.
     
-    \item When comparing the daily location features with subjective user data we found that the Mobility Features Package predicts the Number of Places visited with an RMSE of 0.5 places, the Home Stay percentage with an RMSE of 14.3\% and the Routine Index with an RMSE of 22.5\%.
-    
-    \item The algorithms tends to undershoot in predicting the number of places and home stay, likely due to gaps in the data. There is no consistent over- or undershooting shown when it comes to computing the Routine Index, which likely stemmed from the between-subject variance in the routine answers and the non-uniform gaps in the location data.
+    \item The algorithms tends to undershoot in predicting the Number of Places and Home Stay, which is likely due to gaps in the collected data. There is no consistent over- or undershooting shown when it comes to computing the Routine Index. This likely stems from the between-subject variance in the routine answers as well as the gaps in the location data.
 \end{itemize}
 
-The thesis lastly  discusses different approaches to mitigate the errors in computing features, i.e. how the algorithms can be improved and how gaps in the data can be handled in the future. 
+The thesis lastly discusses different approaches to mitigate the errors in computing features, i.e. how the algorithms can be improved and how gaps in the data can be handled in the future. 
