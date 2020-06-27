@@ -62,7 +62,7 @@ The Stop algorithm takes a List of LocationSample objects as input and uses two 
 
 Stops with a duration shorter than the duration specified by the \verb|stopDuration| parameter are removed since they are noisy. 
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     int start = 0;
@@ -90,7 +90,7 @@ Stops with a duration shorter than the duration specified by the \verb|stopDurat
 
 The distance calculation is carried out using the \verb|GeoSpatial| interface previously mentioned. The distance function \verb|fromGeoSpatial| takes two objects which implement the interface and unpacks the latitude and longitude from these objects. The haversine distance can then be computed afterward.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
 class Distance {
@@ -127,11 +127,11 @@ The algorithm for finding Moves takes a List of LocationSample objects and the S
 
 \begin{itemize}
     \item The algorithm first checks if the set of Stops is empty, and if so returns an empty set of Moves. 
-    \item If the set of Stops is not empty, then the two placeholder Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of Location Samples. 
+    \item If the set of Stops is not empty, then the two placeholder Stops are created and added to the set of Stops. These two additional stops are created from the first and last element in the set of LocationSample objects. 
     \item For each Stop in the set of Stops, it is calculated which samples lie in between the current and next Stop. A Move is created using the current Stop, the next Stop, and the path between. 
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
   Stop first = Stop._fromLocationSamples([data.first]);
@@ -165,7 +165,7 @@ Place._(this._id, this._stops);
 
 The Place algorithm takes a set of Stops for a given period, i.e. Stops over multiple days. The DBSCAN algorithm by Ester et al. \cite{density-based-1996} is used to cluster the Stops and label each Stop with a cluster-ID, this is the \textit{place ID} previously discussed. Once the labels are computed, the Stops are grouped by their \textit{place ID} and for each group, a Place object is created with the group label and all the Stops with that label. Lastly, the \verb|placeId| attribute for each Stop in the group is set to the group label.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
    \begin{minted}{dart}
   DBSCAN dbscan = DBSCAN(
@@ -200,7 +200,7 @@ The Place algorithm takes a set of Stops for a given period, i.e. Stops over mul
 \subsubsection*{Hour Matrix Computation}
 The Hour Matrix is an auxiliary feature used for internal computation and is therefore private. The class is implemented using a 2D double array as a field, representing the matrix of 24 rows, equal to the number of hours in a day, and columns equal to the Number of Places visited on the day. The construction of the Hour Matrix is done with a factory constructor that takes a List of Stops and the number of places visited. The matrix is filled out using the arrival- and depature timestamp of each Stop.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     factory _HourMatrix.fromStops(List<Stop> stops, int numPlaces) {
@@ -220,13 +220,13 @@ The Hour Matrix is an auxiliary feature used for internal computation and is the
       return _HourMatrix(matrix);
     }
     \end{minted}
-    \caption{Construction of the Hour Matrix}
+    \caption{Implementation of the construction of an Hour Matrix}
     \label{fig:hour-matrix-construction}
 \end{figure}
 
 Next, the \verb|routineMatrix()| factory constructor is discussed. This is a method for creating the Routine Matrix, given a list of other Hour Matrices. The method is quite simple since it uses two for loops to fill out an empty zero-matrix with the average value of each position indexed by \verb|i| and \verb|j|, for each matrix.\\
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     factory _HourMatrix.routineMatrix(List<_HourMatrix> matrices) {
@@ -250,9 +250,9 @@ Next, the \verb|routineMatrix()| factory constructor is discussed. This is a met
 
 Lastly, the \verb|computeOverlap| method is discussed: This method computes the overlap similarity function discussed in Equation \eqref{eq:overlap-function}. Another Hour Matrix is provided as parameter referred to as \verb|other| and the current Hour Matrix is referred to as \verb|this| since the method is called on a specific object. \\
 
-The maximum possible overlap is computed as the minimum of the two matrix sums, since if one matrix is very sparse, then the overlap is severely limited. If either of the sums is zero then -1 is returned, due to either matrix being empty, which is valid. For computing total overlap a sum is used, and the matrix positions are iteration. For each position, the overlap for two scalars is computed and added to the total overlap. The overlap for two scalar values we defined in Equation \eqref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative. 
+The max overlap is computed according to Equation \eqref{eq:max-overlap} in Chapter \ref{chapter:03}, and if the max overlap is 0, then -1 is returned, meaning there is insufficient data in either matrix. The overlap for each entry-pair we defined in Equation \eqref{eq:overlap-function} as the minimum value of the two, given that both values are non-negative, and the total overlap is computed as the sum of overlapping entries.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     double computeOverlap(_HourMatrix other) {
@@ -279,9 +279,15 @@ The maximum possible overlap is computed as the minimum of the two matrix sums, 
 
 
 \subsubsection*{Home Stay Computation}
-The derived features are computed according to their definitions in Chapter \ref{chapter:03}, using the lazy evaluation template outlined in Figure \ref{fig:lazy-evaluation}. The home stay feature is no exception. The algorithm for computing home stay uses the stops of today: First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. Then, the total duration spent at the home place is calculated by summing the duration of the Stops which belong to the home place. The home stay is then calculated as the time at home divided by the total time elapsed.
+The algorithm for computing Home Stay uses the stops of today and does the following: 
 
-\begin{figure}
+\begin{itemize}
+    \item First, the total time elapsed today is calculated using the departure timestamp of the last known Stop of today. 
+    \item Next, the Stops are used to identify the home place by constructing an Hour Matrix and then extracting the \verb|homePlaceId| from the Hour Matrix. 
+    \item Then, the total duration spent at the home place is calculated by summing the duration of the Stops which belong to the home place. The Home Stay is then calculated as the time at home divided by the total time elapsed.
+\end{itemize}
+
+\begin{figure}[h]
     \centering
 \begin{minted}{dart}
 double _calculateHomeStay() {
@@ -303,14 +309,14 @@ double _calculateHomeStay() {
   return homeTime.toDouble() / totalTime.toDouble();
 }
 \end{minted}
-    \caption{The method for computing the home stay feature}
+    \caption{Source code for computing the Home Stay feature}
     \label{fig:home-stay-code}
 \end{figure}
 
 \subsubsection*{Routine Index}
-The routine index is the most difficult to compute by far. The method for computing this feature inside the Mobility Context class is however quite short, but this is due to all the matrix computations being done in the Hour Matrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the routine index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the Routine Matrix is computed. Lastly, the routine index is found by computing the overlap between the two Hour Matrix of today, and the Routine Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
+The Routine Index is the most difficult to compute by far. The method for computing this feature inside the MobilityContext class is very short due to all the matrix computations being done in the HourMatrix class, i.e. the averaging and overlapping of matrices. The algorithm first checks if any contexts are provided if not then the Routine Index should be -1.0. Next, the Hour Matrices for each historic date is computed, and from these, the Routine Matrix is computed. Lastly, the Routine Index is found by computing the overlap between the Hour Matrix of today, and the Routine Matrix, using the \verb|a.computeOverlap(b)| method of the Hour Matrix class.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     double _calculateRoutineIndex() {
@@ -330,12 +336,12 @@ The routine index is the most difficult to compute by far. The method for comput
       return this.hourMatrix.computeOverlap(routine);
     }
     \end{minted}
-    \caption{The method for computing the routine index feature}
+    \caption{The method for computing the Routine Index feature}
     \label{fig:routine-index-code}
 \end{figure}
 
-\subsection{Mobility Context}
-A \textit{MobilityContext} object represents features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the date parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a Mobility Context for a date in the past.
+\subsection{MobilityContext}
+A MobilityContext object is an collection of features for a given date. The class has a private constructor that takes a List of Stops and Moves from today, and a List of Places from the current period, i.e. the last 28 days including today. When the class is instantiated the date of today is automatically inferred, if not provided through the \verb|date| parameter, which is an optional parameter. This parameter can be overridden in the case of unit testing for specific dates or if the programmer wishes to compute a MobilityContext for a date in the past.
 
 \begin{minted}{dart}
 MobilityContext._(this._stops, this._allPlaces, this._moves,
@@ -345,9 +351,9 @@ MobilityContext._(this._stops, this._allPlaces, this._moves,
 }
 \end{minted}
 
-The other optional parameter is a List of Mobility Contexts is used for computing the routine index - how this is achieved will be explained in Subsection \ref{subsection:context-generation}. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the Mobility Context class.
+Another optional parameter is a List of MobilityContext objects is used for computing the Routine Index - how this is achieved will be explained in Subsection \ref{subsection:context-generation}. The 'derived' features are implemented as doubles (except for Number of Places which is an integer) and are fields in the MobilityContext class.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     class MobilityContext {
@@ -365,9 +371,9 @@ The other optional parameter is a List of Mobility Contexts is used for computin
 \end{figure}
 
 \subsubsection*{Lazy Evaluation}
-A \textit{getter} method for a given feature should reflect that the feature that is to be retrieved requires minimal computation (i.e. 'getting'), and therefore the feature computation should not take place in the getter method. However, there is a middle way, since the given feature needs to be computed only once to be evaluated, which allows us to keep the getter syntax. This middle way is \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], which applied to this example is the idea of postponing computation of a given field until the first time it is needed. After being computed, the field is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the field be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the field's value is updated after the computation and the getter can return the field's value. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
+Lazy evaluation \textit{lazy evaluation} described by Fowler \cite{fowler-PEEA} [p. 200], in this context is the idea of postponing computation of a given feature until the first time it is needed. After being computed, the feature is stored and can be retrieved henceforth without any computational cost. In practice, this is done by letting the features be initialized to \textit{null}, and checking for \textit{null} in the getter method. If the value is \textit{null} then the feature is calculated and the its value is updated after the computation. If the field is not \textit{null} then the feature has already been computed and can be returned immediately.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{minted}{dart}
     class MobilityContext {
@@ -390,14 +396,18 @@ A \textit{getter} method for a given feature should reflect that the feature tha
 
 \subsection{Context Generation}
 \label{subsection:context-generation}
-The instantiation of Mobility Contexts is done through the Context Generator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class. The class is a static class and thus does not have a mutable state which means that all methods of this class are also static and cannot rely on any internal, non-static values. The central part of the ContextGenerator class is the \verb|generate()| method, which is where a MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: \verb|usePriorContexts| is a boolean option to compute the MobilityContext using prior contexts which is false by default. The other parameter is a date parameter, \verb|today|, which similar to the MobilityContext constructor allows the user to override today's date, which is automatically computed if not specified.
+The instantiation of a MobilityContext object is done through the ContextGenerator class, which is the interface between the programmer and the core of the package. All computation and storing and loading of data is done through this class.  The central part of the ContextGenerator class is the \verb|generate()| method, which is where a MobilityContext is computed. The method is asynchronous since it requires loading data from the file system before computation can take place. It does not require any parameters to call, but has two optional parameters: 
 
+\begin{itemize}
+    \item \verb|usePriorContexts|: A boolean option to compute the MobilityContext using prior MobilityContexts which is false by default. \item  \verb|today|: A date parameter which allows the user to override today's date, which is automatically set to today's date if not specified
+
+\end{itemize}
 \begin{minted}{dart}
 static Future<MobilityContext> generate(
       {bool usePriorContexts: false, DateTime today}) {...}
 \end{minted}
 
-First, the file system is queried by initializing the three different MobilitySerializers, i.e. one for Location Samples, another for Stops and a third one for Moves. Next, Location Samples are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
+First, the file system is queried by initializing the three different MobilitySerializers (see Appendix \ref{appendix:source-code}), i.e. one for LocationSample objects, another for Stops and a third one for Moves. Next, LocationSample objects are loaded and filtered; any samples with a date different from today are thrown away since they have already been used on a previous day and are no longer relevant to keep. After this the Stops and Moves are loaded from disk and filtered; any Stops and Moves that are either from today or older than 28 days are thrown away.
 
 \begin{minted}{dart}
 List<LocationSample> samplesToday = await sampleSerializer.load();
@@ -409,7 +419,7 @@ stopsHist = _stopsHistoric(stopsHist, today);
 movesHist = _movesHistoric(movesHist, today);
 \end{minted}
 
-The reason for throwing away elements from today is that they need to be recomputing using all the recent Location Samples which can alter the old results. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
+The reason for throwing away elements from today is that they need to be recomputing using all the LocationSample objects collected today, including those collecting since the last time the features were computed. After recomputing today's Stops and Moves, the historical and recent Stops are merged to represent the whole period, and likewise for the Moves. Places are then computed using all the Stops of the period.
 
 \begin{minted}{dart}
 List<Stop> stopsToday = _findStops(samplesToday, today);
@@ -429,7 +439,7 @@ stopSerializer.save(stopsAll);
 moveSerializer.save(movesAll);
 \end{minted}
 
-Lastly, if prior contexts are to be used then the historical dates are extracted from the historical stops, and for each date, the Stops and Moves are extracted and used to construct a Mobility Context, with each context being added to a List of prior contexts.
+Lastly, if prior MobilityContexts are to be used then the historical dates are extracted from the historical stops, and for each date, the Stops and Moves are extracted and used to construct a MobilityContext, with each context being added to a List of prior MobilityContexts.
 
 \begin{minted}{dart}
 List<MobilityContext> priorContexts = [];

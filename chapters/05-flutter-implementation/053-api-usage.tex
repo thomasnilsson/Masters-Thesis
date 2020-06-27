@@ -1,5 +1,5 @@
 \section{Using the Package}
-This section will be a mirror of the official instructions on how to use the package, as of version \textit{1.1.5}. For getting started, the programmer has to download the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project and running the following command:
+This section will be a mirror of the official instructions on how to use the package, as of version \textit{1.2.0}. For getting started, the programmer has to download the package by adding it as a dependency in their \verb|pubspec.yaml| file of the Flutter project and running the following command:
 
 \begin{minted}{sh}
 flutter packages get
@@ -32,9 +32,9 @@ Features are computed using the 3 lines of code displayed in Figure \ref{fig:cod
 The exact method for arriving at this stage is outlined in the following 4 steps.
 
 \subsection*{Step 1: Collect location data}
-Location data collection is, as mentioned, not part of the Mobility Features package, and the programmer will, therefore, have to a location plugin such as \url{https://pub.dev/packages/geolocator}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
+Location data collection is, as mentioned, not part of the Mobility Features package. The location plugin can be flexibily chosen by the programmer. An example of such a plugin the \textit{GeoLocator} plugin\footnote{\url{https://pub.dev/packages/geolocator}}. From here, each incoming location object has to be converted to a \verb|LocationSample| via the constructor
 
-Below is shown an example where incoming \verb|Position| objects are coming in from the \verb|GeoLocator| plugin and are being handled after saved to a list, in the \verb|_onData()| call-back method.
+Below is shown an example where incoming \verb|Position| objects are coming in from the \textit{GeoLocator} plugin and are being handled after saved to a list, in the \verb|_onData()| call-back method.
 
 \begin{minted}{dart}
 List<LocationSample> locationSamples = [];
@@ -64,11 +64,11 @@ There most basic computation is done as follows:
 MobilityContext context = await ContextGenerator.generate();
 \end{minted}
 
-Note: it is not possible to instantiate a `MobilityContext` object directly. 
-It must be instantiated through the `ContextGenerator.generate()` method.
+Note: it is not possible to instantiate a MobilityContext object directly. 
+It must be instantiated through \verb|ContextGenerator.generate()|.
 
 \subsubsection*{Step 3.1: Compute features with prior contexts}
-Should the programmer wish to compute the routine index feature as well, then prior contexts are needed. Concretely, the application needs to have tracked data for at least 2 days, to compute this feature. The generation of a Mobility Context using prior contexts is done using the \verb|usePriorContexts| argument and setting it to \verb|true|.
+Should the programmer wish to compute the routine index feature as well, then prior contexts are needed. Concretely, the application needs to have tracked data for at least 2 days, to compute this feature. The generation of a Mobility Context using prior contexts is done by overriding the \verb|usePriorContexts| argument and setting it to \verb|true|.
 
 \begin{minted}{dart}
 MobilityContext context = 
@@ -76,7 +76,7 @@ MobilityContext context =
 \end{minted}
 
 \subsubsection*{Step 3.2: Compute features for a specific date}
-By default, a \textit{MobilityContext} object uses the current date as a reference to filter and group data, however, should one wish to compute the features for a specific date, then it is possible to do so using the \verb|today| argument and providing the desired date.
+By default, a MobilityContextobject uses the current date as a reference to filter and group data, however, should one wish to compute the features for a specific date, then it is possible to do so by overriding the \verb|today| argument and providing the desired date.
 
 \begin{minted}{dart}
 DateTime myDate = DateTime(01, 01, 2020);
